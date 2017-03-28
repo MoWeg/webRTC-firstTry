@@ -1,0 +1,29 @@
+<div>
+    <h2>Simple Chat without Rooms</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="reveiced in vm.receivedMessages">
+                  <td>{{reveiced.userLogin}}</td>
+                  <td>{{reveiced.content}}</td>
+                  <td>{{reveiced.time}}</td>
+              </tr>
+            </tbody>
+        </table>
+    </div>
+    <form name="form" role="form" ng-submit="vm.sendMessage()">
+      <div class="form-group">
+          <label class="control-label" for="message">New message</label>
+          <input type="text" class="form-control" id="message" name="message"
+                 ng-model="vm.message" ng-minlength=1 ng-maxlength=50 required>
+      </div>
+      <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary">Send</button>
+    </form>
+</div>

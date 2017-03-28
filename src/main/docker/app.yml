@@ -1,0 +1,14 @@
+version: '2'
+services:
+    simple_webrtc_server-app:
+        image: simple_webrtc_server
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATASOURCE_URL=jdbc:mysql://simple_webrtc_server-mysql:3306/simple_webrtc_server?useUnicode=true&characterEncoding=utf8&useSSL=false
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+        ports:
+            - 8080:8080
+    simple_webrtc_server-mysql:
+        extends:
+            file: mysql.yml
+            service: simple_webrtc_server-mysql

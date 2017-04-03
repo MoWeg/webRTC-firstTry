@@ -12,6 +12,7 @@
 
       vm.receivedUsers = [];
       vm.chatWith = chatWith;
+      vm.videochatWith = videochatWith;
 
       //ChatRoomService.notifyEntry();
 
@@ -26,15 +27,28 @@
       }
 
       function chatWith(index) {
-        JhiTrackerService.sendSimpleMessageToUser(vm.receivedUsers[index].content, $rootScope.myIdForChat);
+        JhiTrackerService.sendSimpleMessageToUser(vm.receivedUsers[index].content, 'chat', $rootScope.myIdForChat);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
-        //$state.go('simplechatroom');
+        $state.go('simplechatroom');
+        //$state.go('simple1on1');
+      }
+      function videochatWith(index) {
+        console.log('Client pressed videochatWith');
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].content, 'video', $rootScope.myIdForChat);
+        $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
+        $rootScope.isInitiator = true;
         $state.go('simple1on1');
       }
 
       JhiTrackerService.receiveInvite().then(null, null, function(invite){
         $rootScope.partnerIdForChat = invite.content;
-        $state.go('simple1on1');
+        if(invite.goal === 'video'){
+          $rootScope.isInitiator = false;
+          $state.go('simple1on1');
+        }
+        if(invite.goal === 'chat'){
+          $state.go('simplechatroom');
+        }
       });
     }
 })();

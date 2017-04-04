@@ -23,7 +23,7 @@
                 }
             },
             onEnter: ['JhiTrackerService', function(JhiTrackerService) {
-                JhiTrackerService.subscribeToPartner();
+                JhiTrackerService.subscribeToSelf();
             }],
             onExit: ['JhiTrackerService', function(JhiTrackerService) {
                 JhiTrackerService.unsubscribeChatRooms();

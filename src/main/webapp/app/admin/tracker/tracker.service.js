@@ -8,7 +8,7 @@
 
     JhiTrackerService.$inject = ['$rootScope', '$window', '$cookies', '$http', '$q'];
 
-    function JhiTrackerService ($rootScope, $window, $cookies, $http, $q, $scope) {
+    function JhiTrackerService ($rootScope, $window, $cookies, $http, $q) {
         var stompClient = null;
         var subscriber = null;
         var listener = $q.defer();

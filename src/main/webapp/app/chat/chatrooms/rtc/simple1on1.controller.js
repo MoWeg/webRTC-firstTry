@@ -34,7 +34,7 @@
       JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
     }
 
-    JhiTrackerService.reveiceFromUser().then(null, null, function(send) {
+    JhiTrackerService.receiveInvite().then(null, null, function(send) {
         handleContent(send);
     });
 
@@ -145,14 +145,18 @@
       console.log('createOffer() error: ', e);
     }
 
+    function handleCreateAnswerError(event){
+      console.log('createAnswer() error: ', e);
+    }
+
     function doCall() {
       console.log('Sending offer to peer');
-      var offer = pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
+      pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
     }
 
     function doAnswer() {
       console.log('Sending answer to peer.');
-      var answer = pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+      pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
     }
 
     function setLocalAndSendMessage(sessionDescription) {

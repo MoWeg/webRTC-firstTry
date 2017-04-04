@@ -10,7 +10,7 @@ public class SimpleChatMessageDTO {
 	private String goal;
 	
 	private String type;
-	private String spd;
+	private String sdp;
 	private String label;
 	private String id;
 	private String candidate;
@@ -55,12 +55,12 @@ public class SimpleChatMessageDTO {
 		this.type = type;
 	}
 
-	public String getSpd() {
-		return spd;
+	public String getSdp() {
+		return sdp;
 	}
 
-	public void setSpd(String spd) {
-		this.spd = spd;
+	public void setSdp(String spd) {
+		this.sdp = spd;
 	}
 
 	public String getLabel() {
@@ -94,7 +94,8 @@ public class SimpleChatMessageDTO {
             ", content='" + content + '\'' +
             ", time='" + time + '\'' +
             ", goal='" + goal + '\'' +
-             ", type='" + type + '\'' +
+            ", type='" + type + '\'' +
+            ", sdp='" + sdp + '\'' + 
             '}';
     }
 }

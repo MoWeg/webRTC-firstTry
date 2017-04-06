@@ -28,6 +28,11 @@
         'OfferToReceiveAudio':true,
         'OfferToReceiveVideo':true }};
 
+
+      var localVideo = document.querySelector('#localVideo');
+      var remoteVideo = document.querySelector('#remoteVideo');
+
+    //Signaling
     /////////////////////////////////////////////
 
     function sendMessage(message) {
@@ -62,18 +67,14 @@
     }
 
 ////////////////////////////////////////////////////
-
-    var localVideo = document.querySelector('#localVideo');
-    var remoteVideo = document.querySelector('#remoteVideo');
-
     function handleUserMedia(stream) {
       console.log('Adding local stream.');
       localVideo.src = window.URL.createObjectURL(stream);
       localStream = stream;
       sendMessage({'content':'got user media'});
-      if (isInitiator) {
-        maybeStart();
-      }
+      //if (isInitiator) {
+      //  maybeStart();
+      //}
     }
 
     function handleUserMediaError(error){
@@ -150,7 +151,7 @@
     }
 
     function doCall() {
-      console.log('Sending offer to peer');
+      console.log('Sending offer to peer.');
       pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
     }
 
@@ -241,7 +242,6 @@ function stop() {
           break;
         }
       }
-      console.log(mLineIndex);
       if (!angular.isDefined(mLineIndex) || mLineIndex === null) {
         return sdp;
       }

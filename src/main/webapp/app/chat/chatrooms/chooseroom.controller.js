@@ -40,13 +40,14 @@
         $state.go('simple1on1');
       }
 
-      JhiTrackerService.receiveInvite().then(null, null, function(invite){
-        $rootScope.partnerIdForChat = invite.content;
+      JhiTrackerService.receiveInvite().then(null, null, function(invite){      
         if(invite.goal === 'video'){
+          $rootScope.partnerIdForChat = invite.content;
           $rootScope.isInitiator = false;
           $state.go('simple1on1');
         }
         if(invite.goal === 'chat'){
+          $rootScope.partnerIdForChat = invite.content;
           $state.go('simplechatroom');
         }
       });

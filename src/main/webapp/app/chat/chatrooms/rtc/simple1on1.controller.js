@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Simple1on1Controller', Simple1on1Controller);
 
-    Simple1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService'];
+    Simple1on1Controller.$inject = ['$rootScope','$cookies', '$http','SocketChatService'];
 
-    function Simple1on1Controller($rootScope, $cookies, $http, JhiTrackerService) {
+    function Simple1on1Controller($rootScope, $cookies, $http, SocketChatService) {
       navigator.getUserMedia = navigator.getUserMedia ||
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
       var vm = this;
@@ -36,10 +36,10 @@
     /////////////////////////////////////////////
 
     function sendMessage(message) {
-      JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+      SocketChatService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
     }
 
-    JhiTrackerService.receiveInvite().then(null, null, function(send) {
+    SocketChatService.receiveInvite().then(null, null, function(send) {
         handleContent(send);
     });
 

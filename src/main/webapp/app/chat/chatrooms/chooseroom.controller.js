@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('ChooseRoomController', ChooseRoomController);
 
-    ChooseRoomController.$inject = ['$state','$rootScope', '$cookies', '$http','JhiTrackerService'];
+    ChooseRoomController.$inject = ['$state','$rootScope', '$cookies', '$http','SocketChatService'];
 
-    function ChooseRoomController($state, $rootScope, $cookies, $http, JhiTrackerService) {
+    function ChooseRoomController($state, $rootScope, $cookies, $http, SocketChatService) {
       var vm = this;
 
       vm.receivedUsers = [];
@@ -16,7 +16,7 @@
 
       //ChatRoomService.notifyEntry();
 
-      JhiTrackerService.receiveAvailable().then(null, null, function(received) {
+      SocketChatService.receiveAvailable().then(null, null, function(received) {
           receiveUser(received);
       });
 
@@ -27,20 +27,20 @@
       }
 
       function chatWith(index) {
-        JhiTrackerService.sendSimpleMessageToUser(vm.receivedUsers[index].content, 'chat', $rootScope.myIdForChat);
+        SocketChatService.sendSimpleMessageToUser(vm.receivedUsers[index].content, 'chat', $rootScope.myIdForChat);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
         $state.go('simplechatroom');
         //$state.go('simple1on1');
       }
       function videochatWith(index) {
         console.log('Client pressed videochatWith');
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].content, 'video', $rootScope.myIdForChat);
+        SocketChatService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].content, 'video', $rootScope.myIdForChat);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
         $rootScope.isInitiator = true;
         $state.go('simple1on1');
       }
 
-      JhiTrackerService.receiveInvite().then(null, null, function(invite){      
+      SocketChatService.receiveInvite().then(null, null, function(invite){      
         if(invite.goal === 'video'){
           $rootScope.partnerIdForChat = invite.content;
           $rootScope.isInitiator = false;

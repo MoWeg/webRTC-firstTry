@@ -14,6 +14,8 @@
 
         var service = {
             getStompClient: getStompClient,
+            getConnected: getConnected,
+            disconnect: disconnect
         };
 
         return service;
@@ -24,7 +26,6 @@
           }
           return stompClient;
         }
-
         function connect () {
             //building absolute path so that websocket doesnt fail when deploying with a context path
             var loc = $window.location;
@@ -37,6 +38,15 @@
             stompClient.connect(headers, function() {
                 connected.resolve('success');
             });
-          }
+        }
+        function disconnect () {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+                stompClient = null;
+            }
+        }
+        function getConnected(){
+          return connected;
+        }
     }
 })();

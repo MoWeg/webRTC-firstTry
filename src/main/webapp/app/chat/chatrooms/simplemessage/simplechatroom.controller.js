@@ -5,24 +5,24 @@
         .module('simpleWebrtcServerApp')
         .controller('SimpleChatRoomController', SimpleChatRoomController);
 
-    SimpleChatRoomController.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService'];
+    SimpleChatRoomController.$inject = ['$rootScope','$cookies', '$http','SocketChatService'];
 
-    function SimpleChatRoomController($rootScope, $cookies, $http, JhiTrackerService) {
+    function SimpleChatRoomController($rootScope, $cookies, $http, SocketChatService) {
       var vm = this;
 
       vm.receivedMessages = [];
       vm.sendMessage = sendMessage;
 
-      JhiTrackerService.reveiceFromUser().then(null, null, function(send) {
+      SocketChatService.reveiceFromUser().then(null, null, function(send) {
           vm.receivedMessages.push(send);
       });
 
-      JhiTrackerService.receiveInvite().then(null, null, function(received) {
+      SocketChatService.receiveInvite().then(null, null, function(received) {
           vm.receivedMessages.push(received);
       });
 
       function sendMessage() {
-        JhiTrackerService.sendSimpleMessageToUser($rootScope.partnerIdForChat, vm.message);
+        SocketChatService.sendSimpleMessageToUser($rootScope.partnerIdForChat, vm.message);
         vm.message = null;
       }
     }

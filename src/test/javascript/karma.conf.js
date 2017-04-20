@@ -28,6 +28,7 @@ module.exports = function (config) {
             'src/main/webapp/bower_components/messageformat/messageformat.js',
             'src/main/webapp/bower_components/sockjs-client/dist/sockjs.js',
             'src/main/webapp/bower_components/stomp-websocket/lib/stomp.min.js',
+            'src/main/webapp/bower_components/webrtc-adapter/release/adapter.js',
             'src/main/webapp/bower_components/angular/angular.js',
             'src/main/webapp/bower_components/angular-aria/angular-aria.js',
             'src/main/webapp/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',

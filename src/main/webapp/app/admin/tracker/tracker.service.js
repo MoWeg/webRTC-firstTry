@@ -8,7 +8,7 @@
 
     JhiTrackerService.$inject = ['$rootScope', '$window', '$cookies', '$http', '$q'];
 
-    function JhiTrackerService ($rootScope, $window, $cookies, $http, $q, $scope) {
+    function JhiTrackerService ($rootScope, $window, $cookies, $http, $q) {
         var stompClient = null;
         var subscriber = null;
         var listener = $q.defer();
@@ -40,6 +40,8 @@
             sendSimpleMessage: sendSimpleMessage,
 
             sendSimpleMessageToUser: sendSimpleMessageToUser,
+            sendSimpleMessageToJsonUser: sendSimpleMessageToJsonUser,
+            sendSimpleMessageToUserWithGoal: sendSimpleMessageToUserWithGoal,
 
             subscribeToAvailable: subscribeToAvailable,
             receiveAvailable: receiveAvailable,
@@ -159,7 +161,22 @@
                     angular.toJson({'content': message}));
             }
         }
-
+        function sendSimpleMessageToJsonUser(user, messageJson) {
+            if (stompClient !== null && stompClient.connected) {
+                stompClient
+                    .send('/topic/rooms/send/'+user,
+                    {},
+                    angular.toJson(messageJson));
+            }
+        }
+        function sendSimpleMessageToUserWithGoal(user, goal, message) {
+            if (stompClient !== null && stompClient.connected) {
+                stompClient
+                    .send('/topic/rooms/send/'+user,
+                    {},
+                    angular.toJson({'content': message, 'goal':goal}));
+            }
+        }
         function subscribeToAvailable(){
           if (stompClient == null) {
               connect();
@@ -202,6 +219,8 @@
         }
 
         function subscribeToPartner(){
+          console.log('my id for chat: '+$rootScope.myIdForChat);
+          console.log('my partner for chat: '+$rootScope.partnerIdForChat);
           subscribeToUser($rootScope.partnerIdForChat);
         }
 

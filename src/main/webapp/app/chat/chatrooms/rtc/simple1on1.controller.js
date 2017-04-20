@@ -8,25 +8,11 @@
     Simple1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService'];
 
     function Simple1on1Controller($rootScope, $cookies, $http, JhiTrackerService) {
+      navigator.getUserMedia = navigator.getUserMedia ||
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
       var vm = this;
-
-      vm.receivedMessages = [];
-      vm.sendMessage = sendMessage;
-
-      JhiTrackerService.reveiceFromUser().then(null, null, function(send) {
-          vm.receivedMessages.push(send);
-      });
-
-      JhiTrackerService.receiveInvite().then(null, null, function(received) {
-          vm.receivedMessages.push(received);
-      });
-
-      function sendMessage() {
-        JhiTrackerService.sendSimpleMessageToUser($rootScope.partnerIdForChat, vm.message);
-        vm.message = null;
-      }
-      var isChannelReady;
-      var isInitiator = false;
+      //var isChannelReady;
+      var isInitiator = $rootScope.isInitiator;
       var isStarted = false;
       var localStream;
       var pc;
@@ -42,60 +28,24 @@
         'OfferToReceiveAudio':true,
         'OfferToReceiveVideo':true }};
 
-      /////////////////////////////////////////////
 
-      var room = location.pathname.substring(1);
-      if (room === '') {
-        //  room = prompt('Enter room name:');
-        room = 'foo';
-      } else {
-        //
-      }
+      var localVideo = document.querySelector('#localVideo');
+      var remoteVideo = document.querySelector('#remoteVideo');
 
-      var socket = io.connect();
+    //Signaling
+    /////////////////////////////////////////////
 
-      if (room !== '') {
-        console.log('Create or join room', room);
-        socket.emit('create or join', room);
-      }
+    function sendMessage(message) {
+      JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+    }
 
-      socket.on('created', function (room){
-        console.log('Created room ' + room);
-        isInitiator = true;
-      });
+    JhiTrackerService.receiveInvite().then(null, null, function(send) {
+        handleContent(send);
+    });
 
-      socket.on('full', function (room){
-        console.log('Room ' + room + ' is full');
-      });
-
-      socket.on('join', function (room){
-        console.log('Another peer made a request to join room ' + room);
-        console.log('This peer is the initiator of room ' + room + '!');
-        isChannelReady = true;
-      });
-
-      socket.on('joined', function (room){
-        console.log('This peer has joined room ' + room);
-        isChannelReady = true;
-      });
-
-      socket.on('log', function (array){
-        console.log.apply(console, array);
-      });
-
-////////////////////////////////////////////////
-
-    function sendMessage(message){
-	     console.log('Client sending message: ', message);
-       // if (typeof message === 'object') {
-       //   message = JSON.stringify(message);
-       // }
-       socket.emit('message', message);
-     }
-
-     socket.on('message', function (message){
+    function handleContent (message){
        console.log('Client received message:', message);
-       if (message === 'got user media') {
+       if (message.content === 'got user media') {
   	      maybeStart();
         } else if (message.type === 'offer') {
           if (!isInitiator && !isStarted) {
@@ -111,24 +61,20 @@
             candidate: message.candidate
         });
         pc.addIceCandidate(candidate);
-      } else if (message === 'bye' && isStarted) {
+      } else if (message.content === 'bye' && isStarted) {
         handleRemoteHangup();
       }
-    });
+    }
 
 ////////////////////////////////////////////////////
-
-    var localVideo = document.querySelector('#localVideo');
-    var remoteVideo = document.querySelector('#remoteVideo');
-
     function handleUserMedia(stream) {
       console.log('Adding local stream.');
       localVideo.src = window.URL.createObjectURL(stream);
       localStream = stream;
-      sendMessage('got user media');
-      if (isInitiator) {
-        maybeStart();
-      }
+      sendMessage({'content':'got user media'});
+      //if (isInitiator) {
+      //  maybeStart();
+      //}
     }
 
     function handleUserMediaError(error){
@@ -136,16 +82,18 @@
     }
 
     var constraints = {video: true};
-    getUserMedia(constraints, handleUserMedia, handleUserMediaError);
+    navigator.getUserMedia(constraints, handleUserMedia, handleUserMediaError);
 
     console.log('Getting user media with constraints', constraints);
 
     if (location.hostname != "localhost") {
-      requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
+      console.log('would request turn');
+      //requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
     }
 
     function maybeStart() {
-      if (!isStarted && typeof localStream != 'undefined' && isChannelReady) {
+      console.log('maybeStart:')
+      if (!isStarted && typeof localStream != 'undefined') {
         createPeerConnection();
         pc.addStream(localStream);
         isStarted = true;
@@ -157,7 +105,7 @@
     }
 
     window.onbeforeunload = function(e){
-	     sendMessage('bye');
+	     sendMessage({'content':'bye'});
      }
 
 /////////////////////////////////////////////////////////
@@ -199,14 +147,18 @@
       console.log('createOffer() error: ', e);
     }
 
+    function handleCreateAnswerError(event){
+      console.log('createAnswer() error: ', e);
+    }
+
     function doCall() {
-      console.log('Sending offer to peer');
+      console.log('Sending offer to peer.');
       pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
     }
 
     function doAnswer() {
       console.log('Sending answer to peer.');
-      pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+      pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
     }
 
     function setLocalAndSendMessage(sessionDescription) {
@@ -280,7 +232,9 @@ function stop() {
 
     // Set Opus as the default audio codec if it's present.
     function preferOpus(sdp) {
+    //  console.log(sdp)
       var sdpLines = sdp.split('\r\n');
+    //  console.log(sdpLines);
       var mLineIndex;
       // Search for m line.
       for (var i = 0; i < sdpLines.length; i++) {
@@ -289,7 +243,7 @@ function stop() {
           break;
         }
       }
-      if (mLineIndex === null) {
+      if (!angular.isDefined(mLineIndex) || mLineIndex === null) {
         return sdp;
       }
 
@@ -333,7 +287,11 @@ function stop() {
 
     // Strip CN from sdp before CN constraints is ready.
     function removeCN(sdpLines, mLineIndex) {
-      var mLineElements = sdpLines[mLineIndex].split(' ');
+      console.log(mLineIndex);
+      var mLineElementsAtIndex = sdpLines[mLineIndex];
+      var mLineElements = mLineElementsAtIndex.split(' ');
+      console.log(mLineElements);
+      //var mLineElements = sdpLines[mLineIndex].split(' ');
       // Scan from end for the convenience of removing an item.
       for (var i = sdpLines.length-1; i >= 0; i--) {
         var payload = extractSdp(sdpLines[i], /a=rtpmap:(\d+) CN\/\d+/i);

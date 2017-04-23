@@ -3,7 +3,8 @@ package de.mwg.web.service.dto;
 import java.util.Objects;
 
 public class UserAvailabilityDTO {
-	private String userName;
+	private String userName, chatId;
+	private boolean isAvailable;
 
 	public String getUserName() {
 		return userName;
@@ -13,6 +14,22 @@ public class UserAvailabilityDTO {
 		this.userName = userName;
 	}
 	
+	public String getChatId() {
+		return chatId;
+	}
+
+	public void setChatId(String chatId) {
+		this.chatId = chatId;
+	}
+
+	public boolean isAvailable() {
+		return isAvailable;
+	}
+
+	public void setAvailable(boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}
+
 	@Override
 	public boolean equals(Object o){
 		if (this == o) {

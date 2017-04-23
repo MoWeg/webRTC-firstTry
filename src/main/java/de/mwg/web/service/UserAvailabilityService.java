@@ -29,7 +29,11 @@ public class UserAvailabilityService {
 		if(availableUsers == null){
 			availableUsers = new HashSet<>();
 		}
-		availableUsers.add(user);
+		if(user.isAvailable()){
+			availableUsers.add(user);
+		} else {
+			availableUsers.remove(user);
+		}
 		userAvailabilityNotificationService.notifyAllSubscribed();
 	}
 	

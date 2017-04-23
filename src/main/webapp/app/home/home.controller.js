@@ -23,6 +23,7 @@
         function getAccount() {
             Principal.identity().then(function(account) {
                 vm.account = account;
+                $rootScope.myName = account.login;
                 vm.isAuthenticated = Principal.isAuthenticated;
             });
         }

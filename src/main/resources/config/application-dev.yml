@@ -63,17 +63,17 @@ liquibase:
 # https://maximilian-boehm.com/hp2121/Create-a-Java-Keystore-JKS-from-Let-s-Encrypt-Certificates.htm
 #
 # Then, modify the server.ssl properties so your "server" configuration looks like:
-#
-# server:
-#    port: 8443
-#    ssl:
-#        key-store: keystore.p12
-#        key-store-password: <your-password>
-#        keyStoreType: PKCS12
-#        keyAlias: simple_webrtc_server
-# ===================================================================
+# 
 server:
-    port: 8080
+    port: 8443
+    ssl:
+        key-store: keystore.p12
+        key-store-password: dev2718master
+        keyStoreType: PKCS12
+        keyAlias: simple_webrtc_server
+# ===================================================================
+#server:
+#    port: 8080
 
 # ===================================================================
 # JHipster specific properties

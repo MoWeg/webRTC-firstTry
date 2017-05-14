@@ -19,8 +19,8 @@
       var remoteStream;
       var turnReady;
 
-      var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
-
+      //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
+      var pc_config = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}; //, stun:stun4.l.google.com:19302, stun:stun1.l.google.com:19302, stun:stun01.sipphone.com
       var pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
 
       // Set up audio and video regardless of what devices are present.
@@ -112,7 +112,7 @@
 
   function createPeerConnection() {
     try {
-      pc = new RTCPeerConnection(null);
+      pc = new RTCPeerConnection(pc_config);
       pc.onicecandidate = handleIceCandidate;
       pc.onaddstream = handleRemoteStreamAdded;
       pc.onremovestream = handleRemoteStreamRemoved;
@@ -195,8 +195,8 @@
     };
     xhr.open('GET', turn_url, true);
     xhr.send();
+    }
   }
-}
 
 function handleRemoteStreamAdded(event) {
   console.log('Remote stream added.');

@@ -45,6 +45,7 @@
 
             subscribeToAvailable: subscribeToAvailable,
             receiveAvailable: receiveAvailable,
+            sendToAvailable: sendToAvailable,
 
             subscribeToSelf: subscribeToSelf,
             receiveInvite: receiveInvite,
@@ -103,10 +104,7 @@
                     {},
                     angular.toJson({'page': $rootScope.toState.name}));
                 if($rootScope.toState.name == 'chooseroom'){
-                  stompClient
-                      .send('/topic/rooms/send',
-                      {},
-                      angular.toJson({'page': $rootScope.toState.name, 'content': $rootScope.myIdForChat}));
+
                 }
               }
         }
@@ -190,6 +188,15 @@
 
         function receiveAvailable(){
           return listenerToAvailable.promise;
+        }
+
+        function sendToAvailable(){
+            if (stompClient !== null && stompClient.connected) {
+              stompClient
+                  .send('/topic/rooms/send',
+                  {},
+                  angular.toJson({'page': $rootScope.toState.name, 'content': $rootScope.myIdForChat}));
+            }
         }
 
         function subscribeToSelf(){

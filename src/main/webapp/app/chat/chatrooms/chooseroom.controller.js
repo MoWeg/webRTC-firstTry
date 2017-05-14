@@ -5,20 +5,60 @@
         .module('simpleWebrtcServerApp')
         .controller('ChooseRoomController', ChooseRoomController);
 
-    ChooseRoomController.$inject = ['$state','$rootScope', '$cookies', '$http','JhiTrackerService'];
+    ChooseRoomController.$inject = ['$state','$rootScope', '$cookies', '$http','JhiTrackerService', 'ChatRoomService','AvailibilityService'];
 
-    function ChooseRoomController($state, $rootScope, $cookies, $http, JhiTrackerService) {
+    function ChooseRoomController($state, $rootScope, $cookies, $http, JhiTrackerService, ChatRoomService, AvailibilityService) {
       var vm = this;
 
       vm.receivedUsers = [];
       vm.chatWith = chatWith;
       vm.videochatWith = videochatWith;
 
-      //ChatRoomService.notifyEntry();
+      if($rootScope.myIdForChat === null || angular.isUndefined($rootScope.myIdForChat)){
+        $rootScope.myIdForChat = Math.round((Math.random() * 1000000) * 10);
+        JhiTrackerService.subscriberToSelf();
+      }
+      ChatRoomService.setUserAvailable();
+      getUsers();
 
       JhiTrackerService.receiveAvailable().then(null, null, function(received) {
-          receiveUser(received);
+      //    receiveUser(received);
+          getUsers();
       });
+
+      function getUsers(){
+        AvailibilityService.get({}, onGetSuccess, onGetError);
+        function onGetSuccess(data, headers) {
+             console.log("got availability from Server");
+             angular.forEach(data, function(user, i){
+               if(user.chatId !=  $rootScope.myIdForChat){
+                 console.log("userid: " + user.chatId + " is not equal to " + $rootScope.myIdForChat)
+                 angular.forEach(vm.receivedUsers, function(alreadyReceivedUser, i){
+                     if(user.userName == alreadyReceivedUser.userName){
+                       vm.receivedUsers.splice(i, 1);
+                     }
+                  });
+                  vm.receivedUsers.push(user);
+                  if(vm.receivedUsers.length >= data.length){
+                    angular.forEach(vm.receivedUsers, function(alreadyReceivedUser, i){
+                        foundInData = false;
+                        angular.forEach(data, function(user, index){
+                          if(user.userName == alreadyReceivedUser.userName){
+                            foundInData = true;
+                          }
+                        });
+                        if(!foundInData){
+                            vm.receivedUsers.splice(i, 1);
+                        }
+                     });
+                  }
+                }
+             });
+        }
+        function onGetError(error) {
+            AlertService.error(error.data.message);
+        }
+      }
 
       function receiveUser(receivedUser){
         if(receivedUser.content !== $rootScope.myIdForChat){
@@ -27,20 +67,23 @@
       }
 
       function chatWith(index) {
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].content, 'chat', $rootScope.myIdForChat);
-        $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'chat', $rootScope.myIdForChat);
+        $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
+        ChatRoomService.setUserUnavailable();
         $state.go('simplechatroom');
         //$state.go('simple1on1');
       }
       function videochatWith(index) {
         console.log('Client pressed videochatWith');
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].content, 'video', $rootScope.myIdForChat);
-        $rootScope.partnerIdForChat = vm.receivedUsers[index].content;
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'video', $rootScope.myIdForChat);
+        $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
         $rootScope.isInitiator = true;
+        ChatRoomService.setUserUnavailable();
         $state.go('simple1on1');
       }
 
       JhiTrackerService.receiveInvite().then(null, null, function(invite){
+        ChatRoomService.setUserUnavailable();
         if(invite.goal === 'video'){
           $rootScope.partnerIdForChat = invite.content;
           $rootScope.isInitiator = false;

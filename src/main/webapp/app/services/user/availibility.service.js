@@ -9,15 +9,17 @@
     AvailibilityService.$inject = [ '$resource'];
 
     function AvailibilityService ( $resource) {
-      var service = $resource('api/availability/:login', {}, {
+      var service = $resource('api/availability/', {}, {
         'get': {
             method: 'GET',
+            isArray: true,
             transformResponse: function (data) {
                 data = angular.fromJson(data);
                 return data;
             }
         },
-        'post':{method: 'POST'}
+        'post':{method: 'POST'},
+        'delete':{method: 'DELETE'}
       });
       return service;
     }

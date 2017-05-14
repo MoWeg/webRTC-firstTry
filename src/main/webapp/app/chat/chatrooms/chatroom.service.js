@@ -6,36 +6,51 @@
         .module('simpleWebrtcServerApp')
         .factory('ChatRoomService', ChatRoomService);
 
-    ChatRoomService.$inject = [ 'AvailibilityService', '$stateParams', '$rootScope'];
+    ChatRoomService.$inject = [ 'AvailibilityService', 'JhiTrackerService', '$stateParams', '$rootScope'];
 
-    function ChatRoomService ( AvailibilityService, $stateParams, $rootScope) {
+    function ChatRoomService ( AvailibilityService, JhiTrackerService, $stateParams, $rootScope) {
       var service = {
         getAllAvailable: getAllAvailable,
-        addUser: addUser,
+        setUserAvailable: setUserAvailable,
+        setUserUnavailable: setUserUnavailable,
         removeUser: removeUser
       };
       return service;
 
+      // $stateParams.login
       function getAllAvailable(){
-         AvailibilityService.get({login : $stateParams.login}, onSuccess, onError);
-         function onSuccess(data, headers) {
+         var users = null;
+         AvailibilityService.get({}, onGetSuccess, onGetError);
+         function onGetSuccess(data, headers) {
               console.log("got availability from Server");
-              return data;
+              users = data;
          }
-         function onError(error) {
+         function onGetError(error) {
              AlertService.error(error.data.message);
          }
+         console.log("users: "+users);
+         return users;
       }
 
-      function addUser() {
+      function setUserAvailable() {
         updateAvailability(true);
       }
-      function removeUser() {
+      function setUserUnavailable() {
         updateAvailability(false);
+      }
+      function removeUser() {
+        AvailibilityService.delete({},{ chatId: $rootScope.myIdForChat});
       }
 
       function updateAvailability(availability){
-        AvailibilityService.post({login : $stateParams.login}, {userName: $rootScope.myName, chatId: $rootScope.myIdForChat, isAvailability: availability });
+        AvailibilityService.post({}, {chatId: $rootScope.myIdForChat, available: availability }, onPostSuccess, onPostError);
+        function onPostSuccess(){
+          console.log("Post was successful");
+          JhiTrackerService.sendToAvailable();
+        }
+        function onPostError(errorResult){
+          console.log("Error: "+errorResult);
+        }
       }
     }
 })();

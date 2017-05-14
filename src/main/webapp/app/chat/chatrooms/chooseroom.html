@@ -5,24 +5,21 @@
           <thead>
               <tr>
                   <th>User</th>
-                  <th>Online since</th>
-                  <th>Number<th>
-                  <th></th>
+                  <th>available<th>
                   <th></th>
               </tr>
           </thead>
           <tbody>
             <tr ng-repeat="reveiced in vm.receivedUsers">
-                <td>{{reveiced.userLogin}}</td>
-                <td>{{reveiced.time}}</td>
-                <td>{{reveiced.content}}</td>
+                <td>{{reveiced.userName}}</td>
+                <td>{{reveiced.available}}</td>
                 <td>
-                  <button class="btn btn-success btn-xs" ng-click="vm.chatWith($index)"
-                        >chat with user</button>
-                </td>
-                <td>
-                  <button class="btn btn-success btn-xs" ng-click="vm.videochatWith($index)"
-                        >call user</button>
+                  <button class="btn btn-success" ng-click="vm.chatWith($index)"
+                          ng-disabled = "!reveiced.available"
+                        >chat with user <i class="glyphicon glyphicon-comment"/></button>
+                  <button class="btn btn-success" ng-click="vm.videochatWith($index)"
+                          ng-disabled = "!reveiced.available"
+                        >call user <i class="glyphicon glyphicon-facetime-video"/></button>
                 </td>
             </tr>
           </tbody>

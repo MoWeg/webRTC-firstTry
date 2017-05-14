@@ -22,12 +22,12 @@
                     controllerAs: 'vm'
                 }
             },
-            onEnter: ['SocketChatService', function(SocketChatService) {
-                SocketChatService.subscribeToAvailable();
-                SocketChatService.subscribeToSelf();
+            onEnter: ['JhiTrackerService', function(JhiTrackerService) {
+                JhiTrackerService.subscribeToAvailable();
+                JhiTrackerService.subscribeToSelf();
             }],
-            onExit: ['SocketChatService', function(JhiTrackerService) {
-                SocketChatService.unsubscribeChatRooms();
+            onExit: ['JhiTrackerService', function(JhiTrackerService) {
+                JhiTrackerService.unsubscribeChatRooms();
             }]
         });
     }

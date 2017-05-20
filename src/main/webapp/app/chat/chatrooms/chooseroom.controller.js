@@ -13,6 +13,7 @@
       vm.receivedUsers = [];
       vm.chatWith = chatWith;
       vm.videochatWith = videochatWith;
+      vm.drawWith = drawWith;
 
       if($rootScope.myIdForChat === null || angular.isUndefined($rootScope.myIdForChat)){
         $rootScope.myIdForChat = Math.round((Math.random() * 1000000) * 10);
@@ -73,6 +74,15 @@
         $state.go('simplechatroom');
         //$state.go('simple1on1');
       }
+
+      function drawWith(index) {
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'draw', $rootScope.myIdForChat);
+        $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
+        ChatRoomService.setUserUnavailable();
+        $state.go('simpledraw');
+        //$state.go('simple1on1');
+      }
+
       function videochatWith(index) {
         console.log('Client pressed videochatWith');
         JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'video', $rootScope.myIdForChat);
@@ -92,6 +102,10 @@
         if(invite.goal === 'chat'){
           $rootScope.partnerIdForChat = invite.content;
           $state.go('simplechatroom');
+        }
+        if(invite.goal === 'draw'){
+        $rootScope.partnerIdForChat = invite.content;
+        $state.go('simpledraw');
         }
       });
     }

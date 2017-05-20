@@ -8,25 +8,25 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('simplechat', {
+        $stateProvider.state('simpledraw', {
             parent: 'chat',
-            url: '/simplechat',
+            url: '/simpledraw1on1',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'Simple Chat'
+                pageTitle: 'Draw!!!'
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/chat/simplechat/simplechat.html',
-                    controller: 'SimpleChatController',
+                    templateUrl: 'app/chat/chatrooms/drawing/simpledraw.html',
+                    controller: 'SimpleDrawController',
                     controllerAs: 'vm'
                 }
             },
             onEnter: ['JhiTrackerService', function(JhiTrackerService) {
-                JhiTrackerService.subscribeSimpleMessage();
+                JhiTrackerService.subscribeToSelf();
             }],
             onExit: ['JhiTrackerService', function(JhiTrackerService) {
-                JhiTrackerService.unsubscribeSimpleMessage();
+                JhiTrackerService.unsubscribeChatRooms();
             }]
         });
     }

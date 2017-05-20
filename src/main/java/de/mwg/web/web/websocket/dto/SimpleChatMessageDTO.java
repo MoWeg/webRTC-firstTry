@@ -15,6 +15,8 @@ public class SimpleChatMessageDTO {
 	private String id;
 	private String candidate;
 
+	private PaintDto[] paint;
+	
 	public String getContent() {
 		return content;
 	}
@@ -85,6 +87,14 @@ public class SimpleChatMessageDTO {
 
 	public void setCandidate(String candidate) {
 		this.candidate = candidate;
+	}
+
+	public PaintDto[] getPaint() {
+		return paint;
+	}
+
+	public void setPaint(PaintDto[] paint) {
+		this.paint = paint;
 	}
 
 	@Override

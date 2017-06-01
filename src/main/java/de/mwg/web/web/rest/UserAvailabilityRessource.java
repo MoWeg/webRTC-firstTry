@@ -54,8 +54,14 @@ public class UserAvailabilityRessource {
     @GetMapping("/availability")
     public ResponseEntity<List<UserAvailabilityDTO>> getAllAvailableUsers(){
     	log.debug("getting all available users");
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String name = auth.getName(); //get logged in username
+    	List<UserAvailabilityDTO> result = userAvailabilityService.getAvailableUsers();
+    	UserAvailabilityDTO asking = new UserAvailabilityDTO();
+    	asking.setUserName(name);
+    	result.remove(asking);
     	return new ResponseEntity<>(
-                userAvailabilityService.getAvailableUsers(),
+                result,
                 HttpStatus.OK);
     }
 }

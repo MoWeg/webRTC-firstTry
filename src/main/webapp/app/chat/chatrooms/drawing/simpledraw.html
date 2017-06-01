@@ -1,5 +1,14 @@
 <div>
     <h2>Simple drawing with another user</h2>
+    <div>
+      <button ng-click="vm.resetCanvas()">
+        reset canvas <i class="glyphicon glyphicon-refresh"/>
+      </button>
+    </div>
+    <div>
+      <select name="Pencils"  ng-options="option.label for option in vm.pencils track by option.value">
+      </select>
+    </div>
     <div id="drawingCanvas" class="my-drawing-canvas"  >
     </div>
 </div>

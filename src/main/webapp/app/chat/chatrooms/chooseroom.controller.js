@@ -14,6 +14,7 @@
       vm.chatWith = chatWith;
       vm.videochatWith = videochatWith;
       vm.drawWith = drawWith;
+      vm.callExpert = callExpert;
 
       if($rootScope.myIdForChat === null || angular.isUndefined($rootScope.myIdForChat)){
         $rootScope.myIdForChat = Math.round((Math.random() * 1000000) * 10);
@@ -92,6 +93,15 @@
         $state.go('simple1on1');
       }
 
+      function callExpert(index) {
+        console.log('Client pressed videochatWith');
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'expert', $rootScope.myIdForChat);
+        $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
+        $rootScope.isInitiator = true;
+        ChatRoomService.setUserUnavailable();
+        $state.go('proto1on1');
+      }
+
       JhiTrackerService.receiveInvite().then(null, null, function(invite){
         ChatRoomService.setUserUnavailable();
         if(invite.goal === 'video'){
@@ -104,8 +114,12 @@
           $state.go('simplechatroom');
         }
         if(invite.goal === 'draw'){
-        $rootScope.partnerIdForChat = invite.content;
-        $state.go('simpledraw');
+          $rootScope.partnerIdForChat = invite.content;
+          $state.go('simpledraw');
+        }
+        if(invite.goal === 'expert'){
+          $rootScope.partnerIdForChat = invite.content;
+          $state.go('proto1on1expert');
         }
       });
     }

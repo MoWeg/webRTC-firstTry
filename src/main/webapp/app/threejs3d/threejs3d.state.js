@@ -8,7 +8,7 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('3d', {
+        $stateProvider.state('threejs3d', {
             abstract: true,
             parent: 'app'
         });

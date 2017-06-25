@@ -8,17 +8,17 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('orientation2motion', {
+        $stateProvider.state('simpledeviceorientation', {
             parent: 'chat',
-            url: '/orientation2motion',
+            url: '/simpledeviceorientation',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'three deee!!!'
+                pageTitle: 'device orientation!!!'
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/chat/orientation2motion/orientation2motion.html',
-                    controller: 'Orientation2MotionController',
+                    templateUrl: 'app/chat/simpledeviceorientation/simpledeviceorientation.html',
+                    controller: 'SimpleDeviceOrienationController',
                     controllerAs: 'vm'
                 }
             },

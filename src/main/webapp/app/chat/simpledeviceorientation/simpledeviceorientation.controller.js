@@ -3,11 +3,11 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .controller('Orientation2MotionController', Orientation2MotionController);
+        .controller('SimpleDeviceOrienationController', SimpleDeviceOrienationController);
 
-    Orientation2MotionController.$inject = ['OrientationCalculator'];
+    SimpleDeviceOrienationController.$inject = ['OrientationCalculator'];
 
-    function Orientation2MotionController(OrientationCalculator) {
+    function SimpleDeviceOrienationController(OrientationCalculator) {
       var vm = this;
       var container, camera, scene, renderer, geometry, mesh;
 
@@ -41,26 +41,23 @@
           renderer.setSize( window.innerWidth, window.innerHeight );
         }, false);
         animate();
-        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
         window.requestAnimationFrame( animate );
         window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
-        window.addEventListener('devicemotion', deviceMotionHandler, false);
       }
 
       function animate(){
-        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
         renderer.render(scene, camera);
       }
 
       function onScreenOrientationChangeEvent(orientation){
-        var orientationInfo = OrientationCalculator.calculate(null, orientation);
+        var orientationInfo = OrientationCalculator.calculateOrientation(null, orientation);
         setOrientationInfo(orientationInfo);
         animate();
       }
 
       function onDeviceOrientationChangeEvent(deviceEvent){
-        var orientationInfo = OrientationCalculator.calculate(deviceEvent, null);
+        var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
         setOrientationInfo(orientationInfo);
         animate();
       }
@@ -69,48 +66,6 @@
         camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
         camera.quaternion.multiply(orientationInfo.backCamMultiplier);
         camera.quaternion.multiply(orientationInfo.screenAdjustment);
-      }
-
-      function deviceMotionHandler(event){
-        var factor = 10;
-        var workingX = event.acceleration.x;
-        var workingY = event.acceleration.y;
-        var workingZ = event.acceleration.z;
-
-        var intervalInSeconds = event.interval*0.001;
-        var sqIntervalInSecs = intervalInSeconds*intervalInSeconds;
-        var metersRight =  0.5*workingX*sqIntervalInSecs;
-        var metersUp = 0.5*workingY*sqIntervalInSecs;
-        var metersForward = -0.5*workingZ*sqIntervalInSecs;
-
-        camera.position.z += 10*metersForward;
-
-        //if(isBiggerThenThreshold(workingX)||isBiggerThenThreshold(workingY)||isBiggerThenThreshold(workingZ)){
-          //  console.log("X: "+ workingX +" Y: "+workingY+" Z: "+workingZ);
-          //var deviceX = workingX;
-          //var deviceY = workingY;
-          //var deviceZ = workingZ;
-
-
-          //camera.position.x += deviceX;
-          //camera.position.y += deviceY;
-          //camera.position.z += -deviceZ;
-          //camera.position.z += -0.5*deviceZ*intervalInSeconds*intervalInSeconds;
-
-        //  var target = new THREE.Vector3( 0, 0, 0 );
-        //  target.x = camera.position.x + 0.5*deviceX*intervalInSeconds*intervalInSeconds;
-        //  target.y = camera.position.y + 0.5*deviceY*intervalInSeconds*intervalInSeconds;
-        //  target.z = camera.position.z - 0.5*deviceZ*intervalInSeconds*intervalInSeconds;
-        //  camera.lookAt(target);
-          //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
-
-        //}
-        animate();
-      }
-
-      function isBiggerThenThreshold(value){
-        var threshold = 1;
-        return value >= threshold || value <= - threshold;
       }
       init();
     }

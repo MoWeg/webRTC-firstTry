@@ -121,7 +121,7 @@
         requestAnimationFrame( animate );
         render();
       }
-      
+
       function render() {
         camera.position.x += ( mouseX - camera.position.x ) * 0.05;
         camera.position.y += ( - mouseY - camera.position.y ) * 0.05;

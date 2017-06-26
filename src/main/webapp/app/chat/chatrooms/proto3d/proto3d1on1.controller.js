@@ -248,22 +248,10 @@ function stop() {
     var objects = [];
     init3D();
     function init3D(){
-      //container = document.createElement( 'div' );
-      //document.body.appendChild( container );
-      //var info = document.createElement( 'div' );
-      //info.style.position = 'absolute';
-      //info.style.top = '10px';
-      //info.style.width = '100%';
-      //info.style.textAlign = 'center';
-      //info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
-      //container.appendChild( info );
-        var myCanvas = {};
-        myCanvas.node = document.getElementById('drawingCanvas');
-
         //container = document.getElementById( 'innerContainer' );
         container = document.getElementById( 'innerContainer' );
-        camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
-        //camera = new THREE.PerspectiveCamera( 45, localVideo.width / localVideo.height, 1, 10000 );
+        //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
+        camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
         camera.position.set( 500, 800, 1300 );
         camera.lookAt( new THREE.Vector3() );
         scene = new THREE.Scene();
@@ -292,24 +280,24 @@ function stop() {
         var directionalLight = new THREE.DirectionalLight( 0xffffff );
         directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
         scene.add( directionalLight );
-        renderer = new THREE.WebGLRenderer( { antialias: true} );
-      //  renderer.setClearColor( 'transparent' );
+        renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
+        renderer.setClearColor( 0x000000, 0 );
 
-        rrenderer.setClearColor( 0xf0f0f0 );
+      //  rrenderer.setClearColor( 0xf0f0f0 );
         renderer.setPixelRatio( window.devicePixelRatio );
         //renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setSize( myCanvas.width, myCanvas.height );
+        renderer.setSize( 640,400 );
         //renderer.domElement = myCanvas;
         //
-        renderer.domElement.style.position = 'absolute';
+        //renderer.domElement.style.position = 'absolute';
         container.appendChild( renderer.domElement );
 
 
         window.addEventListener('resize', function() {
-        //camera.aspect = window.innerWidth / window.innerHeight;
-        camera.aspect = myCanvas.width / myCanvas.height;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        //camera.aspect = myCanvas.width / myCanvas.height;
         camera.updateProjectionMatrix();
-        //renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth, window.innerHeight );
         }, false);
 
         animate();

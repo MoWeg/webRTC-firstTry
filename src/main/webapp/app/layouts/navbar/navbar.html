@@ -70,6 +70,12 @@
                                 <span>Blocks by Device Motion</span>
                             </a>
                         </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="motion2orientation" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-picture"></span>&nbsp;
+                                <span>Device Motion and orientation</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li ng-class="{active: vm.$state.includes('chat')}" ng-switch-when="true" uib-dropdown class="dropdown pointer">

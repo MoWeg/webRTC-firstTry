@@ -9,8 +9,10 @@
 
     function SimpleDeviceMotionController(OrientationCalculator) {
       var vm = this;
+      vm.resetCamera = resetCamera;
       var container, camera, scene, renderer, geometry, mesh;
       var group1, group2, group3, light;
+      var needsCalibration = true;
 
       function init(){
         container = document.getElementById( 'container' );
@@ -174,16 +176,29 @@
       }
 
       function deviceMotionHandler(event){
-        var motionInfo = OrientationCalculator.calculateDistance(event, 10000);
-        //console.log("X: "+motionInfo.x +" Y: "+motionInfo.y+" Z: "+motionInfo.z);
-        camera.position.x += motionInfo.right;
-        camera.position.y += motionInfo.up;
-        camera.position.z += motionInfo.forward;
-        //console.log("cam pos: "+camera.position.z+" change: "+motionInfo.z);
-        //
-        //console.log("new cam pos: "+camera.position.z);
-        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
+        if(needsCalibration){
+          OrientationCalculator.setBaseLine(event);
+          needsCalibration = false;
+        }else{
+          var motionInfo = OrientationCalculator.calculateDistance(event, 1000);
+          //console.log("X: "+motionInfo.x +" Y: "+motionInfo.y+" Z: "+motionInfo.z);
+          camera.position.x += motionInfo.right;
+          camera.position.y += motionInfo.up;
+          camera.position.z += motionInfo.forward;
+          //console.log("cam pos: "+camera.position.z+" change: "+motionInfo.z);
+          //
+          //console.log("new cam pos: "+camera.position.z);
+          //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
 
+          animate();
+        }
+      }
+
+      function resetCamera(){
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 1800;
+        needsCalibration = true;
         animate();
       }
 

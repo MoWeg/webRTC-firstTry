@@ -31,10 +31,15 @@
         var yWasPositive = true;
         var zWasPositive = true;
 
+        var baseX = 0.5;
+        var baseY = 0.5;
+        var baseZ = 0.5;
+
         // the service;
         var service = {
           calculateOrientation: calcOrient,
-          calculateDistance: calcDist
+          calculateDistance: calcDist,
+          setBaseLine : setBase
         };
         return service;
 
@@ -73,8 +78,8 @@
           var unitsUp = 0;
           var unitsForward = 0;
           factorUnitsPerMeter = factor;
-
-          if(isBiggerThenThreshold(workingX)){
+          /*
+          if(isBiggerThenThreshold(workingX, baseX)){
             unitsRight =  calculateDistanceForDimension(workingX, baseVelocity.x, xWasPositive);
             baseVelocity['x'] = calculateBaseVelocity(workingX, baseVelocity.x, xWasPositive);
             xWasPositive = isPositive(workingX);
@@ -82,7 +87,7 @@
             workingX = 0;
           }
 
-          if(isBiggerThenThreshold(workingY)){
+          if(isBiggerThenThreshold(workingY, baseY)){
             unitsUp = calculateDistanceForDimension(workingZ, baseVelocity.y, yWasPositive);
             baseVelocity['y'] = calculateBaseVelocity(workingY, baseVelocity.y, yWasPositive);
             yWasPositive = isPositive(workingY);
@@ -90,11 +95,30 @@
             workingY = 0;
           }
 
-          if(isBiggerThenThreshold(workingZ)){
+          if(isBiggerThenThreshold(workingZ, baseZ)){
             unitsForward =  calculateDistanceForDimension(workingZ, baseVelocity.z, zWasPositive);
             baseVelocity['z'] = calculateBaseVelocity(workingZ, baseVelocity.z, zWasPositive);
             zWasPositive = isPositive(workingZ);
           } else {
+            workingZ = 0;
+          }
+          */
+
+          if(isBiggerThenThreshold(workingX, baseX)||isBiggerThenThreshold(workingZ, baseZ)||isBiggerThenThreshold(workingY, baseY)){
+            unitsRight =  calculateDistanceForDimension(workingX, baseVelocity.x, xWasPositive);
+            baseVelocity['x'] = calculateBaseVelocity(workingX, baseVelocity.x, xWasPositive);
+            xWasPositive = isPositive(workingX);
+
+            unitsUp = calculateDistanceForDimension(workingZ, baseVelocity.y, yWasPositive);
+            baseVelocity['y'] = calculateBaseVelocity(workingY, baseVelocity.y, yWasPositive);
+            yWasPositive = isPositive(workingY);
+      
+            unitsForward =  calculateDistanceForDimension(workingZ, baseVelocity.z, zWasPositive);
+            baseVelocity['z'] = calculateBaseVelocity(workingZ, baseVelocity.z, zWasPositive);
+            zWasPositive = isPositive(workingZ);
+          } else {
+            workingX = 0;
+            workingY = 0;
             workingZ = 0;
           }
 
@@ -106,9 +130,17 @@
           return result;
         }
 
-        function isBiggerThenThreshold(value){
-          var threshold = 0.5;
-          return value >= threshold || value <= - threshold;
+        function isBiggerThenThreshold(value, base){
+           //var threshold = 0.5;
+           //return value >= threshold || value <= - threshold;
+
+          //var normalizedValue = normalize(value);
+          //console.log("normalizedValue: "+normalizedValue +" base: "+base);
+          //return normalizedValue >= base;
+
+          //return true;
+
+          return value >= base || value <= - base;
         }
         function isPositive(value){
           return value > 0;
@@ -138,6 +170,22 @@
             }
             var result = dimensionAcc*intervalInSeconds + dimensionBaseVelo;
             return result;
+        }
+
+        function setBase(newEvent){
+          var factor = 2;
+          baseX =  normalize(event.acceleration.x)*factor;
+          baseY =  normalize(event.acceleration.y)*factor;
+          baseZ =  normalize(event.acceleration.z)*factor;
+          console.log("baseX: "+baseX+" baseY: "+baseY+" baseZ: "+baseZ);
+        }
+
+        function normalize(value){
+          if(value < 0){
+            return -value;
+          }else{
+            return value;
+          }
         }
     }
 })();

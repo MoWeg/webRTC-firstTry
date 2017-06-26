@@ -3,11 +3,11 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .controller('Proto1on1Controller', Proto1on1Controller);
+        .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService'];
+    Proto3D1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService', 'OrientationCalculator'];
 
-    function Proto1on1Controller($rootScope, $cookies, $http, JhiTrackerService, SdpService) {
+    function Proto3D1on1Controller($rootScope, $cookies, $http, JhiTrackerService, SdpService, OrientationCalculator) {
       //navigator.getUserMedia = navigator.getUserMedia ||
       //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
@@ -236,45 +236,113 @@ function stop() {
     return SdpService.getOpus(sdp);
   }
 //////////////////////////////////////////////////////////////////////////////////
-// canvas
+// 3D
+
+    //vm.resetCubes = resetCubes;
+    var container;
+    var camera, scene, renderer;
+    var plane, cube;
+    var mouse, raycaster, isShiftDown = false;
+    var rollOverMesh, rollOverMaterial;
+    var cubeGeo, cubeMaterial;
+    var objects = [];
+    init3D();
+    function init3D(){
+      //container = document.createElement( 'div' );
+      //document.body.appendChild( container );
+      //var info = document.createElement( 'div' );
+      //info.style.position = 'absolute';
+      //info.style.top = '10px';
+      //info.style.width = '100%';
+      //info.style.textAlign = 'center';
+      //info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
+      //container.appendChild( info );
+        var myCanvas = {};
+        myCanvas.node = document.getElementById('drawingCanvas');
+
+        //container = document.getElementById( 'innerContainer' );
+        container = document.getElementById( 'innerContainer' );
+        camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
+        //camera = new THREE.PerspectiveCamera( 45, localVideo.width / localVideo.height, 1, 10000 );
+        camera.position.set( 500, 800, 1300 );
+        camera.lookAt( new THREE.Vector3() );
+        scene = new THREE.Scene();
+        // roll-over helpers
+        var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+        rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+        scene.add( rollOverMesh );
+        // cubes
+        cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        //cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
+        // grid
+        var gridHelper = new THREE.GridHelper( 1000, 20 );
+        scene.add( gridHelper );
+        //
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+        var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+        geometry.rotateX( - Math.PI / 2 );
+        plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+        scene.add( plane );
+        objects.push( plane );
+        // Lights
+        var ambientLight = new THREE.AmbientLight( 0x606060 );
+        scene.add( ambientLight );
+        var directionalLight = new THREE.DirectionalLight( 0xffffff );
+        directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
+        scene.add( directionalLight );
+        renderer = new THREE.WebGLRenderer( { antialias: true} );
+      //  renderer.setClearColor( 'transparent' );
+
+        rrenderer.setClearColor( 0xf0f0f0 );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        //renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( myCanvas.width, myCanvas.height );
+        //renderer.domElement = myCanvas;
+        //
+        renderer.domElement.style.position = 'absolute';
+        container.appendChild( renderer.domElement );
 
 
-      var canvasContext = initCanvasContext();
+        window.addEventListener('resize', function() {
+        //camera.aspect = window.innerWidth / window.innerHeight;
+        camera.aspect = myCanvas.width / myCanvas.height;
+        camera.updateProjectionMatrix();
+        //renderer.setSize( window.innerWidth, window.innerHeight );
+        }, false);
 
-
-      function createCanvas() {
-        var canvas = {};
-        canvas.node = document.getElementById('drawingCanvas');
-        canvas.context = canvas.node.getContext('2d');
-        //parent.appendChild(canvas.node);
-        return canvas;
+        animate();
+        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
+        window.requestAnimationFrame( animate );
+//  window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+//  window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+    //    window.addEventListener( 'devicemotion', deviceMotionHandler, false);
+        window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+        window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
       }
 
+      function animate(){
+        //camera.lookAt( scene.position );
+        renderer.render(scene, camera);
+      }
 
-      function initCanvasContext() {
-          var canvas = createCanvas();
-          var ctx = canvas.context;
-          // define a custom fillCircle method
-          ctx.fillCircle = function(x, y, radius, fillColor) {
-              this.fillStyle = fillColor;
-              this.beginPath();
-              this.moveTo(x, y);
-              this.arc(x, y, radius, 0, Math.PI * 1, false);
-              this.fill();
-            };
-            return ctx;
-        }
-        function receivePaintingInfo(message){
-          console.log("should be drawing something");
-          angular.forEach(message.paint, function(value, i){
-            canvasContext.fillCircle(value.x, value.y, value.radius, value.fillColor);
-          });
-        }
-        function clearCanvas() {
-          console.log("should clear canvas");
-          canvasContext.clearRect(0, 0, 640, 400);
-          //canvasContext.restore();
-          //canvasContext.fillRect(0, 0, 640, 400);
-        }
+      function onScreenOrientationChangeEvent(orientation){
+        var orientationInfo = OrientationCalculator.calculateOrientation(null, orientation);
+        setOrientationInfo(orientationInfo);
+        animate();
+      }
+
+      function onDeviceOrientationChangeEvent(deviceEvent){
+        var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
+        setOrientationInfo(orientationInfo);
+        animate();
+      }
+
+      function setOrientationInfo(orientationInfo){
+        camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
+        camera.quaternion.multiply(orientationInfo.backCamMultiplier);
+        camera.quaternion.multiply(orientationInfo.screenAdjustment);
+      }
     }
 })();

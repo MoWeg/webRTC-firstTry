@@ -99,7 +99,8 @@
         $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
         $rootScope.isInitiator = true;
         ChatRoomService.setUserUnavailable();
-        $state.go('proto1on1');
+        //$state.go('proto1on1');
+        $state.go('proto3d1on1');
       }
 
       JhiTrackerService.receiveInvite().then(null, null, function(invite){
@@ -119,7 +120,8 @@
         }
         if(invite.goal === 'expert'){
           $rootScope.partnerIdForChat = invite.content;
-          $state.go('proto1on1expert');
+          //$state.go('proto1on1expert');
+          $state.go('proto3d1on1expert');
         }
       });
     }

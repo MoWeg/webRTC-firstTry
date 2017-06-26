@@ -15,6 +15,7 @@
       //var isChannelReady;
       var isInitiator = true;//$rootScope.isInitiator;
       var isStarted = false;
+      var gotOffer = false;
       var localStream;
       var pc;
       var remoteStream;
@@ -46,18 +47,19 @@
     function handleContent (message){
        console.log('Client received message:', message);
        if (message.type === 'offer') {
+          gotOffer = true;
           if (!isStarted) {
             maybeStart();
           }
           pc.setRemoteDescription(new RTCSessionDescription(message));
           doAnswer();
-        } else if (message.type === 'candidate' && isStarted) {
+        } else if (message.type === 'candidate' && isStarted && gotOffer) {
           var candidate = new RTCIceCandidate({
             sdpMLineIndex: message.label,
             candidate: message.candidate
         });
         pc.addIceCandidate(candidate);
-      } else if (message.content === 'bye' && isStarted) {
+      } else if (message.content === 'bye' && isStarted && gotOffer) {
         handleRemoteHangup();
       }
     }
@@ -135,7 +137,10 @@
 
     function setLocalAndSendMessage(sessionDescription) {
       // Set Opus as the preferred codec in SDP if Opus is present.
-      sessionDescription.sdp = preferOpus(sessionDescription.sdp);
+      if(sessionDescription.sdp != null && angular.isDefined(sessionDescription.sdp)){
+        var oldSdp = sessionDescription.sdp
+        sessionDescription.sdp = preferOpus(oldSdp);
+      }
       pc.setLocalDescription(sessionDescription);
       console.log('setLocalAndSendMessage sending message' , sessionDescription);
       sendMessage(sessionDescription);

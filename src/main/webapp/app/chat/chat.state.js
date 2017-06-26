@@ -8,7 +8,7 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('3d', {
+        $stateProvider.state('chat', {
             abstract: true,
             parent: 'app'
         });

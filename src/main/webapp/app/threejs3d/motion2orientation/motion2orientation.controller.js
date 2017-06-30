@@ -173,7 +173,7 @@
         camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
         camera.quaternion.multiply(orientationInfo.backCamMultiplier);
         camera.quaternion.multiply(orientationInfo.screenAdjustment);
-        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
+        //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
       }
 
       function deviceMotionHandler(event){
@@ -185,10 +185,10 @@
           //setOrientationInfo(orientationInfo);
 
 
-          var motionInfo = OrientationCalculator.calculateDistance(event, 10000);
+          var motionInfo = OrientationCalculator.calculateDistanceWithOrientation(event, 10000);
           //console.log("X: "+motionInfo.x +" Y: "+motionInfo.y+" Z: "+motionInfo.z);
           camera.position.x += motionInfo.right;
-          camera.position.y += motionInfo.up;
+        //  camera.position.y += motionInfo.up;
           camera.position.z += motionInfo.forward;
           //console.log("cam pos: "+camera.position.z+" change: "+motionInfo.z);
           //

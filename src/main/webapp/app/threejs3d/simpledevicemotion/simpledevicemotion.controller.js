@@ -177,13 +177,13 @@
 
       function deviceMotionHandler(event){
         if(needsCalibration){
-          OrientationCalculator.setBaseLine(event);
+        //  OrientationCalculator.setBaseLine(event);
           needsCalibration = false;
         }else{
           var motionInfo = OrientationCalculator.calculateDistance(event, 1000);
           //console.log("X: "+motionInfo.x +" Y: "+motionInfo.y+" Z: "+motionInfo.z);
           camera.position.x += motionInfo.right;
-          camera.position.y += motionInfo.up;
+          //camera.position.y += motionInfo.up;
           camera.position.z += motionInfo.forward;
           //console.log("cam pos: "+camera.position.z+" change: "+motionInfo.z);
           //

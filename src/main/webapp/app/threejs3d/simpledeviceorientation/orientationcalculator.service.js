@@ -32,12 +32,14 @@
         var baseVelocity = defaultBaseVelocity;
         var intervalInSeconds = 0;
         var factorUnitsPerMeter = 0;
-
+        var motionQuaterion = new THREE.Quaternion();
+        var quaternionWasSet = false;
         // the service;
         var service = {
           calculateOrientation: calcOrient,
           calculateDistance: calcDist,
-          setBaseLine : setBase
+          setBaseLine : setBase,
+          calculateDistanceWithOrientation: calcDistWithQ
         };
         return service;
 
@@ -60,14 +62,31 @@
           workingAlpha = alpha;
           lastEvent = newEvent;
 
+          euler.set( beta, alpha, - gamma, 'YXZ' );
+          motionQuaterion.setFromEuler(euler);
+          quaternionWasSet = true;
+
           return {
-            eulerOrientation: euler.set( beta, alpha, - gamma, 'YXZ' ), // 'ZXY' for the device, but 'YXZ' for us
+            eulerOrientation: euler, // 'ZXY' for the device, but 'YXZ' for us
             backCamMultiplier: q1,
             screenAdjustment:  q0.setFromAxisAngle( zee, - orient )
           }
         }
 
         // calculate distance
+        function calcDistWithQ(newEvent, factor){
+          var distance = calcDist(newEvent, factor);
+          if(quaternionWasSet){
+            var distanceVector = new THREE.Vector3(distance.unitsRight, distance.unitsUp, distance.unitsForward);
+            //var distanceVector = new THREE.Vector3(0, 0, distance.unitsForward);
+            distanceVector.applyQuaternion(motionQuaterion);
+            distance.unitsRight = distanceVector.x;
+            distance.unitsUp = distanceVector.y;
+            distance.unitsForward = distanceVector.z;
+          }
+          return distance;
+        }
+
         function calcDist(newEvent, factor){
           intervalInSeconds = event.interval*0.001;
           factorUnitsPerMeter = factor;
@@ -75,7 +94,7 @@
           var unitsRight = calcuteEverythingForDimension(event, 'x');
           var unitsUp = calcuteEverythingForDimension(event, 'y');
           var unitsForward = calcuteEverythingForDimension(event, 'z');
-          
+
           var result = {
             right : unitsRight,
             up : unitsUp,

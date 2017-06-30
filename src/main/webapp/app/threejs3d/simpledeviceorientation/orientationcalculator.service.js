@@ -24,16 +24,14 @@
             y : 0,
             z : 0
           };
+        var threshold = {
+          x : 0.2,
+          y : 0.2,
+          z : 0.5,
+        }
         var baseVelocity = defaultBaseVelocity;
         var intervalInSeconds = 0;
         var factorUnitsPerMeter = 0;
-        var xWasPositive = true;
-        var yWasPositive = true;
-        var zWasPositive = true;
-
-        var baseX = 0.5;
-        var baseY = 0.5;
-        var baseZ = 0.5;
 
         // the service;
         var service = {
@@ -43,7 +41,7 @@
         };
         return service;
 
-
+        // calculate orientation
         function calcOrient(newEvent, orientation){
           var event = {};
           if(newEvent){
@@ -69,59 +67,15 @@
           }
         }
 
+        // calculate distance
         function calcDist(newEvent, factor){
           intervalInSeconds = event.interval*0.001;
-          var workingX = event.acceleration.x;
-          var workingY = event.acceleration.y;
-          var workingZ = event.acceleration.z;
-          var unitsRight = 0;
-          var unitsUp = 0;
-          var unitsForward = 0;
           factorUnitsPerMeter = factor;
-          /*
-          if(isBiggerThenThreshold(workingX, baseX)){
-            unitsRight =  calculateDistanceForDimension(workingX, baseVelocity.x, xWasPositive);
-            baseVelocity['x'] = calculateBaseVelocity(workingX, baseVelocity.x, xWasPositive);
-            xWasPositive = isPositive(workingX);
-          } else {
-            workingX = 0;
-          }
 
-          if(isBiggerThenThreshold(workingY, baseY)){
-            unitsUp = calculateDistanceForDimension(workingZ, baseVelocity.y, yWasPositive);
-            baseVelocity['y'] = calculateBaseVelocity(workingY, baseVelocity.y, yWasPositive);
-            yWasPositive = isPositive(workingY);
-          } else {
-            workingY = 0;
-          }
-
-          if(isBiggerThenThreshold(workingZ, baseZ)){
-            unitsForward =  calculateDistanceForDimension(workingZ, baseVelocity.z, zWasPositive);
-            baseVelocity['z'] = calculateBaseVelocity(workingZ, baseVelocity.z, zWasPositive);
-            zWasPositive = isPositive(workingZ);
-          } else {
-            workingZ = 0;
-          }
-          */
-
-          if(isBiggerThenThreshold(workingX, baseX)||isBiggerThenThreshold(workingZ, baseZ)||isBiggerThenThreshold(workingY, baseY)){
-            unitsRight =  calculateDistanceForDimension(workingX, baseVelocity.x, xWasPositive);
-            baseVelocity['x'] = calculateBaseVelocity(workingX, baseVelocity.x, xWasPositive);
-            xWasPositive = isPositive(workingX);
-
-            unitsUp = calculateDistanceForDimension(workingZ, baseVelocity.y, yWasPositive);
-            baseVelocity['y'] = calculateBaseVelocity(workingY, baseVelocity.y, yWasPositive);
-            yWasPositive = isPositive(workingY);
-      
-            unitsForward =  calculateDistanceForDimension(workingZ, baseVelocity.z, zWasPositive);
-            baseVelocity['z'] = calculateBaseVelocity(workingZ, baseVelocity.z, zWasPositive);
-            zWasPositive = isPositive(workingZ);
-          } else {
-            workingX = 0;
-            workingY = 0;
-            workingZ = 0;
-          }
-
+          var unitsRight = calcuteEverythingForDimension(event, 'x');
+          var unitsUp = calcuteEverythingForDimension(event, 'y');
+          var unitsForward = calcuteEverythingForDimension(event, 'z');
+          
           var result = {
             right : unitsRight,
             up : unitsUp,
@@ -130,62 +84,40 @@
           return result;
         }
 
+        function calcuteEverythingForDimension(deviceEvent, dimension){
+          var acceleration = deviceEvent.acceleration[dimension];
+          var unitsInDimension = 0;
+          if(isBiggerThenThreshold(acceleration, threshold[dimension])){
+            var oldBaseVelocity = baseVelocity[dimension];
+            unitsInDimension = calculateDistanceForDimension(acceleration, oldBaseVelocity);
+            baseVelocity[dimension] = calculateBaseVelocity(acceleration, oldBaseVelocity);
+          }else{
+            baseVelocity[dimension] = 0;
+          }
+          return unitsInDimension;
+        }
+
         function isBiggerThenThreshold(value, base){
-           //var threshold = 0.5;
-           //return value >= threshold || value <= - threshold;
-
-          //var normalizedValue = normalize(value);
-          //console.log("normalizedValue: "+normalizedValue +" base: "+base);
-          //return normalizedValue >= base;
-
-          //return true;
-
           return value >= base || value <= - base;
         }
-        function isPositive(value){
-          return value > 0;
-        }
-        function directionChangedForDimension(value, dimensionWasPositive){
-          if(value < 0 && dimensionWasPositive){
-            return true;
-          }
-          if(value > 0 && !dimensionWasPositive){
-            return true;
-          }
-          return false;
-        }
 
-        function calculateDistanceForDimension(dimensionAcc, dimensionBaseVelo, dimensionWasPositive){
-            if(directionChangedForDimension(dimensionAcc, dimensionWasPositive)){
-              dimensionBaseVelo = 0;
-            }
+        function calculateDistanceForDimension(dimensionAcc, dimensionBaseVelo){
             var sqIntervalInSecs = intervalInSeconds*intervalInSeconds;
             var resultInMeters = 0.5*dimensionAcc*sqIntervalInSecs + dimensionBaseVelo*intervalInSeconds;
             var resultInUnits = factorUnitsPerMeter*resultInMeters;
             return resultInUnits;
         }
-        function calculateBaseVelocity(dimensionAcc, dimensionBaseVelo, dimensionWasPositive){
-            if(directionChangedForDimension(dimensionAcc, dimensionWasPositive)){
-              return 0;
-            }
+        function calculateBaseVelocity(dimensionAcc, dimensionBaseVelo){
             var result = dimensionAcc*intervalInSeconds + dimensionBaseVelo;
             return result;
         }
 
         function setBase(newEvent){
           var factor = 2;
-          baseX =  normalize(event.acceleration.x)*factor;
-          baseY =  normalize(event.acceleration.y)*factor;
-          baseZ =  normalize(event.acceleration.z)*factor;
+          threshold.x =  normalize(event.acceleration.x)*factor;
+          threshold.y =  normalize(event.acceleration.y)*factor;
+          threshold.z  =  normalize(event.acceleration.z)*factor;
           console.log("baseX: "+baseX+" baseY: "+baseY+" baseZ: "+baseZ);
-        }
-
-        function normalize(value){
-          if(value < 0){
-            return -value;
-          }else{
-            return value;
-          }
         }
     }
 })();

@@ -109,7 +109,7 @@
       }
 
       function deviceMotionHandler(event){
-        var motionInfo = OrientationCalculator.calculateDistance(event, 10000);
+        var motionInfo = OrientationCalculator.calculateDistance(event, 1000);
         if(motionInfo.right != 0 && motionInfo.up != 0 && motionInfo.forward != 0){
           lastPosX += motionInfo.right;
           lastPosY += motionInfo.up;

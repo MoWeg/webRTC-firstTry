@@ -10,6 +10,7 @@
     function Motion2BlocksController(OrientationCalculator) {
       var vm = this;
       vm.resetCubes = resetCubes;
+      vm.switchMethod = switchMethod;
       var container;
   		var camera, scene, renderer;
   		var plane, cube;
@@ -20,6 +21,8 @@
       var lastPosX = 0;
       var lastPosY = 0;
       var lastPosZ = 0;
+
+      var isWithOrientation = false;
 
       function init(){
         //container = document.createElement( 'div' );
@@ -109,8 +112,12 @@
       }
 
       function deviceMotionHandler(event){
-        var motionInfo = OrientationCalculator.calculateDistance(event, 1000);
-        //var motionInfo = OrientationCalculator.calculateDistanceWithOrientation(event, 1000);
+        if(isWithOrientation){
+          var motionInfo = OrientationCalculator.calculateDistanceWithOrientation(event, 1000);
+        } else {
+          var motionInfo = OrientationCalculator.calculateDistance(event, 1000);
+        }
+
         if(motionInfo.right != 0 || motionInfo.up != 0 || motionInfo.forward != 0){
           lastPosX += motionInfo.right;
           lastPosY += motionInfo.up;
@@ -140,6 +147,15 @@
           }
         });
         animate();
+      }
+
+      function switchMethod(){
+        if (isWithOrientation) {
+          isWithOrientation = false;
+        } else {
+          isWithOrientation = true;
+        }
+        console.log("isWithOrientation: "+isWithOrientation);
       }
 
       init();

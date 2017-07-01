@@ -24,21 +24,40 @@
             y : 0,
             z : 0
           };
-        var threshold = {
-          x : 0.2,
-          y : 0.2,
-          z : 0.5,
-        }
+
         var baseVelocity = defaultBaseVelocity;
         var intervalInSeconds = 0;
         var factorUnitsPerMeter = 0;
         var motionQuaterion = new THREE.Quaternion();
         var quaternionWasSet = false;
+
+        var sampledThreshold = {
+          x : {
+            upper: -1,
+            lower: 1,
+            sum: 0,
+            average: 0
+          },
+          y : {
+            upper: -1,
+            lower: 1,
+            sum: 0,
+            average: 0
+          },
+          z : {
+            upper: -1,
+            lower: 1,
+            sum: 0,
+            average: 0
+          }
+        }
+        var calibrationTimeInMillis = 1000; //one second of sampling
+        var actualSampleSize = 0;
+        var needsCalibration = true;
         // the service;
         var service = {
           calculateOrientation: calcOrient,
           calculateDistance: calcDist,
-          setBaseLine : setBase,
           calculateDistanceWithOrientation: calcDistWithQ
         };
         return service;
@@ -77,47 +96,58 @@
         function calcDistWithQ(newEvent, factor){
           var distance = calcDist(newEvent, factor);
           if(quaternionWasSet){
-            var distanceVector = new THREE.Vector3(distance.unitsRight, distance.unitsUp, distance.unitsForward);
+            var distanceVector = new THREE.Vector3(distance.right, distance.up, distance.forward);
             //var distanceVector = new THREE.Vector3(0, 0, distance.unitsForward);
             distanceVector.applyQuaternion(motionQuaterion);
-            distance.unitsRight = distanceVector.x;
-            distance.unitsUp = distanceVector.y;
-            distance.unitsForward = distanceVector.z;
+            distance.right = distanceVector.y;
+            distance.up = distanceVector.z;
+            distance.forward = distanceVector.x;
           }
           return distance;
         }
 
         function calcDist(newEvent, factor){
-          intervalInSeconds = event.interval*0.001;
+          intervalInSeconds = newEvent.interval*0.001;
           factorUnitsPerMeter = factor;
-
-          var unitsRight = calcuteEverythingForDimension(event, 'x');
-          var unitsUp = calcuteEverythingForDimension(event, 'y');
-          var unitsForward = calcuteEverythingForDimension(event, 'z');
-
           var result = {
-            right : unitsRight,
-            up : unitsUp,
-            forward : unitsForward
+            right : 0,
+            up : 0,
+            forward : 0
           }
+
+          if(needsCalibration){
+            setThreshold(newEvent);
+          }else{
+            result.right = calcuteEverythingForDimension(newEvent, 'x');
+            result.up = calcuteEverythingForDimension(newEvent, 'y');
+            result.forward = calcuteEverythingForDimension(newEvent, 'z');
+          }
+
           return result;
         }
 
         function calcuteEverythingForDimension(deviceEvent, dimension){
           var acceleration = deviceEvent.acceleration[dimension];
           var unitsInDimension = 0;
-          if(isBiggerThenThreshold(acceleration, threshold[dimension])){
+          if(compareToBounds(acceleration, sampledThreshold[dimension])){
+            var workingAcceleration = acceleration - sampledThreshold[dimension].average;
             var oldBaseVelocity = baseVelocity[dimension];
-            unitsInDimension = calculateDistanceForDimension(acceleration, oldBaseVelocity);
-            baseVelocity[dimension] = calculateBaseVelocity(acceleration, oldBaseVelocity);
+            unitsInDimension = calculateDistanceForDimension(workingAcceleration, oldBaseVelocity);
+            baseVelocity[dimension] = calculateBaseVelocity(workingAcceleration, oldBaseVelocity);
           }else{
             baseVelocity[dimension] = 0;
           }
           return unitsInDimension;
         }
 
-        function isBiggerThenThreshold(value, base){
-          return value >= base || value <= - base;
+        function compareToBounds(value, bounds){
+          if(value >= bounds.upper){
+            return true;
+          }
+          if(value <= bounds.lower){
+            return true;
+          }
+          return false;
         }
 
         function calculateDistanceForDimension(dimensionAcc, dimensionBaseVelo){
@@ -131,12 +161,32 @@
             return result;
         }
 
-        function setBase(newEvent){
-          var factor = 2;
-          threshold.x =  normalize(event.acceleration.x)*factor;
-          threshold.y =  normalize(event.acceleration.y)*factor;
-          threshold.z  =  normalize(event.acceleration.z)*factor;
-          console.log("baseX: "+baseX+" baseY: "+baseY+" baseZ: "+baseZ);
+        function setThreshold(deviceEvent){
+          var requiredSampleSize = calibrationTimeInMillis/deviceEvent.interval;
+          setThresholdForDimension(deviceEvent, 'x');
+          setThresholdForDimension(deviceEvent, 'y');
+          setThresholdForDimension(deviceEvent, 'z');
+          actualSampleSize++;
+          if(actualSampleSize >= requiredSampleSize){
+            needsCalibration = false;
+            angular.forEach(sampledThreshold, function(value, key){
+              var sum = value.sum;
+              value.average = sum/actualSampleSize;
+            });
+            console.log(sampledThreshold);
+          }
+        }
+
+        function setThresholdForDimension(deviceEvent, dimension){
+          var bounds = sampledThreshold[dimension];
+          var acceleration = deviceEvent.acceleration[dimension];
+          if(acceleration >= bounds.upper){
+            bounds.upper = acceleration;
+          }
+          if(acceleration <= bounds.lower){
+            bounds.lower = acceleration;
+          }
+          bounds.sum += acceleration;
         }
     }
 })();

@@ -5,15 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto3D1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService', 'OrientationCalculator'];
+    Proto3D1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService'];
 
-    function Proto3D1on1Controller($rootScope, $cookies, $http, JhiTrackerService, SdpService, OrientationCalculator) {
-      //navigator.getUserMedia = navigator.getUserMedia ||
-      //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-      navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia ||
-      navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
-
+    function Proto3D1on1Controller($rootScope, $cookies, $http, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService) {
       var vm = this;
       //var isChannelReady;
       var isInitiator = $rootScope.isInitiator;
@@ -23,6 +17,16 @@
       var pc;
       var remoteStream;
       var turnReady;
+      var storedOffer = null;
+
+      // 3D stuff
+      var container;
+      var camera, scene, renderer;
+      var plane, cube;
+      var mouse, raycaster, isShiftDown = false;
+      var rollOverMesh, rollOverMaterial;
+      var cubeGeo, cubeMaterial;
+      var objects = [];
 
       //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
       var pc_config = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}; //, stun:stun4.l.google.com:19302, stun:stun1.l.google.com:19302, stun:stun01.sipphone.com
@@ -31,7 +35,7 @@
       // Set up audio and video regardless of what devices are present.
       var sdpConstraints = {'mandatory': {
         'OfferToReceiveAudio':true,
-        'OfferToReceiveVideo':true }};
+        'OfferToReceiveVideo':false }};
 
 
       var localVideo = document.querySelector('#video');
@@ -61,18 +65,15 @@
         pc.addIceCandidate(candidate);
         } else if (message.content === 'bye' && isStarted && gotAnswer) {
           handleRemoteHangup();
-        } else if (message.goal == 'canvas'){
-          if(message.content == 'reset'){
-              clearCanvas();
-          }
-          if(message.content == 'paint'){
-            receivePaintingInfo(message);
-          }
+        } else if (message.content == 'needOffer'){
+          sendMessage(storedOffer);
         }
     }
 
 ////////////////////////////////////////////////////
     function handleUserMedia(stream) {
+      console.log('initializing 3D model');
+      init3D();
       console.log('Adding local stream.');
       localVideo.src = window.URL.createObjectURL(stream);
       localStream = stream;
@@ -91,10 +92,11 @@
       console.log('getUserMedia error: ', error);
     }
 
-    var constraints = {video: true};
+    //var constraints = {video: true};
     //navigator.getUserMedia(constraints, handleUserMedia, handleUserMediaError);
     //var constraints = {video: {facingMode: { exact: "environment" }}};
-    navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
+    //navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
+    UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
 
     console.log('Getting user media with constraints', constraints);
 
@@ -168,6 +170,7 @@
       }
       pc.setLocalDescription(sessionDescription);
       console.log('setLocalAndSendMessage sending message' , sessionDescription);
+      storedOffer = sessionDescription;
       sendMessage(sessionDescription);
     }
 
@@ -239,14 +242,8 @@ function stop() {
 // 3D
 
     //vm.resetCubes = resetCubes;
-    var container;
-    var camera, scene, renderer;
-    var plane, cube;
-    var mouse, raycaster, isShiftDown = false;
-    var rollOverMesh, rollOverMaterial;
-    var cubeGeo, cubeMaterial;
-    var objects = [];
-    init3D();
+
+
     function init3D(){
         //container = document.getElementById( 'innerContainer' );
         container = document.getElementById( 'innerContainer' );
@@ -306,7 +303,7 @@ function stop() {
 //  window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
 //  window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
     //    window.addEventListener( 'devicemotion', deviceMotionHandler, false);
-        window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+      //  window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
       }
 
@@ -315,15 +312,10 @@ function stop() {
         renderer.render(scene, camera);
       }
 
-      function onScreenOrientationChangeEvent(orientation){
-        var orientationInfo = OrientationCalculator.calculateOrientation(null, orientation);
-        setOrientationInfo(orientationInfo);
-        animate();
-      }
-
       function onDeviceOrientationChangeEvent(deviceEvent){
         var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
         setOrientationInfo(orientationInfo);
+        sendOrientation(createDeviceOrientationDto(deviceEvent));
         animate();
       }
 
@@ -331,6 +323,18 @@ function stop() {
         camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
         camera.quaternion.multiply(orientationInfo.backCamMultiplier);
         camera.quaternion.multiply(orientationInfo.screenAdjustment);
+      }
+
+      function createDeviceOrientationDto(event){
+        return {
+          'alpha': event.alpha,
+          'beta': event.beta,
+          'gamma': event.gamma
+        };
+      }
+
+      function sendOrientation(newOrientation) {
+        JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'camera' ,orientation: newOrientation});
       }
     }
 })();

@@ -18,7 +18,7 @@
             views: {
                 'content@': {
                     templateUrl: 'app/chat/simplertc/simplertc.html',
-                    controller: 'SimpleRtcController',
+                    controller: 'RevisedSimpleRtcController',
                     controllerAs: 'vm'
                 }
             },

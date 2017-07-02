@@ -16,6 +16,7 @@ public class SimpleChatMessageDTO {
 	private String candidate;
 
 	private PaintDto[] paint;
+	private DeviceOrientationDto orientation;
 	
 	public String getContent() {
 		return content;
@@ -95,6 +96,14 @@ public class SimpleChatMessageDTO {
 
 	public void setPaint(PaintDto[] paint) {
 		this.paint = paint;
+	}
+
+	public DeviceOrientationDto getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(DeviceOrientationDto orient) {
+		this.orientation = orient;
 	}
 
 	@Override

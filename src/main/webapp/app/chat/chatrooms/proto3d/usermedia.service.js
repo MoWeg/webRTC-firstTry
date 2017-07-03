@@ -15,6 +15,7 @@
       var service = {
         getBackCameraAsPromise: getBackCamera,
         getStreamByDeviceIdAsPromise: getStream,
+        closeAllStreams: closeAllStreams
       };
       return service;
 
@@ -41,23 +42,19 @@
 
       function getBackCamera(){
         var deferred = $q.defer();
-        var backCamId = null;
-        var fallBack = null;
         getAllDevices().then(function(allDevices){
+          var backCamId = null;
           angular.forEach(allDevices, function(value, key){
             if(isBackCam(value)){
               backCamId = value.deviceId;
-            }else{
+              return;
+            } else {
               if(value.kind === 'videoinput'){
-                fallBack = value.deviceId;
+                backCamId = value.deviceId;
               }
             }
           });
-          if(backCamId){
-            deferred.resolve(getStream(backCamId));
-          }else{
-            deferred.resolve(getStream(fallBack));
-          }
+          deferred.resolve(getStream(backCamId));
         });
         return deferred.promise;
       }
@@ -69,6 +66,12 @@
           }
         }
         return false;
+      }
+
+      function closeAllStreams(stream){
+        angular.forEach(stream.getTracks(), function(value, key){
+          value.stop();
+        });
       }
     }
 })();

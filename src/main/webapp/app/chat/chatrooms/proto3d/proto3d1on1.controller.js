@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto3D1on1Controller.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService'];
+    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService'];
 
-    function Proto3D1on1Controller($rootScope, $cookies, $http, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService) {
+    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService) {
       var vm = this;
       //var isChannelReady;
       var isInitiator = $rootScope.isInitiator;
@@ -43,98 +43,97 @@
     //Signaling
     /////////////////////////////////////////////
 
-    function sendMessage(message){
-      console.log('Client send message:', message);
-        JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
-    }
+      function sendMessage(message){
+        console.log('Client send message:', message);
+          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+      }
 
-    JhiTrackerService.receiveInvite().then(null, null, function(received) {
-        handleContent(received);
-    });
+      JhiTrackerService.receiveInvite().then(null, null, function(received) {
+          handleContent(received);
+      });
 
-    function handleContent (message){
-       console.log('Client received message:', message);
-        if (message.type === 'answer' && isStarted) {
-          pc.setRemoteDescription(new RTCSessionDescription(message));
-          gotAnswer = true;
-        } else if (message.type === 'candidate' && isStarted && gotAnswer) {
-          var candidate = new RTCIceCandidate({
-            sdpMLineIndex: message.label,
-            candidate: message.candidate
-        });
-        pc.addIceCandidate(candidate);
-        } else if (message.content === 'bye' && isStarted && gotAnswer) {
-          handleRemoteHangup();
-        } else if (message.content == 'needOffer'){
-          sendMessage(storedOffer);
-        }
-    }
+      //$rootScope.$on('$stateChangeStart',hangUp());
+      $scope.$on('$destroy', function() {
+        hangup();
+      });
 
-////////////////////////////////////////////////////
-    function handleUserMedia(stream) {
-      console.log('initializing 3D model');
-      init3D();
-      console.log('Adding local stream.');
-      localVideo.src = window.URL.createObjectURL(stream);
-      localStream = stream;
-      if (!isStarted && typeof localStream != 'undefined') {
-        createPeerConnection();
-        pc.addStream(localStream);
-        isStarted = true;
-        console.log('isInitiator', isInitiator);
-        if (isInitiator) {
-          doCall();
+      function handleContent (message){
+         console.log('Client received message:', message);
+          if (message.type === 'answer' && isStarted) {
+            pc.setRemoteDescription(new RTCSessionDescription(message));
+            gotAnswer = true;
+          } else if (message.type === 'candidate' && isStarted && gotAnswer) {
+            var candidate = new RTCIceCandidate({
+              sdpMLineIndex: message.label,
+              candidate: message.candidate
+          });
+          pc.addIceCandidate(candidate);
+          } else if (message.content === 'bye' && isStarted && gotAnswer) {
+            handleRemoteHangup();
+          } else if (message.content == 'needOffer'){
+            sendMessage(storedOffer);
+          }
+      }
+
+  ////////////////////////////////////////////////////
+      function handleUserMedia(stream) {
+        console.log('initializing 3D model');
+        init3D();
+        console.log('Adding local stream.');
+        localVideo.src = window.URL.createObjectURL(stream);
+        localStream = stream;
+        if (!isStarted && typeof localStream != 'undefined') {
+          createPeerConnection();
+          pc.addStream(localStream);
+          isStarted = true;
+          console.log('isInitiator', isInitiator);
+          if (isInitiator) {
+            doCall();
+          }
         }
       }
-    }
 
-    function handleUserMediaError(error){
-      console.log('getUserMedia error: ', error);
-    }
+      function handleUserMediaError(error){
+        console.log('getUserMedia error: ', error);
+      }
 
-    //var constraints = {video: true};
-    //navigator.getUserMedia(constraints, handleUserMedia, handleUserMediaError);
-    //var constraints = {video: {facingMode: { exact: "environment" }}};
-    //navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
-    UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+      UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
 
-    console.log('Getting user media with constraints', constraints);
+      if (location.hostname != "localhost") {
+        console.log('would request turn');
+        //requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
+      }
 
-    if (location.hostname != "localhost") {
-      console.log('would request turn');
-      //requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
-    }
-
-    window.onbeforeunload = function(e){
-	     sendMessage({'content':'bye'});
-     }
+      window.onbeforeunload = function(e){
+        hangup();
+      }
 
 /////////////////////////////////////////////////////////
 
-  function createPeerConnection() {
-    try {
-      pc = new RTCPeerConnection(pc_config);
-      pc.onicecandidate = handleIceCandidate;
-      pc.onaddstream = handleRemoteStreamAdded;
-      pc.onremovestream = handleRemoteStreamRemoved;
-      console.log('Created RTCPeerConnnection');
-    } catch (e) {
-      console.log('Failed to create PeerConnection, exception: ' + e.message);
-      alert('Cannot create RTCPeerConnection object.');
-      return;
+    function createPeerConnection() {
+      try {
+        pc = new RTCPeerConnection(pc_config);
+        pc.onicecandidate = handleIceCandidate;
+        pc.onaddstream = handleRemoteStreamAdded;
+        pc.onremovestream = handleRemoteStreamRemoved;
+        console.log('Created RTCPeerConnnection');
+      } catch (e) {
+        console.log('Failed to create PeerConnection, exception: ' + e.message);
+        //alert('Cannot create RTCPeerConnection object.');
+        return;
+      }
     }
-  }
 
-  function handleIceCandidate(event) {
-    console.log('handleIceCandidate event: ', event);
-    if (event.candidate) {
-      sendMessage({
-        type: 'candidate',
-        label: event.candidate.sdpMLineIndex,
-        id: event.candidate.sdpMid,
-        candidate: event.candidate.candidate});
+    function handleIceCandidate(event) {
+      console.log('handleIceCandidate event: ', event);
+      if (event.candidate) {
+        sendMessage({
+          type: 'candidate',
+          label: event.candidate.sdpMLineIndex,
+          id: event.candidate.sdpMid,
+          candidate: event.candidate.candidate});
       } else {
-        console.log('End of candidates.');
+          console.log('End of candidates.');
       }
     }
 
@@ -148,18 +147,10 @@
       console.log('createOffer() error: ', e);
     }
 
-    function handleCreateAnswerError(event){
-      console.log('createAnswer() error: ', e);
-    }
 
     function doCall() {
       console.log('Sending offer to peer.');
       pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
-    }
-
-    function doAnswer() {
-      console.log('Sending answer to peer.');
-      pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
     }
 
     function setLocalAndSendMessage(sessionDescription) {
@@ -188,63 +179,56 @@
         // No TURN server. Get one from computeengineondemand.appspot.com:
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function(){
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          var turnServer = JSON.parse(xhr.responseText);
-      	  console.log('Got TURN server: ', turnServer);
-          pc_config.iceServers.push({
-          'url': 'turn:' + turnServer.username + '@' + turnServer.turn,
-          'credential': turnServer.password
-        });
-        turnReady = true;
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var turnServer = JSON.parse(xhr.responseText);
+      	    console.log('Got TURN server: ', turnServer);
+            pc_config.iceServers.push({
+              'url': 'turn:' + turnServer.username + '@' + turnServer.turn,
+              'credential': turnServer.password
+            });
+            turnReady = true;
+          }
+        };
+        xhr.open('GET', turn_url, true);
+        xhr.send();
       }
-    };
-    xhr.open('GET', turn_url, true);
-    xhr.send();
     }
-  }
 
-function handleRemoteStreamAdded(event) {
-  console.log('Remote stream added.');
-  remoteVideo.src = window.URL.createObjectURL(event.stream);
-  remoteStream = event.stream;
-}
+    function hangup() {
+      console.log('Hanging up.');
+      sendMessage({goal: 'rtc', content:'bye'});
+      stop();
+    }
 
-function handleRemoteStreamRemoved(event) {
-  console.log('Remote stream removed. Event: ', event);
-}
+    function handleRemoteHangup() {
+      console.log('Session terminated.');
+      stop();
 
-function hangup() {
-  console.log('Hanging up.');
-  stop();
-  sendMessage('bye');
-}
+      $state.go('chooseroom');
+      // isInitiator = false;
+    }
 
-function handleRemoteHangup() {
-//  console.log('Session terminated.');
-  // stop();
-  // isInitiator = false;
-}
+    function stop() {
+      isStarted = false;
+      // isAudioMuted = false;
+      // isVideoMuted = false;
+      pc.close();
+      pc = null;
+      localVideo.pause();
+      localVideo.src = "";
+      UserMediaService.closeAllStreams(localStream);
+    }
 
-function stop() {
-  isStarted = false;
-  // isAudioMuted = false;
-  // isVideoMuted = false;
-    pc.close();
-    pc = null;
-  }
-
-///////////////////////////////////////////
-
-  function preferOpus(sdp){
-    return SdpService.getOpus(sdp);
-  }
-//////////////////////////////////////////////////////////////////////////////////
-// 3D
+    function preferOpus(sdp){
+      return SdpService.getOpus(sdp);
+    }
+    //////////////////////////////////////////////////////////////////////////////////
+    // 3D
 
     //vm.resetCubes = resetCubes;
 
 
-    function init3D(){
+      function init3D(){
         //container = document.getElementById( 'innerContainer' );
         container = document.getElementById( 'innerContainer' );
         //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
@@ -291,10 +275,10 @@ function stop() {
 
 
         window.addEventListener('resize', function() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        //camera.aspect = myCanvas.width / myCanvas.height;
-        camera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, window.innerHeight );
+          camera.aspect = window.innerWidth / window.innerHeight;
+          //camera.aspect = myCanvas.width / myCanvas.height;
+          camera.updateProjectionMatrix();
+          renderer.setSize( window.innerWidth, window.innerHeight );
         }, false);
 
         animate();
@@ -308,7 +292,6 @@ function stop() {
       }
 
       function animate(){
-        //camera.lookAt( scene.position );
         renderer.render(scene, camera);
       }
 

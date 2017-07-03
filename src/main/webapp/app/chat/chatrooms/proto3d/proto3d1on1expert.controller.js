@@ -5,15 +5,11 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1ExpertController', Proto3D1on1ExpertController);
 
-    Proto3D1on1ExpertController.$inject = ['$rootScope','$cookies', '$http','JhiTrackerService', 'SdpService', 'OrientationCalculator'];
+    Proto3D1on1ExpertController.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator'];
 
-    function Proto3D1on1ExpertController($rootScope, $cookies, $http, JhiTrackerService, SdpService, OrientationCalculator) {
-      //navigator.getUserMedia = navigator.getUserMedia ||
-      //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
+    function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator) {
       var vm = this;
-      //var isChannelReady;
-      var isInitiator = true;//$rootScope.isInitiator;
+
       var isStarted = false;
       var gotOffer = false;
       var localStream;
@@ -30,8 +26,6 @@
         'OfferToReceiveAudio':true,
         'OfferToReceiveVideo':true }};
 
-
-      //  var localVideo = document.querySelector('#video');
       var remoteVideo = document.querySelector('#video');
       //Signaling
       /////////////////////////////////////////////
@@ -42,6 +36,18 @@
 
       JhiTrackerService.receiveInvite().then(null, null, function(received) {
           handleContent(received);
+      });
+
+      //$rootScope.$on('$stateChangeStart',hangup());
+      // $scope.$watch(function(){
+      //     return $state.$current.name
+      //   }, function(newVal, oldVal){
+      //     if(newVal !== 'proto3d1on1expert'){
+      //       valu
+      //     }
+      // });
+      $scope.$on('$destroy', function() {
+        hangup();
       });
 
       function handleContent (message){
@@ -95,10 +101,10 @@
       }
 
       window.onbeforeunload = function(e){
-         sendMessage({goal: 'rtc', content:'bye'});
-       }
 
-    /////////////////////////////////////////////////////////
+      }
+
+      /////////////////////////////////////////////////////////
 
       function createPeerConnection() {
         try {
@@ -183,132 +189,133 @@
           }
         }
 
-      function handleRemoteStreamAdded(event) {
-        console.log('Remote stream added.');
-        remoteVideo.src = window.URL.createObjectURL(event.stream);
-        remoteStream = event.stream;
-      }
-
-      function handleRemoteStreamRemoved(event) {
-        console.log('Remote stream removed. Event: ', event);
-      }
-
-      function hangup() {
-        console.log('Hanging up.');
-        stop();
-        sendMessage('bye');
-      }
-
-      function handleRemoteHangup() {
-      //  console.log('Session terminated.');
-      // stop();
-      // isInitiator = false;
-      }
-
-      function stop() {
-        isStarted = false;
-      // isAudioMuted = false;
-      // isVideoMuted = false;
-        pc.close();
-        pc = null;
-      }
-
-      ///////////////////////////////////////////
-
-      // Set Opus as the default audio codec if it's present.
-      function preferOpus(sdp) {
-          return SdpService.getOpus(sdp);
+        function handleRemoteStreamAdded(event) {
+          console.log('Remote stream added.');
+          remoteVideo.src = window.URL.createObjectURL(event.stream);
+          remoteStream = event.stream;
         }
+
+        function handleRemoteStreamRemoved(event) {
+          console.log('Remote stream removed. Event: ', event);
+        }
+
+        function hangup() {
+          console.log('Hanging up.');
+          sendMessage({goal: 'rtc', content:'bye'});
+          stop();
+        }
+
+        function handleRemoteHangup() {
+          console.log('Session terminated.');
+          stop();
+          $state.go('chooseroom');
+        }
+
+        function stop() {
+          isStarted = false;
+        // isAudioMuted = false;
+        // isVideoMuted = false;
+          pc.close();
+          pc = null;
+          //UserMediaService.closeAllStreams(localStream);
+        }
+
+        ///////////////////////////////////////////
+
+        // Set Opus as the default audio codec if it's present.
+        function preferOpus(sdp) {
+            return SdpService.getOpus(sdp);
+          }
+          //////////////////////////////////////////////////////////////////////////////////
+          // 3D////////////////////////////////////////////////
+          // canvas//navigator.getUserMedia = navigator.getUserMedia ||
+          //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+
         //////////////////////////////////////////////////////////////////////////////////
-        // 3D////////////////////////////////////////////////
-        // canvas//navigator.getUserMedia = navigator.getUserMedia ||
-        //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        var container;
+        var camera, scene, renderer;
+        var plane, cube;
+        var mouse, raycaster, isShiftDown = false;
+        var rollOverMesh, rollOverMaterial;
+        var cubeGeo, cubeMaterial;
+        var objects = [];
+        init3D();
+        function init3D(){
+            //container = document.getElementById( 'innerContainer' );
+            container = document.getElementById( 'innerContainer' );
+            //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
+            camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
+            camera.position.set( 500, 800, 1300 );
+            camera.lookAt( new THREE.Vector3() );
+            scene = new THREE.Scene();
+            // roll-over helpers
+            var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+            rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+            rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+            scene.add( rollOverMesh );
+            // cubes
+            cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+            //cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
+            // grid
+            var gridHelper = new THREE.GridHelper( 1000, 20 );
+            scene.add( gridHelper );
+            //
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+            geometry.rotateX( - Math.PI / 2 );
+            plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+            scene.add( plane );
+            objects.push( plane );
+            // Lights
+            var ambientLight = new THREE.AmbientLight( 0x606060 );
+            scene.add( ambientLight );
+            var directionalLight = new THREE.DirectionalLight( 0xffffff );
+            directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
+            scene.add( directionalLight );
+            renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
+            renderer.setClearColor( 0x000000, 0 );
+
+          //  renderer.setClearColor( 0xf0f0f0 );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            //renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.setSize( 640,400 );
+            //renderer.domElement = myCanvas;
+            //
+            //renderer.domElement.style.position = 'absolute';
+            container.appendChild( renderer.domElement );
 
 
-      //////////////////////////////////////////////////////////////////////////////////
-      var container;
-      var camera, scene, renderer;
-      var plane, cube;
-      var mouse, raycaster, isShiftDown = false;
-      var rollOverMesh, rollOverMaterial;
-      var cubeGeo, cubeMaterial;
-      var objects = [];
-      init3D();
-      function init3D(){
-          //container = document.getElementById( 'innerContainer' );
-          container = document.getElementById( 'innerContainer' );
-          //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
-          camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
-          camera.position.set( 500, 800, 1300 );
-          camera.lookAt( new THREE.Vector3() );
-          scene = new THREE.Scene();
-          // roll-over helpers
-          var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
-          rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-          rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-          scene.add( rollOverMesh );
-          // cubes
-          cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-          //cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
-          // grid
-          var gridHelper = new THREE.GridHelper( 1000, 20 );
-          scene.add( gridHelper );
-          //
-          raycaster = new THREE.Raycaster();
-          mouse = new THREE.Vector2();
-          var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
-          geometry.rotateX( - Math.PI / 2 );
-          plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-          scene.add( plane );
-          objects.push( plane );
-          // Lights
-          var ambientLight = new THREE.AmbientLight( 0x606060 );
-          scene.add( ambientLight );
-          var directionalLight = new THREE.DirectionalLight( 0xffffff );
-          directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-          scene.add( directionalLight );
-          renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
-          renderer.setClearColor( 0x000000, 0 );
+            window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            //camera.aspect = myCanvas.width / myCanvas.height;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            }, false);
 
-        //  rrenderer.setClearColor( 0xf0f0f0 );
-          renderer.setPixelRatio( window.devicePixelRatio );
-          //renderer.setSize( window.innerWidth, window.innerHeight );
-          renderer.setSize( 640,400 );
-          //renderer.domElement = myCanvas;
-          //
-          //renderer.domElement.style.position = 'absolute';
-          container.appendChild( renderer.domElement );
+            animate();
+            //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
+            window.requestAnimationFrame( animate );
+          }
 
+          function animate(){
+            //camera.lookAt( scene.position );
+            renderer.render(scene, camera);
+          }
 
-          window.addEventListener('resize', function() {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          //camera.aspect = myCanvas.width / myCanvas.height;
-          camera.updateProjectionMatrix();
-          renderer.setSize( window.innerWidth, window.innerHeight );
-          }, false);
+          function setCamera(deviceEvent){
+            //console.log(event);
+            var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
+            console.log(orientationInfo);
+            setOrientationInfo(orientationInfo);
+            animate();
+          }
 
-          animate();
-          //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
-          window.requestAnimationFrame( animate );
-        }
-
-        function animate(){
-          //camera.lookAt( scene.position );
-          renderer.render(scene, camera);
-        }
-
-        function setCamera(deviceEvent){
-          //console.log(event);
-          var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
-          console.log(orientationInfo);
-          setOrientationInfo(orientationInfo);
-          animate();
-        }
-
-        function setOrientationInfo(orientationInfo){
-          camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
-          camera.quaternion.multiply(orientationInfo.backCamMultiplier);
-          camera.quaternion.multiply(orientationInfo.screenAdjustment);
-        }
+          function setOrientationInfo(orientationInfo){
+            camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
+            camera.quaternion.multiply(orientationInfo.backCamMultiplier);
+            camera.quaternion.multiply(orientationInfo.screenAdjustment);
+          }
     }
 })();

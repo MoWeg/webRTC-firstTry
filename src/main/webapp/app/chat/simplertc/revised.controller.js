@@ -12,19 +12,15 @@
       var videoSource = null;
       vm.devices = [];
 
-      //var videoDevices = []
-      //var switched = false;
       var localVideo = document.querySelector('#firstVideo');
       //var videoSelect = document.querySelector('select#videoSource');
       init();
 
       function init(){
          UserMediaService.getBackCameraAsPromise().then(gotStream).catch(handleError);
-        //navigator.getUserMedia(constraints, gotStream, handleError);
       }
 
       function gotStream(stream) {
-        //video.srcObject = stream;
         localVideo.srcObject = stream;
       }
 

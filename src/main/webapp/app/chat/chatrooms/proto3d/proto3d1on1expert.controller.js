@@ -301,6 +301,11 @@
             animate();
             //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
             window.requestAnimationFrame( animate );
+
+            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				    document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
 
           function animate(){
@@ -356,6 +361,69 @@
               oldVideoHeight = height;
               oldVideoWidth = width;
             }
+          }
+
+          function onDocumentMouseMove( event ) {
+            event.preventDefault();
+            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+            raycaster.setFromCamera( mouse, camera );
+            var intersects = raycaster.intersectObjects( objects );
+            if ( intersects.length > 0 ) {
+              var intersect = intersects[ 0 ];
+              rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+              rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+            }
+            render();
+          }
+
+          function onDocumentMouseDown( event ) {
+            event.preventDefault();
+            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+            raycaster.setFromCamera( mouse, camera );
+            var intersects = raycaster.intersectObjects( objects );
+            if ( intersects.length > 0 ) {
+              var intersect = intersects[ 0 ];
+              // delete cube
+              if ( isShiftDown ) {
+                if ( intersect.object != plane ) {
+                  scene.remove( intersect.object );
+                  objects.splice( objects.indexOf( intersect.object ), 1 );
+                  //sendVoxel(voxel, false);
+                }
+              // create cube
+              } else {
+                var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+                voxel.position.copy( intersect.point ).add( intersect.face.normal );
+                voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+                scene.add( voxel );
+                objects.push( voxel );
+                sendVoxel(voxel, true);
+              }
+              render();
+            }
+          }
+          function onDocumentKeyDown( event ) {
+            switch( event.keyCode ) {
+              case 16: isShiftDown = true; break;
+            }
+          }
+          function onDocumentKeyUp( event ) {
+            switch ( event.keyCode ) {
+              case 16: isShiftDown = false; break;
+            }
+          }
+          function render() {
+            renderer.render( scene, camera );
+          }
+
+          function sendVoxel(voxel, insert){
+            var voxelDto = {
+              x : voxel.position.x,
+              y : voxel.position.y,
+              z : voxel.position.z,
+              insert : insert,
+            }
+            JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'voxel' ,voxel: voxelDto});
           }
     }
 })();

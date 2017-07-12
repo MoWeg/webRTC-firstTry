@@ -87,6 +87,11 @@
             handleRemoteHangup();
           } else if (message.content == 'needOffer'){
             sendMessage(storedOffer);
+          } else if(message.goal == '3d'){
+            if(message.content == 'voxel'){
+                console.log(message.voxel);
+                createVoxel(message.voxel);
+            }
           }
       }
 
@@ -368,6 +373,19 @@
           oldVideoHeight = height;
           oldVideoWidth = width;
         }
+      }
+
+      function createVoxel(voxelDto) {
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+            //voxel.position.copy( intersect.point ).add( intersect.face.normal );
+            //voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+        voxel.position.x = voxelDto.x;
+        voxel.position.y = voxelDto.y;
+        voxel.position.z = voxelDto.z;
+        scene.add( voxel );
+        objects.push( voxel );
+
+        animate();
       }
     }
 })();

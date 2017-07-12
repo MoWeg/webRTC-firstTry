@@ -17,6 +17,7 @@ public class SimpleChatMessageDTO {
 
 	private PaintDto[] paint;
 	private DeviceOrientationDto orientation;
+	private VoxelDto voxel;
 	
 	public String getContent() {
 		return content;
@@ -104,6 +105,14 @@ public class SimpleChatMessageDTO {
 
 	public void setOrientation(DeviceOrientationDto orient) {
 		this.orientation = orient;
+	}
+
+	public VoxelDto getVoxel() {
+		return voxel;
+	}
+
+	public void setVoxel(VoxelDto voxel) {
+		this.voxel = voxel;
 	}
 
 	@Override

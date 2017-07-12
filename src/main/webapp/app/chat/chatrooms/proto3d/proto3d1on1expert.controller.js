@@ -12,10 +12,20 @@
 
       var isStarted = false;
       var gotOffer = false;
-      var localStream;
       var pc;
       var remoteStream;
       var turnReady;
+
+      var container;
+      var camera, scene, renderer;
+      var plane, cube;
+      var mouse, raycaster, isShiftDown = false;
+      var rollOverMesh, rollOverMaterial;
+      var cubeGeo, cubeMaterial;
+      var objects = [];
+
+      var oldVideoHeight = 0;
+      var oldVideoWidth = 0;
 
       //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
       var pc_config = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}; //, stun:stun4.l.google.com:19302, stun:stun1.l.google.com:19302, stun:stun01.sipphone.com
@@ -27,6 +37,7 @@
         'OfferToReceiveVideo':true }};
 
       var remoteVideo = document.querySelector('#video');
+      var innerContainer = document.querySelector('#innerContainer')
       //Signaling
       /////////////////////////////////////////////
 
@@ -38,17 +49,17 @@
           handleContent(received);
       });
 
-      //$rootScope.$on('$stateChangeStart',hangup());
-      // $scope.$watch(function(){
-      //     return $state.$current.name
-      //   }, function(newVal, oldVal){
-      //     if(newVal !== 'proto3d1on1expert'){
-      //       valu
-      //     }
-      // });
       $scope.$on('$destroy', function() {
         hangup();
       });
+
+      init3D();
+      $scope.$watch(remoteVideo, function(oldval, newval){
+          //resize3dModell(remoteVideo.videoHeight, remoteVideo.videoWidth);
+          console.log('height: '+ remoteVideo.videoHeight +' width: '+remoteVideo.videoWidth);
+      }, true);
+
+      remoteVideo.addEventListener('resize', resize3dModell(remoteVideo.videoHeight, remoteVideo.videoWidth));
 
       function handleContent (message){
          //console.log('Client received message:', message);
@@ -100,11 +111,6 @@
         }
       }
 
-      window.onbeforeunload = function(e){
-
-      }
-
-      /////////////////////////////////////////////////////////
 
       function createPeerConnection() {
         try {
@@ -135,9 +141,11 @@
         }
 
         function handleRemoteStreamAdded(event) {
+
           console.log('Remote stream added.');
           remoteVideo.src = window.URL.createObjectURL(event.stream);
           remoteStream = event.stream;
+          //resize3dModell(remoteVideo.height, remoteVideo.width);
         }
 
         function handleCreateAnswerError(event){
@@ -233,17 +241,12 @@
 
 
         //////////////////////////////////////////////////////////////////////////////////
-        var container;
-        var camera, scene, renderer;
-        var plane, cube;
-        var mouse, raycaster, isShiftDown = false;
-        var rollOverMesh, rollOverMaterial;
-        var cubeGeo, cubeMaterial;
-        var objects = [];
-        init3D();
+
+
         function init3D(){
             //container = document.getElementById( 'innerContainer' );
-            container = document.getElementById( 'innerContainer' );
+            //container = document.getElementById( 'innerContainer' );
+            container = innerContainer;
             //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
             camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
             camera.position.set( 500, 800, 1300 );
@@ -280,7 +283,8 @@
           //  renderer.setClearColor( 0xf0f0f0 );
             renderer.setPixelRatio( window.devicePixelRatio );
             //renderer.setSize( window.innerWidth, window.innerHeight );
-            renderer.setSize( 640,400 );
+            //renderer.setSize( remoteVideo.width, remoteVideo.height );
+            renderer.setSize( 640, 400);
             //renderer.domElement = myCanvas;
             //
             //renderer.domElement.style.position = 'absolute';
@@ -306,6 +310,7 @@
 
           function setCamera(deviceEvent){
             //console.log(event);
+            checkResize();
             var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
             console.log(orientationInfo);
             setOrientationInfo(orientationInfo);
@@ -313,9 +318,44 @@
           }
 
           function setOrientationInfo(orientationInfo){
-            camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
-            camera.quaternion.multiply(orientationInfo.backCamMultiplier);
-            camera.quaternion.multiply(orientationInfo.screenAdjustment);
+            if(camera){
+              camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
+              camera.quaternion.multiply(orientationInfo.backCamMultiplier);
+              camera.quaternion.multiply(orientationInfo.screenAdjustment);
+            }
+          }
+
+          function resize3dModell(height, width){
+            if(height != null){
+              innerContainer.height = height;
+            } else {
+              height = innerContainer.height;
+            }
+            if(width != null){
+              innerContainer.width = width;
+            }else{
+              width = innerContainer.width;
+            }
+
+            if(renderer != null && camera != null){
+
+              camera.aspect = width / height;
+              //camera.aspect = myCanvas.width / myCanvas.height;
+              camera.updateProjectionMatrix();
+              renderer.setSize( width, height);
+              //animate();
+            }
+          }
+          function checkResize() {
+            var height = remoteVideo.videoHeight;
+            var width = remoteVideo.videoWidth;
+            //console.log('checkResize with: '+height+' '+width);
+            if(height != oldVideoHeight||width != oldVideoWidth){
+              //console.log('checkResize with: '+height+' '+width);
+              resize3dModell(height, width);
+              oldVideoHeight = height;
+              oldVideoWidth = width;
+            }
           }
     }
 })();

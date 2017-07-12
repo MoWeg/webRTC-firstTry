@@ -28,6 +28,10 @@
       var cubeGeo, cubeMaterial;
       var objects = [];
 
+      var oldVideoHeight = 0;
+      var oldVideoWidth = 0;
+
+
       //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
       var pc_config = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}; //, stun:stun4.l.google.com:19302, stun:stun1.l.google.com:19302, stun:stun01.sipphone.com
       var pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
@@ -39,23 +43,34 @@
 
 
       var localVideo = document.querySelector('#video');
+      var innerContainer = document.querySelector('#innerContainer');
 
-    //Signaling
-    /////////////////////////////////////////////
+      $scope.$on('$destroy', function() {
+        hangup();
+      });
 
-      function sendMessage(message){
-        console.log('Client send message:', message);
-          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
-      }
+      UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+
+      init3D();
+      // $scope.$watch(videoHeight, function(oldval, newval){
+      //     resize3dModell(localVideo.videoHeight, null);
+      // }, true);
+      // $scope.$watch(videoWidth, function(oldval, newval){
+      //     resize3dModell(null, localVideo.videoWidth);
+      // }, true);
+      //localVideo.addEventListener('resize', resize3dModell(localVideo.videoHeight,  localVideo.videoWidth));
+
+      //Signaling
+      /////////////////////////////////////////////
 
       JhiTrackerService.receiveInvite().then(null, null, function(received) {
           handleContent(received);
       });
 
-      //$rootScope.$on('$stateChangeStart',hangUp());
-      $scope.$on('$destroy', function() {
-        hangup();
-      });
+      function sendMessage(message){
+        console.log('Client send message:', message);
+          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+      }
 
       function handleContent (message){
          console.log('Client received message:', message);
@@ -75,13 +90,15 @@
           }
       }
 
-  ////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////
       function handleUserMedia(stream) {
         console.log('initializing 3D model');
-        init3D();
+
         console.log('Adding local stream.');
         localVideo.src = window.URL.createObjectURL(stream);
         localStream = stream;
+        //init3D();
+        //resize3dModell(localVideo.height, localVideo.width);
         if (!isStarted && typeof localStream != 'undefined') {
           createPeerConnection();
           pc.addStream(localStream);
@@ -97,16 +114,14 @@
         console.log('getUserMedia error: ', error);
       }
 
-      UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+
 
       if (location.hostname != "localhost") {
         console.log('would request turn');
         //requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
       }
 
-      window.onbeforeunload = function(e){
-        hangup();
-      }
+
 
 /////////////////////////////////////////////////////////
 
@@ -230,7 +245,8 @@
 
       function init3D(){
         //container = document.getElementById( 'innerContainer' );
-        container = document.getElementById( 'innerContainer' );
+        //container = document.getElementById( 'innerContainer' );
+        container = innerContainer;
         //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
         camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
         camera.position.set( 500, 800, 1300 );
@@ -268,6 +284,7 @@
         renderer.setPixelRatio( window.devicePixelRatio );
         //renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.setSize( 640,400 );
+        //renderer.setSize( localVideo.width, localVideo.height );
         //renderer.domElement = myCanvas;
         //
         //renderer.domElement.style.position = 'absolute';
@@ -299,6 +316,7 @@
         var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
         setOrientationInfo(orientationInfo);
         sendOrientation(createDeviceOrientationDto(deviceEvent));
+        checkResize();
         animate();
       }
 
@@ -318,6 +336,38 @@
 
       function sendOrientation(newOrientation) {
         JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'camera' ,orientation: newOrientation});
+      }
+
+      function resize3dModell(height, width){
+        if(height != null){
+          innerContainer.height = height;
+        } else {
+          height = innerContainer.height;
+        }
+        if(width != null){
+          innerContainer.width = width;
+        }else{
+          width = innerContainer.width;
+        }
+
+        if(renderer != null && camera != null){
+
+          camera.aspect = width / height;
+          //camera.aspect = myCanvas.width / myCanvas.height;
+          camera.updateProjectionMatrix();
+          renderer.setSize( width, height);
+          //animate();
+        }
+      }
+
+      function checkResize() {
+        var height = localVideo.videoHeight;
+        var width = localVideo.videoWidth;
+        if(height != oldVideoHeight||width != oldVideoWidth){
+          resize3dModell(height, width);
+          oldVideoHeight = height;
+          oldVideoWidth = width;
+        }
       }
     }
 })();

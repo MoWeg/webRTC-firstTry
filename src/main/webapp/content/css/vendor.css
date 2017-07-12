@@ -5820,8 +5820,6 @@ button.close {
 /* bower:sass */
 /* endinject */
 .my-video {
-  width: 640px;
-  height: 400px;
   z-index: 1; }
 
 .is-under {
@@ -5831,8 +5829,6 @@ button.close {
   position: absolute; }
 
 .my-drawing-canvas {
-  width: 640px;
-  height: 400px;
   z-index: 10; }
 
 .underlay {

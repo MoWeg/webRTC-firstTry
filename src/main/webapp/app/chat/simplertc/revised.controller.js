@@ -22,6 +22,8 @@
 
       function gotStream(stream) {
         localVideo.srcObject = stream;
+        console.log(localVideo.videoHeight+" "+localVideo.videoWidth);
+
       }
 
       function handleError(error) {

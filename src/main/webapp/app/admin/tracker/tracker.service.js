@@ -226,8 +226,6 @@
         }
 
         function subscribeToPartner(){
-          console.log('my id for chat: '+$rootScope.myIdForChat);
-          console.log('my partner for chat: '+$rootScope.partnerIdForChat);
           subscribeToUser($rootScope.partnerIdForChat);
         }
 

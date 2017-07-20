@@ -25,6 +25,7 @@
       var objects = [];
       var viewWithCamera;
       var viewWithoutCamera;
+      var view2Cam;
       var view1CamHelper;
 
       var oldVideoHeight = 0;
@@ -95,7 +96,6 @@
             handleRemoteHangup();
           } else if(message.goal == '3d'){
             if(message.content == 'camera'){
-                console.log(message.orientation);
                 setCamera(message.orientation);
           }
         }
@@ -130,7 +130,6 @@
         }
 
         function handleIceCandidate(event) {
-          console.log('handleIceCandidate event: ', event);
           if (event.candidate) {
             sendMessage({
               goal: 'rtc',
@@ -251,6 +250,10 @@
           canvas.appendChild(renderer.domElement);
 
           this.render = function () {
+            view1CamHelper.visible = showHelper;
+            if(showHelper){
+              camera.lookAt(scene.position);
+            }
             renderer.render( scene, camera );
           };
 
@@ -276,31 +279,32 @@
             var w = 640, h = 640;
             var fullWidth = w * 2;
             var fullHeight = h * 2;
+            canvas2.width = fullWidth;
+            canvas2.height = fullHeight
 
             var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
             renderer.setClearColor( 0x000000, 0 );
             renderer.setPixelRatio( window.devicePixelRatio );
             renderer.setSize( 400, 640);
 
-            // var renderer2  = new THREE.WebGLRenderer( { antialias: true } );
-            // renderer2.setClearColor( 0xffffff );
-            // renderer2.setPixelRatio( window.devicePixelRatio );
-            // renderer2.setSize( 640, 640 );
+            var renderer2  = new THREE.WebGLRenderer( { antialias: true } );
+            renderer2.setClearColor( 0xffffff );
+            renderer2.setPixelRatio( window.devicePixelRatio );
+            renderer2.setSize( 640, 640 );
 
 
             var view1Cam = new THREE.PerspectiveCamera( 45, 400 / 640, 1, 10000 );
             view1Cam.position.set( 500, 800, 1300 );
-            view1Cam.lookAt( new THREE.Vector3() );
-
+            // view1Cam.lookAt( new THREE.Vector3() );
             viewWithCamera = new View( canvas1, 400, 640, view1Cam, renderer, false );
+            view1CamHelper = new THREE.CameraHelper( view1Cam );
+            view1CamHelper.position.set( 500, 800, 1300 );
+            scene.add( view1CamHelper );
 
-            // view2Cam = new THREE.PerspectiveCamera( 20, w / h, 1, 20000 );
-            // view2Cam.position.z = 3600;
-            // view2Cam.position.x = 100;
-            // view2Cam.position.y = 100;
-            // views.push( new View( canvas2, fullWidth, fullHeight, view2Cam, renderer2, true ) );
-            // view1CamHelper = new THREE.CameraHelper( view1Cam );
-            // scene.add( view1CamHelper );
+            view2Cam = new THREE.PerspectiveCamera( 20, w / h, 1, 30000 );
+            view2Cam.position.set( 1000, 1600, 2600 );
+            view2Cam.lookAt( scene.position );
+            viewWithoutCamera = new View( canvas2, fullWidth, fullHeight, view2Cam, renderer2, true );
 
             // roll-over helpers
             var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
@@ -337,7 +341,8 @@
 
             //animate();
 
-            viewWithCamera.render()
+            viewWithCamera.render();
+            viewWithoutCamera.render();
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
@@ -354,6 +359,7 @@
             var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
             viewWithCamera.setOrientationInfo(orientationInfo);
             viewWithCamera.render();
+            viewWithoutCamera.render();
           }
 
           function resize3dModell(height, width){

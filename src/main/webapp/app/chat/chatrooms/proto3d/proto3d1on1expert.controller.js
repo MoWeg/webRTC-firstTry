@@ -17,12 +17,15 @@
       var turnReady;
 
       var container;
-      var camera, scene, renderer;
+      var scene;
       var plane, cube;
       var mouse, raycaster, isShiftDown = false;
       var rollOverMesh, rollOverMaterial;
       var cubeGeo, cubeMaterial;
       var objects = [];
+      var viewWithCamera;
+      var viewWithoutCamera;
+      var view1CamHelper;
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -37,7 +40,7 @@
         'OfferToReceiveVideo':true }};
 
       var remoteVideo = document.querySelector('#video');
-      var innerContainer = document.querySelector('#innerContainer')
+      var innerContainer = document.querySelector('#videos')
       //Signaling
       /////////////////////////////////////////////
 
@@ -241,17 +244,64 @@
 
 
         //////////////////////////////////////////////////////////////////////////////////
+        function View( canvas, viewWidth, viewHeight, inputCamera, inputRenderer,  withHelper) {
+          var showHelper = withHelper;
+          var renderer = inputRenderer;
+          var camera = inputCamera;
+          canvas.appendChild(renderer.domElement);
 
+          this.render = function () {
+            renderer.render( scene, camera );
+          };
+
+          this.setNewSize = function( newWidth, newHeight ){
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth,newHeight);
+          };
+
+          this.setOrientationInfo = function(orientationInfo){
+            camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
+            camera.quaternion.multiply(orientationInfo.backCamMultiplier);
+            camera.quaternion.multiply(orientationInfo.screenAdjustment);
+          }
+        }
 
         function init3D(){
-            //container = document.getElementById( 'innerContainer' );
-            //container = document.getElementById( 'innerContainer' );
-            container = innerContainer;
-            //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
-            camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
-            camera.position.set( 500, 800, 1300 );
-            camera.lookAt( new THREE.Vector3() );
             scene = new THREE.Scene();
+
+            var canvas1 = document.getElementById( 'canvas1' );
+            var canvas2 = document.getElementById( 'canvas2' );
+
+            var w = 640, h = 640;
+            var fullWidth = w * 2;
+            var fullHeight = h * 2;
+
+            var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
+            renderer.setClearColor( 0x000000, 0 );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( 400, 640);
+
+            // var renderer2  = new THREE.WebGLRenderer( { antialias: true } );
+            // renderer2.setClearColor( 0xffffff );
+            // renderer2.setPixelRatio( window.devicePixelRatio );
+            // renderer2.setSize( 640, 640 );
+
+
+            var view1Cam = new THREE.PerspectiveCamera( 45, 400 / 640, 1, 10000 );
+            view1Cam.position.set( 500, 800, 1300 );
+            view1Cam.lookAt( new THREE.Vector3() );
+
+            viewWithCamera = new View( canvas1, 400, 640, view1Cam, renderer, false );
+
+            // view2Cam = new THREE.PerspectiveCamera( 20, w / h, 1, 20000 );
+            // view2Cam.position.z = 3600;
+            // view2Cam.position.x = 100;
+            // view2Cam.position.y = 100;
+            // views.push( new View( canvas2, fullWidth, fullHeight, view2Cam, renderer2, true ) );
+            // view1CamHelper = new THREE.CameraHelper( view1Cam );
+            // scene.add( view1CamHelper );
+
             // roll-over helpers
             var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
             rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
@@ -277,57 +327,33 @@
             var directionalLight = new THREE.DirectionalLight( 0xffffff );
             directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
             scene.add( directionalLight );
-            renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
-            renderer.setClearColor( 0x000000, 0 );
 
-          //  renderer.setClearColor( 0xf0f0f0 );
-            renderer.setPixelRatio( window.devicePixelRatio );
-            //renderer.setSize( window.innerWidth, window.innerHeight );
-            //renderer.setSize( remoteVideo.width, remoteVideo.height );
-            renderer.setSize( 640, 400);
-            //renderer.domElement = myCanvas;
-            //
-            //renderer.domElement.style.position = 'absolute';
-            container.appendChild( renderer.domElement );
+            // window.addEventListener('resize', function() {
+            // //view2Cam.aspect = window.innerWidth / window.innerHeight;
+            // //camera.aspect = myCanvas.width / myCanvas.height;
+            // //camera.updateProjectionMatrix();
+            // renderer.setSize( window.innerWidth, window.innerHeight );
+            // }, false);
 
+            //animate();
 
-            window.addEventListener('resize', function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            //camera.aspect = myCanvas.width / myCanvas.height;
-            camera.updateProjectionMatrix();
-            renderer.setSize( window.innerWidth, window.innerHeight );
-            }, false);
-
-            animate();
-            //console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
-            window.requestAnimationFrame( animate );
-
+            viewWithCamera.render()
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				    document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
 
-          function animate(){
-            //camera.lookAt( scene.position );
-            renderer.render(scene, camera);
-          }
+          // function animate(){
+          //
+          //   window.requestAnimationFrame( animate );
+          // }
 
           function setCamera(deviceEvent){
-            //console.log(event);
             checkResize();
             var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
-            console.log(orientationInfo);
-            setOrientationInfo(orientationInfo);
-            animate();
-          }
-
-          function setOrientationInfo(orientationInfo){
-            if(camera){
-              camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
-              camera.quaternion.multiply(orientationInfo.backCamMultiplier);
-              camera.quaternion.multiply(orientationInfo.screenAdjustment);
-            }
+            viewWithCamera.setOrientationInfo(orientationInfo);
+            viewWithCamera.render();
           }
 
           function resize3dModell(height, width){
@@ -342,21 +368,14 @@
               width = innerContainer.width;
             }
 
-            if(renderer != null && camera != null){
-
-              camera.aspect = width / height;
-              //camera.aspect = myCanvas.width / myCanvas.height;
-              camera.updateProjectionMatrix();
-              renderer.setSize( width, height);
-              //animate();
+            if(viewWithCamera != null){
+              viewWithCamera.setNewSize(width, height)
             }
           }
           function checkResize() {
             var height = remoteVideo.videoHeight;
             var width = remoteVideo.videoWidth;
-            //console.log('checkResize with: '+height+' '+width);
             if(height != oldVideoHeight||width != oldVideoWidth){
-              //console.log('checkResize with: '+height+' '+width);
               resize3dModell(height, width);
               oldVideoHeight = height;
               oldVideoWidth = width;
@@ -364,22 +383,22 @@
           }
 
           function onDocumentMouseMove( event ) {
-            event.preventDefault();
-            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            raycaster.setFromCamera( mouse, camera );
-            var intersects = raycaster.intersectObjects( objects );
-            if ( intersects.length > 0 ) {
-              var intersect = intersects[ 0 ];
-              rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-              rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-            }
-            render();
+            // event.preventDefault();
+            // mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+            // raycaster.setFromCamera( mouse, view2Cam );
+            // var intersects = raycaster.intersectObjects( objects );
+            // if ( intersects.length > 0 ) {
+            //   var intersect = intersects[ 0 ];
+            //   rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+            //   rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+            // }
+            // animate();
           }
 
           function onDocumentMouseDown( event ) {
             event.preventDefault();
             mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            raycaster.setFromCamera( mouse, camera );
+            raycaster.setFromCamera( mouse, view2Cam );
             var intersects = raycaster.intersectObjects( objects );
             if ( intersects.length > 0 ) {
               var intersect = intersects[ 0 ];
@@ -399,7 +418,7 @@
                 objects.push( voxel );
                 sendVoxel(voxel, true);
               }
-              render();
+              animate();
             }
           }
           function onDocumentKeyDown( event ) {
@@ -411,9 +430,6 @@
             switch ( event.keyCode ) {
               case 16: isShiftDown = false; break;
             }
-          }
-          function render() {
-            renderer.render( scene, camera );
           }
 
           function sendVoxel(voxel, insert){

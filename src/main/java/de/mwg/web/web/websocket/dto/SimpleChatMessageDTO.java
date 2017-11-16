@@ -18,6 +18,7 @@ public class SimpleChatMessageDTO {
 	private PaintDto[] paint;
 	private DeviceOrientationDto orientation;
 	private VoxelDto voxel;
+	private VoxelDto endPoint;
 	
 	public String getContent() {
 		return content;
@@ -113,6 +114,14 @@ public class SimpleChatMessageDTO {
 
 	public void setVoxel(VoxelDto voxel) {
 		this.voxel = voxel;
+	}
+
+	public VoxelDto getEndPoint() {
+		return endPoint;
+	}
+
+	public void setEndPoint(VoxelDto endPoint) {
+		this.endPoint = endPoint;
 	}
 
 	@Override

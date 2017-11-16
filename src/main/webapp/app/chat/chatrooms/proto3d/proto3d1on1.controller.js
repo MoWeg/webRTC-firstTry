@@ -94,6 +94,8 @@
             if(message.content == 'voxel'){
                 console.log(message.voxel);
                 createVoxel(message.voxel);
+            } else if(message.content == 'arrow') {
+                createArrow(message.voxel, message.endPoint);
             }else{
               createSprite(message.content, message.voxel);
             }
@@ -415,6 +417,17 @@
         objects.push( sprite );
         sprites.push( sprite );
 
+        animate();
+      }
+
+      function createArrow(startPos, endPos){
+        var dir = new THREE.Vector3(startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z).normalize();
+        var origin = new THREE.Vector3(endPos.x, endPos.y, endPos.z);
+        var length = Math.sqrt(Math.pow(endPos.x-startPos.x, 2) +  Math.pow(endPos.y-startPos.y, 2) +  Math.pow(endPos.z-startPos.z, 2));
+        var hex = 0x0bf23d;
+        var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+        arrowHelper.line.material.linewidth = 2;
+        scene.add( arrowHelper );
         animate();
       }
 

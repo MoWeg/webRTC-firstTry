@@ -9,31 +9,79 @@
 
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator) {
       var vm = this;
-      vm.tools = [new Tool("insert box", setBox), new Tool("insert hipster", setSprite)];
+      vm.tools = [];
+      vm.tools.push(new Tool("insert box", new BoxManager(), false));
+      vm.tools.push(new Tool("insert hipster", new SpriteManager(), false));
+      vm.tools.push(new Tool("insert arrow", new ArrowManager(), false));
       vm.activeTool = vm.tools[0];
       vm.setActive = function(tool){
         vm.activeTool = tool;
       };
-      function Tool(name, action){
+      function Tool(name, action, listensToMouseDown){
         this.name = name;
-        this.action = action;
+        this.actionManager = action;
+        this.listensToMouseDown = listensToMouseDown;
       }
-      function setBox(intersect){
-        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        voxel.position.copy( intersect.point ).add( intersect.face.normal );
-        voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-        scene.add( voxel );
-        objects.push( voxel );
-        sendVoxel(voxel, true);
+      // function setBox(intersect){
+      //   var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+      //   voxel.position.copy( intersect.point ).add( intersect.face.normal );
+      //   voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+      //   scene.add( voxel );
+      //   objects.push( voxel );
+      //   sendVoxel(voxel, true);
+      // }
+      // function setSprite(intersect){
+      //   var sprite = new THREE.Sprite( spriteMaterial );
+      //   sprite.position.copy( intersect.point ).add( intersect.face.normal );
+      //   sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+      //   scene.add( sprite );
+      //   objects.push( sprite );
+      //   sprites.push( sprite );
+      //   sendSprite( sprite, "content/images/logo-jhipster.png");
+      // }
+      function BoxManager(){
+        this.action = function(intersect) {
+          var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+          voxel.position.copy( intersect.point ).add( intersect.face.normal );
+          voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+          scene.add( voxel );
+          objects.push( voxel );
+          sendVoxel(voxel, true);
+        }
       }
-      function setSprite(intersect){
-        var sprite = new THREE.Sprite( spriteMaterial );
-        sprite.position.copy( intersect.point ).add( intersect.face.normal );
-        sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-        scene.add( sprite );
-        objects.push( sprite );
-        sprites.push( sprite );
-        sendSprite( sprite, "content/images/logo-jhipster.png");
+      function SpriteManager(){
+        this.action = function(intersect) {
+          var sprite = new THREE.Sprite( spriteMaterial );
+          sprite.position.copy( intersect.point ).add( intersect.face.normal );
+          sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+          scene.add( sprite );
+          objects.push( sprite );
+          sprites.push( sprite );
+          sendSprite( sprite, "content/images/logo-jhipster.png");
+        }
+      }
+      function ArrowManager(){
+        var startPos = 0;
+
+        this.action = function(intersect){
+          if(startPos == 0){
+            startPos = intersect.point;
+          } else {
+            var endPos = intersect.point;
+            sendArrow(startPos, endPos);
+            var dir = new THREE.Vector3(startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z).normalize();
+            var origin = new THREE.Vector3(endPos.x, endPos.y, endPos.z);
+            var length = Math.sqrt(Math.pow(endPos.x-startPos.x, 2) +  Math.pow(endPos.y-startPos.y, 2) +  Math.pow(endPos.z-startPos.z, 2));
+            // var hex = 0xffff00;
+            var hex = 0x0bf23d;
+            var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+            arrowHelper.line.material.linewidth = 2;
+            // console.log({arrow: arrowHelper, startPosition: origin, computedLength: length});
+            scene.add( arrowHelper );
+
+            startPos = 0;
+          }
+        }
       }
 
       var views = [];
@@ -392,6 +440,7 @@
             // viewWithoutCamera.render();
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+            // document.addEventListener('mouseup', onDocumentMouseUp, false);
 				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				    document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
@@ -466,7 +515,7 @@
                 }
               // create cube
               } else {
-                vm.activeTool.action(intersect);
+                vm.activeTool.actionManager.action(intersect);
                 // var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
                 // voxel.position.copy( intersect.point ).add( intersect.face.normal );
                 // voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
@@ -477,6 +526,7 @@
               animate();
             }
           }
+
           function onDocumentKeyDown( event ) {
             switch( event.keyCode ) {
               case 16: isShiftDown = true; break;
@@ -489,22 +539,26 @@
           }
 
           function sendVoxel(voxel, insert){
-            var voxelDto = {
-              x : voxel.position.x,
-              y : voxel.position.y,
-              z : voxel.position.z,
-              insert : insert,
-            }
+            var voxelDto = getVoxelDto(voxel.position, insert)
             JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'voxel' ,voxel: voxelDto});
           }
           function sendSprite(voxel, location){
-            var voxelDto = {
-              x : voxel.position.x,
-              y : voxel.position.y,
-              z : voxel.position.z,
-              insert : true,
-            }
+            var voxelDto = getVoxelDto(voxel.position, true);
             JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:location ,voxel: voxelDto});
+          }
+
+          function getVoxelDto(position, insert){
+            return {
+              x : position.x,
+              y : position.y,
+              z : position.z,
+              insert: insert
+            }
+          }
+          function sendArrow(startPosition, endPosition){
+            var startPointDto = getVoxelDto(startPosition, true);
+            var endPointDto = getVoxelDto(endPosition, true);
+            JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'arrow' ,voxel: startPointDto, endPoint:endPointDto});
           }
     }
 })();

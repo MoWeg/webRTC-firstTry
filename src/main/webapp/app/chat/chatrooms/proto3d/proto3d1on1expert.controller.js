@@ -52,12 +52,13 @@
       var plane, cube;
       var mouse, raycaster, isShiftDown = false;
       var rollOverMesh, rollOverMaterial;
-      var cubeGeo, cubeMaterial;
+      var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+      var cubeMaterial;
       var objects = [];
       var viewWithCamera;
       var viewWithoutCamera;
       var view2Cam;
-      var view1CamHelper;
+      var view1CamHelper, gridHelper;
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -282,6 +283,7 @@
 
           this.render = function () {
             view1CamHelper.visible = showHelper;
+            gridHelper.visible = showHelper;
             if(showHelper){
               camera.lookAt(scene.position);
             }
@@ -356,10 +358,10 @@
             rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
             scene.add( rollOverMesh );
             // cubes
-            cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-            //cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
+
+            // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
             // grid
-            var gridHelper = new THREE.GridHelper( 1000, 20 );
+            gridHelper = new THREE.GridHelper( 1000, 20 );
             scene.add( gridHelper );
             //
             raycaster = new THREE.Raycaster();

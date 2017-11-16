@@ -25,7 +25,8 @@
       var plane, cube;
       var mouse, raycaster, isShiftDown = false;
       var rollOverMesh, rollOverMaterial;
-      var cubeGeo, cubeMaterial;
+      var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+      var cubeMaterial;
       var objects = [];
       var sprites = [];
       var textureLoader = new THREE.TextureLoader();
@@ -261,18 +262,18 @@
         camera.position.set( 500, 800, 1300 );
         camera.lookAt( new THREE.Vector3() );
         scene = new THREE.Scene();
-        // roll-over helpers
-        var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
-        rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-        rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-        scene.add( rollOverMesh );
-        // cubes
+        // // roll-over helpers
+        // var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        // rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+        // rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+        // scene.add( rollOverMesh );
+        // // cubes
         cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-        //cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( "textures/square-outline-textured.png" ) } );
-        // grid
-        var gridHelper = new THREE.GridHelper( 1000, 20 );
-        scene.add( gridHelper );
-        //
+        // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
+        // // grid
+        // var gridHelper = new THREE.GridHelper( 1000, 20 );
+        // scene.add( gridHelper );
+        // //
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
         var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
@@ -392,24 +393,30 @@
 
       function createVoxel(voxelDto) {
         var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        addObject(voxel, voxelDto);
+        voxel.position.x = voxelDto.x;
+        voxel.position.y = voxelDto.y;
+        voxel.position.z = voxelDto.z;
+        scene.add( voxel );
+        objects.push( voxel );
+
+        animate();
       }
 
       function createSprite(location, voxelDto){
         var spriteMap = textureLoader.load(location);
         var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
-        var sprite = new THREE.Sprite( spriteMaterial );
-        sprites.push( sprite );
-        addObject(sprite, voxelDto);
-      }
 
-      function addObject(object, voxelDto){
-        object.position.x = voxelDto.x;
-        object.position.y = voxelDto.y;
-        object.position.z = voxelDto.z;
-        scene.add( object );
-        objects.push( object );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.position.x = voxelDto.x;
+        sprite.position.y = voxelDto.y;
+        sprite.position.z = voxelDto.z;
+
+        scene.add( sprite );
+        objects.push( sprite );
+        sprites.push( sprite );
+
         animate();
       }
+
     }
 })();

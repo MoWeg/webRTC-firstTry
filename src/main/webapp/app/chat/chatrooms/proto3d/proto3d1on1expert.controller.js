@@ -33,6 +33,7 @@
         scene.add( sprite );
         objects.push( sprite );
         sprites.push( sprite );
+        sendSprite( sprite, "content/images/logo-jhipster.png");
       }
 
       var views = [];
@@ -384,7 +385,7 @@
             views.push(viewWithCamera);
             views.push(viewWithoutCamera);
             animate();
-
+            window.requestAnimationFrame( animate );
             // viewWithCamera.render();
             // viewWithoutCamera.render();
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -394,7 +395,7 @@
           }
 
           function animate(){
-            window.requestAnimationFrame( animate );
+            // window.requestAnimationFrame( animate );
             angular.forEach(views, function(value, key) {
               value.render();
             });
@@ -493,6 +494,15 @@
               insert : insert,
             }
             JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'voxel' ,voxel: voxelDto});
+          }
+          function sendSprite(voxel, location){
+            var voxelDto = {
+              x : voxel.position.x,
+              y : voxel.position.y,
+              z : voxel.position.z,
+              insert : true,
+            }
+            JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:location ,voxel: voxelDto});
           }
     }
 })();

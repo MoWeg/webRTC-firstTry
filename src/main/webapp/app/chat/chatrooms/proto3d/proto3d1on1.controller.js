@@ -27,6 +27,8 @@
       var rollOverMesh, rollOverMaterial;
       var cubeGeo, cubeMaterial;
       var objects = [];
+      var sprites = [];
+      var textureLoader = new THREE.TextureLoader();
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -91,6 +93,8 @@
             if(message.content == 'voxel'){
                 console.log(message.voxel);
                 createVoxel(message.voxel);
+            }else{
+              createSprite(message.content, message.voxel);
             }
           }
       }
@@ -314,6 +318,17 @@
       }
 
       function animate(){
+        angular.forEach(sprites, function(value, key) {
+          var material = value.material;
+          var scale = 1;
+          var imageWidth = 1;
+          var imageHeight = 1;
+          if ( material.map && material.map.image && material.map.image.width ) {
+            imageWidth = material.map.image.width;
+            imageHeight = material.map.image.height;
+          }
+          value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+        });
         renderer.render(scene, camera);
       }
 
@@ -377,14 +392,23 @@
 
       function createVoxel(voxelDto) {
         var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-            //voxel.position.copy( intersect.point ).add( intersect.face.normal );
-            //voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-        voxel.position.x = voxelDto.x;
-        voxel.position.y = voxelDto.y;
-        voxel.position.z = voxelDto.z;
-        scene.add( voxel );
-        objects.push( voxel );
+        addObject(voxel, voxelDto);
+      }
 
+      function createSprite(location, voxelDto){
+        var spriteMap = textureLoader.load(location);
+        var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprites.push( sprite );
+        addObject(sprite, voxelDto);
+      }
+
+      function addObject(object, voxelDto){
+        object.position.x = voxelDto.x;
+        object.position.y = voxelDto.y;
+        object.position.z = voxelDto.z;
+        scene.add( object );
+        objects.push( object );
         animate();
       }
     }

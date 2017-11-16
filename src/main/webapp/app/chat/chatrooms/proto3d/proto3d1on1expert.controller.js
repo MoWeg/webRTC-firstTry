@@ -9,6 +9,32 @@
 
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator) {
       var vm = this;
+      vm.tools = [new Tool("boxes", setBox), new Tool("sprites", setSprite)];
+      vm.activeTool = vm.tools[0];
+      vm.setActive = function(tool){
+        vm.activeTool = tool;
+      };
+      function Tool(name, action){
+        this.name = name;
+        this.action = action;
+      }
+      function setBox(intersect){
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.copy( intersect.point ).add( intersect.face.normal );
+        voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+        scene.add( voxel );
+        objects.push( voxel );
+        sendVoxel(voxel, true);
+      }
+      function setSprite(intersect){
+        var spriteMap = new THREE.TextureLoader().load( "content/images/logo-jhipster.png" );
+        var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap} );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.position.copy( intersect.point ).add( intersect.face.normal );
+        sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+        scene.add( sprite );
+        objects.push( sprite );
+      }
 
       var isStarted = false;
       var gotOffer = false;
@@ -389,15 +415,15 @@
           }
 
           function onDocumentMouseMove( event ) {
-            // event.preventDefault();
-            // mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            // raycaster.setFromCamera( mouse, view2Cam );
-            // var intersects = raycaster.intersectObjects( objects );
-            // if ( intersects.length > 0 ) {
-            //   var intersect = intersects[ 0 ];
-            //   rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-            //   rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-            // }
+            event.preventDefault();
+            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+            raycaster.setFromCamera( mouse, view2Cam );
+            var intersects = raycaster.intersectObjects( objects );
+            if ( intersects.length > 0 ) {
+              var intersect = intersects[ 0 ];
+              rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+              rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+            }
             // animate();
           }
 
@@ -417,14 +443,15 @@
                 }
               // create cube
               } else {
-                var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-                voxel.position.copy( intersect.point ).add( intersect.face.normal );
-                voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-                scene.add( voxel );
-                objects.push( voxel );
-                sendVoxel(voxel, true);
+                vm.activeTool.action(intersect);
+                // var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+                // voxel.position.copy( intersect.point ).add( intersect.face.normal );
+                // voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+                // scene.add( voxel );
+                // objects.push( voxel );
+                // sendVoxel(voxel, true);
               }
-              animate();
+              //animate();
             }
           }
           function onDocumentKeyDown( event ) {

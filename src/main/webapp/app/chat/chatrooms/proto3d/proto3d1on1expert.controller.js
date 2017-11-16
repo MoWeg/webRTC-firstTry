@@ -9,7 +9,7 @@
 
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator) {
       var vm = this;
-      vm.tools = [new Tool("boxes", setBox), new Tool("sprites", setSprite)];
+      vm.tools = [new Tool("insert box", setBox), new Tool("insert hipster", setSprite)];
       vm.activeTool = vm.tools[0];
       vm.setActive = function(tool){
         vm.activeTool = tool;
@@ -27,14 +27,18 @@
         sendVoxel(voxel, true);
       }
       function setSprite(intersect){
-        var spriteMap = new THREE.TextureLoader().load( "content/images/logo-jhipster.png" );
-        var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap} );
         var sprite = new THREE.Sprite( spriteMaterial );
         sprite.position.copy( intersect.point ).add( intersect.face.normal );
         sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
         scene.add( sprite );
         objects.push( sprite );
+        sprites.push( sprite );
       }
+
+      var views = [];
+      var sprites = [];
+      var spriteMap = new THREE.TextureLoader().load( "content/images/logo-jhipster.png" );
+      var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
 
       var isStarted = false;
       var gotOffer = false;
@@ -280,6 +284,19 @@
             if(showHelper){
               camera.lookAt(scene.position);
             }
+            angular.forEach(sprites, function(value, key) {
+              var material = value.material;
+              // var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+              var scale = 1;
+              var imageWidth = 1;
+              var imageHeight = 1;
+              if ( material.map && material.map.image && material.map.image.width ) {
+                imageWidth = material.map.image.width;
+                imageHeight = material.map.image.height;
+              }
+              // sprite.material.rotation += 0.1 * ( i / l );
+              value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+            });
             renderer.render( scene, camera );
           };
 
@@ -364,21 +381,24 @@
             // //camera.updateProjectionMatrix();
             // renderer.setSize( window.innerWidth, window.innerHeight );
             // }, false);
+            views.push(viewWithCamera);
+            views.push(viewWithoutCamera);
+            animate();
 
-            //animate();
-
-            viewWithCamera.render();
-            viewWithoutCamera.render();
+            // viewWithCamera.render();
+            // viewWithoutCamera.render();
             document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				    document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
 
-          // function animate(){
-          //
-          //   window.requestAnimationFrame( animate );
-          // }
+          function animate(){
+            window.requestAnimationFrame( animate );
+            angular.forEach(views, function(value, key) {
+              value.render();
+            });
+          }
 
           function setCamera(deviceEvent){
             checkResize();
@@ -424,7 +444,7 @@
               rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
               rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
             }
-            // animate();
+            animate();
           }
 
           function onDocumentMouseDown( event ) {
@@ -451,7 +471,7 @@
                 // objects.push( voxel );
                 // sendVoxel(voxel, true);
               }
-              //animate();
+              animate();
             }
           }
           function onDocumentKeyDown( event ) {

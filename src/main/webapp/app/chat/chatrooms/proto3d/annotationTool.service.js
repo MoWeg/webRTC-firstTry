@@ -21,23 +21,24 @@
         var tools = [];
         angular.forEach(requestedTools, function(value, key) {
           var manager = null;
-          if(value == 'box'){
+          if(value.type == 'box'){
             manager = new BoxManager();
-          }else if(value == 'arrow'){
+          }else if(value.type == 'arrow'){
             manager = new ArrowManager();
-          }else {
-            manager = new SpriteManager(value);
+          }else if(value.type == 'sprite'){
+            manager = new SpriteManager(value.spriteLocation);
           }
-          var tool = new Tool('insert '+value, manager, false);
-          tools.push(tool);
+          if(manager){
+            var tool = new Tool(value.name, manager);
+            tools.push(tool);
+          }
         });
         return tools;
       }
 
-      function Tool(name, action, listensToMouseDown){
+      function Tool(name, action){
         this.name = name;
         this.actionManager = action;
-        this.listensToMouseDown = listensToMouseDown;
       }
 
       function BoxManager(){
@@ -77,8 +78,8 @@
             var dir = new THREE.Vector3(startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z).normalize();
             var origin = new THREE.Vector3(endPos.x, endPos.y, endPos.z);
             var length = Math.sqrt(Math.pow(endPos.x-startPos.x, 2) +  Math.pow(endPos.y-startPos.y, 2) +  Math.pow(endPos.z-startPos.z, 2));
-            // var hex = 0xffff00;
-            var hex = 0x0bf23d;
+            //var hex = 0xffff00; // Gelb
+            var hex = 0x0bf23d; // Grün
             var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
             arrowHelper.line.material.linewidth = 2;
             scene.add( arrowHelper );

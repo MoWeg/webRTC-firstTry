@@ -10,7 +10,12 @@
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, AnnotationToolService) {
       var vm = this;
       vm.tools = [];
-      vm.tools = AnnotationToolService.getAnnotationTools(['arrow', 'box', 'content/images/logo-jhipster.png']);
+      vm.activeTool = null;
+      var toolRequest = [];
+      toolRequest.push({name:'insert box', type:'box', spriteLocation: null})
+      toolRequest.push({name:'insert arrow', type:'arrow', spriteLocation: null})
+      toolRequest.push({name:'insert jHipster', type:'sprite', spriteLocation: 'content/images/logo-jhipster.png'})
+      vm.tools = AnnotationToolService.getAnnotationTools(toolRequest);
       vm.setActive = function(tool){
         vm.activeTool = tool;
       };
@@ -446,9 +451,9 @@
                 }
               // create cube
               } else {
-                if(activeTool){
+                if(vm.activeTool){
                   vm.activeTool.actionManager.action(intersect, scene, objects, sprites);
-                }    
+                }
               }
               animate();
             }

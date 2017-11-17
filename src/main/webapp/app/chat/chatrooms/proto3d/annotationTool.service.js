@@ -10,8 +10,6 @@
 
     function AnnotationToolService (JhiTrackerService,$rootScope ) {
       var textureLoader =  new THREE.TextureLoader();
-      var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-      var cubeMaterial;
       var service = {
         getAnnotationTools: getAnnotationTools
       };
@@ -42,6 +40,9 @@
       }
 
       function BoxManager(){
+        var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        var cubeMaterial;
+
         this.action = function(intersect, scene, objects, sprites) {
           var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
           voxel.position.copy( intersect.point ).add( intersect.face.normal );

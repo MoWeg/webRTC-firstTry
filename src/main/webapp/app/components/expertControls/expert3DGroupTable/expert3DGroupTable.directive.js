@@ -8,10 +8,9 @@
     function groupTable () {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/expert3DGroupTable/expert3DGroupTable.html',
+            templateUrl: 'app/components/expertControls/expert3DGroupTable/expert3DGroupTable.html',
             scope: {
-              groups: '=',
-              scene: '='
+              activegroup: '='
             },
             controllerAs: 'vm',
             controller: 'Expert3DGroupTableController'

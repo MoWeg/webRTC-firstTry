@@ -9,6 +9,8 @@
 
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, AnnotationToolService) {
       var vm = this;
+
+      // kann weg
       vm.tools = [];
       vm.activeTool = null;
       var toolRequest = [];
@@ -29,6 +31,7 @@
       vm.setActiveMovable = function(movable){
         vm.activeMovable = movable;
       }
+      // kann weg
 
       var views = [];
       var sprites = [];
@@ -42,18 +45,20 @@
       var turnReady;
 
       var container;
-      var scene;
       var plane, cube;
-      var mouse, raycaster, isShiftDown = false;
-      var rollOverMesh, rollOverMaterial;
+      var mouse, isShiftDown = false;
+      var rollOverMaterial;
       var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
       var cubeMaterial;
       var objects = [];
       var viewWithCamera;
       var viewWithoutCamera;
-      var view2Cam;
-      var view1CamHelper, gridHelper;
-
+      vm.view2Cam;
+      var view1CamHelper;
+      vm.scene;
+      vm.raycaster;
+      vm.gridHelper;
+      vm.rollOverMesh;
       var newPosY = 0;
 
       var oldVideoHeight = 0;
@@ -83,6 +88,9 @@
 
       $scope.$on('$destroy', function() {
         hangup();
+      });
+      $scope.$on('request-animation', function(event, args) {
+        animate();
       });
 
       init3D();
@@ -279,9 +287,9 @@
 
           this.render = function () {
             view1CamHelper.visible = showHelper;
-            gridHelper.visible = showHelper;
+            vm.gridHelper.visible = showHelper;
             if(showHelper){
-              camera.lookAt(scene.position);
+              camera.lookAt(vm.scene.position);
             }
             angular.forEach(sprites, function(value, key) {
               var material = value.material;
@@ -296,7 +304,7 @@
               // sprite.material.rotation += 0.1 * ( i / l );
               value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
             });
-            renderer.render( scene, camera );
+            renderer.render( vm.scene, camera );
           };
 
           this.setNewSize = function( newWidth, newHeight ){
@@ -313,7 +321,7 @@
         }
 
         function init3D(){
-            scene = new THREE.Scene();
+            vm.scene = new THREE.Scene();
 
             var canvas1 = document.getElementById( 'canvas1' );
             var canvas2 = document.getElementById( 'canvas2' );
@@ -341,39 +349,39 @@
             viewWithCamera = new View( canvas1, 400, 640, view1Cam, renderer, false );
             view1CamHelper = new THREE.CameraHelper( view1Cam );
             view1CamHelper.position.set( 500, 800, 1300 );
-            scene.add( view1CamHelper );
+            vm.scene.add( view1CamHelper );
 
-            view2Cam = new THREE.PerspectiveCamera( 45, w / h, 1, 30000 );
+            vm.view2Cam = new THREE.PerspectiveCamera( 45, w / h, 1, 30000 );
             //view2Cam.position.set( 1000, 1600, 2600 );
-            view2Cam.position.set( 900, 900, 1600 );
-            view2Cam.lookAt( scene.position );
-            viewWithoutCamera = new View( canvas2, fullWidth, fullHeight, view2Cam, renderer2, true );
+            vm.view2Cam.position.set( 900, 900, 1600 );
+            vm.view2Cam.lookAt( vm.scene.position );
+            viewWithoutCamera = new View( canvas2, fullWidth, fullHeight, vm.view2Cam, renderer2, true );
 
             // roll-over helpers
             var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
             rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-            rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-            scene.add( rollOverMesh );
+            vm.rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+            vm.scene.add( vm.rollOverMesh );
             // cubes
 
             // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
             // grid
-            gridHelper = new THREE.GridHelper( 2000, 100  );
-            scene.add( gridHelper );
+            vm.gridHelper = new THREE.GridHelper( 2000, 100  );
+            vm.scene.add( vm.gridHelper );
             //
-            raycaster = new THREE.Raycaster();
+            vm.raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
             var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
             geometry.rotateX( - Math.PI / 2 );
             plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-            scene.add( plane );
+            vm.scene.add( plane );
             objects.push( plane );
             // Lights
             var ambientLight = new THREE.AmbientLight( 0x606060 );
-            scene.add( ambientLight );
+            vm.scene.add( ambientLight );
             var directionalLight = new THREE.DirectionalLight( 0xffffff );
             directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-            scene.add( directionalLight );
+            vm.scene.add( directionalLight );
 
             // window.addEventListener('resize', function() {
             // //view2Cam.aspect = window.innerWidth / window.innerHeight;
@@ -435,16 +443,18 @@
             }
           }
 
+
+          /// kann alles weg
           function onDocumentMouseMove( event ) {
             event.preventDefault();
             mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            raycaster.setFromCamera( mouse, view2Cam );
-            var intersects = raycaster.intersectObjects( objects );
+            vm.raycaster.setFromCamera( mouse, vm.view2Cam );
+            var intersects = vm.raycaster.intersectObjects( objects );
             if ( intersects.length > 0 ) {
               var intersect = intersects[ 0 ];
               intersect.point.y = intersect.point.y + newPosY;
-              rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-              rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+              vm.rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+              vm.rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
             }
             animate();
           }
@@ -452,14 +462,14 @@
           function onDocumentMouseDown( event ) {
             event.preventDefault();
             mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            raycaster.setFromCamera( mouse, view2Cam );
-            var intersects = raycaster.intersectObjects( objects );
+            vm.raycaster.setFromCamera( mouse, vm.view2Cam );
+            var intersects = vm.raycaster.intersectObjects( objects );
             if ( intersects.length > 0 ) {
               var intersect = intersects[ 0 ];
               // delete cube
               if ( isShiftDown ) {
                 if ( intersect.object != plane ) {
-                  scene.remove( intersect.object );
+                  vm.scene.remove( intersect.object );
                   objects.splice( objects.indexOf( intersect.object ), 1 );
                   //sendVoxel(voxel, false);
                 }
@@ -467,7 +477,7 @@
               } else {
                 if(vm.activeTool){
                   intersect.point.y = intersect.point.y + newPosY;
-                  vm.activeTool.actionManager.action(intersect, scene, objects, sprites);
+                  vm.activeTool.actionManager.action(intersect, vm.scene, objects, sprites);
                 }
               }
               animate();
@@ -501,12 +511,12 @@
               direction = -50;
             }
             if(tabPressed){
-              var oldPos = gridHelper.position.z;
-              gridHelper.position.z = oldPos + direction;
+              var oldPos = vm.gridHelper.position.z;
+              vm.gridHelper.position.z = oldPos + direction;
             }else{
-              var oldPos = gridHelper.position.y;
+              var oldPos = vm.gridHelper.position.y;
               newPosY = oldPos + direction;
-              gridHelper.position.y = newPosY;
+              vm.gridHelper.position.y = newPosY;
             }
             animate();
           }
@@ -516,8 +526,8 @@
             if(!positive){
               direction = -50;
             }
-            var oldPos = gridHelper.position.x;
-            gridHelper.position.x = oldPos + direction;
+            var oldPos = vm.gridHelper.position.x;
+            vm.gridHelper.position.x = oldPos + direction;
             animate();
           }
 
@@ -526,9 +536,9 @@
             if(!positive){
               direction = -200;
             }
-            var oldPos = view2Cam.position.x;
-            view2Cam.position.x = oldPos + direction;
-            view2Cam.lookAt(scene);
+            var oldPos = vm.view2Cam.position.x;
+            vm.view2Cam.position.x = oldPos + direction;
+            vm.view2Cam.lookAt(vm.scene);
             animate();
           }
 
@@ -538,18 +548,18 @@
               direction = 200;
             }
             if(tabPressed){
-              var oldPos = view2Cam.position.y;
-              view2Cam.position.y = oldPos + direction;
+              var oldPos = vm.view2Cam.position.y;
+              vm.view2Cam.position.y = oldPos + direction;
             }else{
-              var oldPos = view2Cam.position.z;
-              view2Cam.position.z = oldPos + direction;
+              var oldPos = vm.view2Cam.position.z;
+              vm.view2Cam.position.z = oldPos + direction;
             }
-            view2Cam.lookAt(scene);
+            vm.view2Cam.lookAt(vm.scene);
             animate();
           }
 
           function resetCamera(){
-            view2Cam.position.set( 900, 900, 1600 );
+            vm.view2Cam.position.set( 900, 900, 1600 );
             animate();
           }
     }

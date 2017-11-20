@@ -10,11 +10,13 @@
     function Expert3DGroupTableController($scope, JhiTrackerService) {
       var vm = this;
 
-      vm.groups = $scope.groups || [];
-      var scene = $scope.scene;
+      vm.activeGroup = $scope.activegroup;
+      vm.groups = [];
+      vm.groups.push(vm.activeGroup)
 
       vm.addGroup = function(){
         vm.groups.push({
+          name: "random",
           active: false,
           visible: false,
           send: false,
@@ -29,6 +31,7 @@
           value.active = false;
         });
         group.active = !group.active;
+        vm.activeGroup = group;
       }
       vm.setVisible = function (group) {
         group.visible = !group.visible;

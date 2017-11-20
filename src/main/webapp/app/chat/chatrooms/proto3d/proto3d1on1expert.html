@@ -9,6 +9,11 @@
       <!-- <div class="btn-group btn-group-vertical right" role="group" ng-repeat="tool in vm.tools">
         <button type="button" class="btn btn-secondary" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool}}</button>
       </div> -->
+
+      <div class="list-group" ng-repeat="movable in vm.movables">
+       <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeMovable == movable}" ng-click="vm.setActiveMovable(movable)">{{movable.name}}</a>
+     </div>
+
        <div class="list-group right" ng-repeat="tool in vm.tools">
         <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool.name}}</a>
       </div>

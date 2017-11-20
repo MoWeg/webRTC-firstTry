@@ -19,6 +19,15 @@
       vm.setActive = function(tool){
         vm.activeTool = tool;
       };
+      vm.movables = [];
+      var movableGrid = {name: 'grid' , leftOrRight:moveGridLeftOrRight, upOrDown:moveGridUpOrDown}
+      var movableCam = {name: 'camera', leftOrRight:moveCamLeftOrRight, upOrDown:moveCamUpOrDown}
+      vm.activeMovable =  movableGrid;
+      vm.movables.push(movableGrid);
+      vm.movables.push(movableCam);
+      vm.setActiveMovable = function(movable){
+        vm.activeMovable = movable;
+      }
 
       var views = [];
       var sprites = [];
@@ -43,6 +52,8 @@
       var viewWithoutCamera;
       var view2Cam;
       var view1CamHelper, gridHelper;
+
+      var newPosY = 0;
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -345,12 +356,12 @@
 
             // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
             // grid
-            gridHelper = new THREE.GridHelper( 1000, 20 );
+            gridHelper = new THREE.GridHelper( 2000, 100  );
             scene.add( gridHelper );
             //
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
-            var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+            var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
             geometry.rotateX( - Math.PI / 2 );
             plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
             scene.add( plane );
@@ -429,6 +440,7 @@
             var intersects = raycaster.intersectObjects( objects );
             if ( intersects.length > 0 ) {
               var intersect = intersects[ 0 ];
+              intersect.point.y = intersect.point.y + newPosY;
               rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
               rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
             }
@@ -452,6 +464,7 @@
               // create cube
               } else {
                 if(vm.activeTool){
+                  intersect.point.y = intersect.point.y + newPosY;
                   vm.activeTool.actionManager.action(intersect, scene, objects, sprites);
                 }
               }
@@ -461,13 +474,65 @@
 
           function onDocumentKeyDown( event ) {
             switch( event.keyCode ) {
+              // case: 9: tabPressed = !tabPressed; break;
               case 16: isShiftDown = true; break;
+              case 65:
+              case 37: vm.activeMovable.leftOrRight(false); break;
+              case 87:
+              case 38: vm.activeMovable.upOrDown(true); break;
+              case 68:
+              case 39: vm.activeMovable.leftOrRight(true); break;
+              case 83:
+              case 40: vm.activeMovable.upOrDown(false); break;
             }
           }
           function onDocumentKeyUp( event ) {
             switch ( event.keyCode ) {
               case 16: isShiftDown = false; break;
             }
+          }
+
+          function moveGridUpOrDown(positive){
+            var direction = 50;
+            if(!positive){
+              direction = -50;
+            }
+            var oldPos = gridHelper.position.y;
+            newPosY = oldPos + direction;
+            gridHelper.position.y = newPosY;
+            animate();
+          }
+
+          function moveGridLeftOrRight(positive){
+            var direction = 50;
+            if(!positive){
+              direction = -50;
+            }
+            var oldPos = gridHelper.position.x;
+            gridHelper.position.x = oldPos + direction;
+            animate();
+          }
+
+          function moveCamLeftOrRight(positive){
+            var direction = 200;
+            if(!positive){
+              direction = -200;
+            }
+            var oldPos = view2Cam.position.x;
+            view2Cam.position.x = oldPos + direction;
+            view2Cam.lookAt(scene);
+            animate();
+          }
+
+          function moveCamUpOrDown(positive){
+            var direction = -200;
+            if(!positive){
+              direction = 200;
+            }
+            var oldPos = view2Cam.position.z;
+            view2Cam.position.z = oldPos + direction;
+            view2Cam.lookAt(scene);
+            animate();
           }
     }
 })();

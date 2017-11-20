@@ -342,8 +342,9 @@
             view1CamHelper.position.set( 500, 800, 1300 );
             scene.add( view1CamHelper );
 
-            view2Cam = new THREE.PerspectiveCamera( 20, w / h, 1, 30000 );
-            view2Cam.position.set( 1000, 1600, 2600 );
+            view2Cam = new THREE.PerspectiveCamera( 45, w / h, 1, 30000 );
+            //view2Cam.position.set( 1000, 1600, 2600 );
+            view2Cam.position.set( 900, 900, 1600 );
             view2Cam.lookAt( scene.position );
             viewWithoutCamera = new View( canvas2, fullWidth, fullHeight, view2Cam, renderer2, true );
 
@@ -476,14 +477,15 @@
             switch( event.keyCode ) {
               // case: 9: tabPressed = !tabPressed; break;
               case 16: isShiftDown = true; break;
+              case 27: event.preventDefault();  resetCamera(); break;
               case 65:
-              case 37: vm.activeMovable.leftOrRight(false); break;
+              case 37: event.preventDefault(); vm.activeMovable.leftOrRight(false); break;
               case 87:
-              case 38: vm.activeMovable.upOrDown(true); break;
+              case 38: event.preventDefault(); vm.activeMovable.upOrDown(true); break;
               case 68:
-              case 39: vm.activeMovable.leftOrRight(true); break;
+              case 39: event.preventDefault(); vm.activeMovable.leftOrRight(true); break;
               case 83:
-              case 40: vm.activeMovable.upOrDown(false); break;
+              case 40: event.preventDefault(); vm.activeMovable.upOrDown(false); break;
             }
           }
           function onDocumentKeyUp( event ) {
@@ -532,6 +534,11 @@
             var oldPos = view2Cam.position.z;
             view2Cam.position.z = oldPos + direction;
             view2Cam.lookAt(scene);
+            animate();
+          }
+
+          function resetCamera(){
+            view2Cam.position.set( 900, 900, 1600 );
             animate();
           }
     }

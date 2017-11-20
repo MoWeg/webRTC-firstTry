@@ -1,0 +1,39 @@
+<div>
+  <h2> Groups</h2>
+  <button class="btn btn-success right" ng-click="vm.addGroup()"
+          >add Group <i class="glyphicon glyphicon-comment"/></button>
+  <div class="table-responsive">
+      <table class="table table-striped">
+          <thead>
+              <tr>
+                  <th>Edit</th>
+                  <th>Group</th>
+                  <th>Visible</th>
+                  <th>Visible For User</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="group in vm.groups">
+                <td>
+                  <input type="checkbox" ng-checked="group.active" ng-click="vm.setActive(group)"/>
+                </td>
+                <td>Group {{$index}}</td>
+                <td>
+                  <input type="checkbox" ng-checked="group.visible" ng-click="vm.setVisible(group)"/>
+                </td>
+                <td>
+                  <input type="checkbox" ng-checked="group.visibleForUser" ng-click="vm.setVisibleForUser(group)"/>
+                </td>
+                <td>
+                  <button class="btn btn-success" ng-click="vm.send(group)"
+                          ng-disabled = "group.send"
+                        >Send <i class="glyphicon glyphicon-comment"/></button>
+                  <button class="btn btn-danger" ng-click="vm.discard($index)"
+                        >Discard <i class="glyphicon glyphicon-comment"/></button>
+                </td>
+            </tr>
+          </tbody>
+      </table>
+  </div>
+</div>

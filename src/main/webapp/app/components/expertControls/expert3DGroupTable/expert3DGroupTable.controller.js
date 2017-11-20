@@ -9,21 +9,15 @@
 
     function Expert3DGroupTableController($scope, JhiTrackerService) {
       var vm = this;
-
+      var plane = $scope.plane;
       vm.activeGroup = $scope.activegroup;
       vm.groups = [];
       vm.groups.push(vm.activeGroup)
 
       vm.addGroup = function(){
-        vm.groups.push({
-          name: "random",
-          active: false,
-          visible: false,
-          send: false,
-          visibleForUser: false,
-          objects: [],
-          sprites: []
-        });
+        var newGroup = new Group();
+        newGroup.objects.push(plane);
+        vm.groups.push(newGroup);
       }
 
       vm.setActive = function (group) {
@@ -44,6 +38,15 @@
       }
       vm.discard = function (index) {
         vm.groups.splice(index, 1);
+      }
+
+      function Group(){
+        this.active = false;
+        this.visible = false;
+        this.send = false;
+        this.visibleForUser = false;
+        this.objects = [];
+        this.sprites = [];
       }
     }
 })();

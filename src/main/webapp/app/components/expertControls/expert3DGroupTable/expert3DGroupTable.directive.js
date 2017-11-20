@@ -10,7 +10,8 @@
             restrict: 'E',
             templateUrl: 'app/components/expertControls/expert3DGroupTable/expert3DGroupTable.html',
             scope: {
-              activegroup: '='
+              activegroup: '=',
+              plane: '='
             },
             controllerAs: 'vm',
             controller: 'Expert3DGroupTableController'

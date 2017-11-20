@@ -77,23 +77,19 @@
         if ( intersects.length > 0 ) {
           var intersect = intersects[ 0 ];
           // delete cube
-          if ( isShiftDown ) {
-            if ( intersect.object != plane ) {
-              scene.remove( intersect.object );
-              objects.splice( objects.indexOf( intersect.object ), 1 );
-              //sendVoxel(voxel, false);
-            }
+          // if ( isShiftDown ) {
+          //   // if ( intersect.object != plane ) {
+          //   //   scene.remove( intersect.object );
+          //   //   objects.splice( objects.indexOf( intersect.object ), 1 );
+          //   //   //sendVoxel(voxel, false);
+          //   // }
           // create cube
-          } else {
+          // } else {
             if(vm.activeTool){
               intersect.point.y = intersect.point.y + newPosY;
-              console.log(scene.children.length);
-              console.log(activeTool.objects);
               vm.activeTool.actionManager.action(intersect, scene, activeGroup.objects, activeGroup.sprites);
-              console.log(scene.children.length);
-              console.log(activeTool.objects);
             }
-          }
+          // }
           animate();
         }
       }

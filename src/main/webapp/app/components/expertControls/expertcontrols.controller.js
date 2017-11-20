@@ -15,10 +15,8 @@
         visible: false,
         send: false,
         visibleForUser: false,
-        objects: [],
+        objects: [$scope.plane],
         sprites: []
       };
-      vm.groups = [];
-      vm.groups.push(vm.activeGroup);
     }
 })();

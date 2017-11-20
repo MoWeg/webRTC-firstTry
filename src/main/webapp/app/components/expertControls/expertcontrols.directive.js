@@ -14,7 +14,8 @@
               raycaster: '=',
               rollovermesh: '=',
               gridhelper: '=',
-              expertcamera: '='
+              expertcamera: '=',
+              plane: '='
             },
             controllerAs: 'vm',
             controller: 'ExpertControlsController'

@@ -45,7 +45,7 @@
       var turnReady;
 
       var container;
-      var plane, cube;
+      var cube;
       var mouse, isShiftDown = false;
       var rollOverMaterial;
       var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
@@ -59,6 +59,7 @@
       vm.raycaster;
       vm.gridHelper;
       vm.rollOverMesh;
+      vm.plane;
       var newPosY = 0;
 
       var oldVideoHeight = 0;
@@ -373,9 +374,9 @@
             mouse = new THREE.Vector2();
             var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
             geometry.rotateX( - Math.PI / 2 );
-            plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-            vm.scene.add( plane );
-            objects.push( plane );
+            vm.plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+            vm.scene.add( vm.plane );
+            objects.push( vm.plane );
             // Lights
             var ambientLight = new THREE.AmbientLight( 0x606060 );
             vm.scene.add( ambientLight );
@@ -468,7 +469,7 @@
               var intersect = intersects[ 0 ];
               // delete cube
               if ( isShiftDown ) {
-                if ( intersect.object != plane ) {
+                if ( intersect.object != vm.plane ) {
                   vm.scene.remove( intersect.object );
                   objects.splice( objects.indexOf( intersect.object ), 1 );
                   //sendVoxel(voxel, false);

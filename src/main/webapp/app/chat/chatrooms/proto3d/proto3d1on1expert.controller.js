@@ -10,29 +10,6 @@
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, AnnotationToolService) {
       var vm = this;
 
-      // kann weg
-      vm.tools = [];
-      vm.activeTool = null;
-      var toolRequest = [];
-      toolRequest.push({name:'insert box', type:'box', spriteLocation: null})
-      toolRequest.push({name:'insert arrow', type:'arrow', spriteLocation: null})
-      toolRequest.push({name:'insert jHipster', type:'sprite', spriteLocation: 'content/images/logo-jhipster.png'})
-      vm.tools = AnnotationToolService.getAnnotationTools(toolRequest);
-      vm.setActive = function(tool){
-        vm.activeTool = tool;
-      };
-      var tabPressed = false;
-      vm.movables = [];
-      var movableGrid = {name: 'grid' , leftOrRight:moveGridLeftOrRight, upOrDown:moveGridUpOrDown}
-      var movableCam = {name: 'camera', leftOrRight:moveCamLeftOrRight, upOrDown:moveCamUpOrDown}
-      vm.activeMovable =  movableGrid;
-      vm.movables.push(movableGrid);
-      vm.movables.push(movableCam);
-      vm.setActiveMovable = function(movable){
-        vm.activeMovable = movable;
-      }
-      // kann weg
-
       var views = [];
       var sprites = [];
       var spriteMap = new THREE.TextureLoader().load( "content/images/logo-jhipster.png" );
@@ -396,11 +373,11 @@
             window.requestAnimationFrame( animate );
             // viewWithCamera.render();
             // viewWithoutCamera.render();
-            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-            // document.addEventListener('mouseup', onDocumentMouseUp, false);
-				    document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				    document.addEventListener( 'keyup', onDocumentKeyUp, false );
+            // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				    // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+            // // document.addEventListener('mouseup', onDocumentMouseUp, false);
+				    // document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				    // document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
 
           function animate(){
@@ -442,126 +419,6 @@
               oldVideoHeight = height;
               oldVideoWidth = width;
             }
-          }
-
-
-          /// kann alles weg
-          function onDocumentMouseMove( event ) {
-            event.preventDefault();
-            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            vm.raycaster.setFromCamera( mouse, vm.view2Cam );
-            var intersects = vm.raycaster.intersectObjects( objects );
-            if ( intersects.length > 0 ) {
-              var intersect = intersects[ 0 ];
-              intersect.point.y = intersect.point.y + newPosY;
-              vm.rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-              vm.rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-            }
-            animate();
-          }
-
-          function onDocumentMouseDown( event ) {
-            event.preventDefault();
-            mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-            vm.raycaster.setFromCamera( mouse, vm.view2Cam );
-            var intersects = vm.raycaster.intersectObjects( objects );
-            if ( intersects.length > 0 ) {
-              var intersect = intersects[ 0 ];
-              // delete cube
-              if ( isShiftDown ) {
-                if ( intersect.object != vm.plane ) {
-                  vm.scene.remove( intersect.object );
-                  objects.splice( objects.indexOf( intersect.object ), 1 );
-                  //sendVoxel(voxel, false);
-                }
-              // create cube
-              } else {
-                if(vm.activeTool){
-                  intersect.point.y = intersect.point.y + newPosY;
-                  vm.activeTool.actionManager.action(intersect, vm.scene, objects, sprites);
-                }
-              }
-              animate();
-            }
-          }
-
-          function onDocumentKeyDown( event ) {
-            switch( event.keyCode ) {
-              case  9: event.preventDefault(); tabPressed = !tabPressed; break;
-              case 16: isShiftDown = true; break;
-              case 27: event.preventDefault();  resetCamera(); break;
-              case 65:
-              case 37: event.preventDefault(); vm.activeMovable.leftOrRight(false); break;
-              case 87:
-              case 38: event.preventDefault(); vm.activeMovable.upOrDown(true); break;
-              case 68:
-              case 39: event.preventDefault(); vm.activeMovable.leftOrRight(true); break;
-              case 83:
-              case 40: event.preventDefault(); vm.activeMovable.upOrDown(false); break;
-            }
-          }
-          function onDocumentKeyUp( event ) {
-            switch ( event.keyCode ) {
-              case 16: isShiftDown = false; break;
-            }
-          }
-
-          function moveGridUpOrDown(positive){
-            var direction = 50;
-            if(!positive){
-              direction = -50;
-            }
-            if(tabPressed){
-              var oldPos = vm.gridHelper.position.z;
-              vm.gridHelper.position.z = oldPos + direction;
-            }else{
-              var oldPos = vm.gridHelper.position.y;
-              newPosY = oldPos + direction;
-              vm.gridHelper.position.y = newPosY;
-            }
-            animate();
-          }
-
-          function moveGridLeftOrRight(positive){
-            var direction = 50;
-            if(!positive){
-              direction = -50;
-            }
-            var oldPos = vm.gridHelper.position.x;
-            vm.gridHelper.position.x = oldPos + direction;
-            animate();
-          }
-
-          function moveCamLeftOrRight(positive){
-            var direction = 200;
-            if(!positive){
-              direction = -200;
-            }
-            var oldPos = vm.view2Cam.position.x;
-            vm.view2Cam.position.x = oldPos + direction;
-            vm.view2Cam.lookAt(vm.scene);
-            animate();
-          }
-
-          function moveCamUpOrDown(positive){
-            var direction = -200;
-            if(!positive){
-              direction = 200;
-            }
-            if(tabPressed){
-              var oldPos = vm.view2Cam.position.y;
-              vm.view2Cam.position.y = oldPos + direction;
-            }else{
-              var oldPos = vm.view2Cam.position.z;
-              vm.view2Cam.position.z = oldPos + direction;
-            }
-            vm.view2Cam.lookAt(vm.scene);
-            animate();
-          }
-
-          function resetCamera(){
-            vm.view2Cam.position.set( 900, 900, 1600 );
-            animate();
           }
     }
 })();

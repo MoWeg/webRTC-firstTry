@@ -19,6 +19,7 @@
       vm.setActive = function(tool){
         vm.activeTool = tool;
       };
+      var tabPressed = false;
       vm.movables = [];
       var movableGrid = {name: 'grid' , leftOrRight:moveGridLeftOrRight, upOrDown:moveGridUpOrDown}
       var movableCam = {name: 'camera', leftOrRight:moveCamLeftOrRight, upOrDown:moveCamUpOrDown}
@@ -475,7 +476,7 @@
 
           function onDocumentKeyDown( event ) {
             switch( event.keyCode ) {
-              // case: 9: tabPressed = !tabPressed; break;
+              case  9: event.preventDefault(); tabPressed = !tabPressed; break;
               case 16: isShiftDown = true; break;
               case 27: event.preventDefault();  resetCamera(); break;
               case 65:
@@ -499,9 +500,14 @@
             if(!positive){
               direction = -50;
             }
-            var oldPos = gridHelper.position.y;
-            newPosY = oldPos + direction;
-            gridHelper.position.y = newPosY;
+            if(tabPressed){
+              var oldPos = gridHelper.position.z;
+              gridHelper.position.z = oldPos + direction;
+            }else{
+              var oldPos = gridHelper.position.y;
+              newPosY = oldPos + direction;
+              gridHelper.position.y = newPosY;
+            }
             animate();
           }
 
@@ -531,8 +537,13 @@
             if(!positive){
               direction = 200;
             }
-            var oldPos = view2Cam.position.z;
-            view2Cam.position.z = oldPos + direction;
+            if(tabPressed){
+              var oldPos = view2Cam.position.y;
+              view2Cam.position.y = oldPos + direction;
+            }else{
+              var oldPos = view2Cam.position.z;
+              view2Cam.position.z = oldPos + direction;
+            }
             view2Cam.lookAt(scene);
             animate();
           }

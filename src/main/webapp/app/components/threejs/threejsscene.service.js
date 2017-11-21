@@ -1,0 +1,176 @@
+(function() {
+    'use strict';
+    /* globals SockJS, Stomp */
+
+    angular
+        .module('simpleWebrtcServerApp')
+        .factory('ThreejsSceneService', ThreejsSceneService);
+
+    ThreejsSceneService.$inject = ['$q'];
+
+    function ThreejsSceneService ($q) {
+      var scene;
+      var plane;
+      var raycaster;
+      var helperDeferred = $q.defer();
+
+      var service = {
+        getScene: getScene,
+        getPlane: getPlane,
+        getRayCaster: getRayCaster,
+        getCamera: getCamera,
+        getView: getView,
+        getHelperPromise: getHelperPromise
+      };
+      return service;
+
+      // $scope.$on('helpers-added', function(event, args) {
+      //     helpers = args;
+      // });
+
+      function getHelperPromise() {
+          return helperDeferred.promise;
+      }
+
+      function getScene() {
+        if(!scene){
+          scene = new THREE.Scene();
+
+          raycaster = new THREE.Raycaster();
+          var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+          geometry.rotateX( - Math.PI / 2 );
+          plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+          scene.add( plane );
+
+          var ambientLight = new THREE.AmbientLight( 0x606060 );
+          scene.add( ambientLight );
+          var directionalLight = new THREE.DirectionalLight( 0xffffff );
+          directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
+          scene.add( directionalLight );
+        }
+        return scene;
+      }
+
+      function getPlane() {
+        if(!scene){
+          getScene();
+        }
+        return plane;
+      }
+      function getRayCaster() {
+        if(!scene){
+          getScene();
+        }
+        return raycaster;
+      }
+
+      function getCamera(width, height, min, max, posX, posY, posZ) {
+        var camera = new THREE.PerspectiveCamera( 45, width / height, min,  max);
+        camera.position.set( posX, posY, posZ );
+        return camera;
+      }
+
+      function getView(canvas, viewWidth, viewHeight, inputCamera, alpha, clearColor, intesity, additionalCamera){
+        var renderer =  getRenderer(alpha, clearColor, intesity, viewWidth, viewHeight);
+        var view = new View( viewWidth, viewHeight, inputCamera, renderer,  additionalCamera);
+        canvas.appendChild(view.renderer.domElement);
+        return view;
+      }
+
+      function getRenderer(alpha, clearColor, intesity, width, height) {
+        var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: alpha} );
+        renderer.setClearColor( clearColor, intesity);
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( width, height);
+        return renderer;
+      }
+
+      function View(viewWidth, viewHeight, inputCamera, renderer,  additionalCamera){
+        var scene = getScene();
+        this.renderer = renderer;
+        var camera = inputCamera;
+        var helpers, sprites;
+        var seesHelper = false;
+
+        getHelperPromise().then(function(args){
+          helpers = args;
+        });
+
+        if(additionalCamera){
+          addHelpers(scene, additionalCamera);
+          seesHelper = true;
+        }
+
+        this.render = function () {
+          if(helpers){
+            if(seesHelper){
+                camera.lookAt(scene.position);
+            }
+            setHelperVisiblity(seesHelper);
+          }
+          if(sprites){
+            angular.forEach(sprites, function(value, key) {
+              var material = value.material;
+              // var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+              var scale = 1;
+              var imageWidth = 1;
+              var imageHeight = 1;
+              if ( material.map && material.map.image && material.map.image.width ) {
+                imageWidth = material.map.image.width;
+                imageHeight = material.map.image.height;
+              }
+              // sprite.material.rotation += 0.1 * ( i / l );
+              value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+            });
+          }
+
+          this.renderer.render( scene, camera );
+        };
+
+        this.setNewSize = function( newWidth, newHeight ){
+          camera.aspect = newWidth / newHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(newWidth,newHeight);
+        };
+
+        this.setOrientationInfo = function(orientationInfo){
+          camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
+          camera.quaternion.multiply(orientationInfo.backCamMultiplier);
+          camera.quaternion.multiply(orientationInfo.screenAdjustment);
+        };
+
+        this.getHelpers = function() {
+          return helpers;
+        }
+
+        function setHelperVisiblity(visisbility){
+          if(helpers){
+            angular.forEach(helpers, function(value, key) {
+              value.object.visible = visisbility;
+            });
+          }
+        }
+      }
+
+      function addHelpers(scene, additionalCamera) {
+        var helpers = [];
+
+        var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        var rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+        var rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+        scene.add( rollOverMesh );
+        helpers.push({name: 'cursor', object: rollOverMesh});
+
+        var gridHelper = new THREE.GridHelper( 2000, 100  );
+        scene.add( gridHelper );
+        helpers.push({name: 'grid', object: gridHelper});
+
+        var camHelper = new THREE.CameraHelper( additionalCamera );
+        scene.add( camHelper );
+        helpers.push({name: 'cam', object: camHelper});
+
+        // $rootScope.$broadcast('helpers-added', helpers);
+        helperDeferred.resolve(helpers);
+      }
+    }
+})();

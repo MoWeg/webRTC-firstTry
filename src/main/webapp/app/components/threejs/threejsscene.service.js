@@ -18,12 +18,28 @@
         getRayCaster: getRayCaster,
         getCamera: getCamera,
         getView: getView,
-        getHelperPromise: getHelperPromise
+        getHelperPromise: getHelperPromise,
+        removeGroupFromScene: removeGroupFromScene
       };
       return service;
 
       function getHelperPromise() {
           return helperDeferred.promise;
+      }
+
+      function removeGroupFromScene(group){
+        if(group){
+          if(group.objects){
+            angular.forEach(group.objects, function (object) {
+              scene.remove(object);
+            })
+          }
+          if(group.sprites){
+            angular.forEach(group.sprites, function (sprite) {
+              scene.remove(sprite);
+            })
+          }
+        }
       }
 
       function getScene() {

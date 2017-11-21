@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService', 'ThreejsSceneService'];
+    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService', 'ThreejsSceneService', 'AnnotationToolService'];
 
-    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService, ThreejsSceneService) {
+    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService, ThreejsSceneService, AnnotationToolService) {
       var vm = this;
       //var isChannelReady;
       var isInitiator = $rootScope.isInitiator;
@@ -21,16 +21,20 @@
 
       // 3D stuff
       var container;
-      var view;
-      var camera, scene, renderer;
-      var plane, cube;
-      var mouse, raycaster, isShiftDown = false;
-      var rollOverMesh, rollOverMaterial;
-      var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-      var cubeMaterial;
-      var objects = [];
-      var sprites = [];
-      var textureLoader = new THREE.TextureLoader();
+      var tools;
+      var groups = [];
+      var lastGroup;
+      var scene, camera, view;
+      // var view;
+      // var camera, scene, renderer;
+      // var plane, cube;
+      // var mouse, raycaster, isShiftDown = false;
+      // var rollOverMesh, rollOverMaterial;
+      // var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+      // var cubeMaterial;
+      // var objects = [];
+      // var sprites = [];
+      // var textureLoader = new THREE.TextureLoader();
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -72,12 +76,10 @@
       });
 
       function sendMessage(message){
-        console.log('Client send message:', message);
           JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
       }
 
       function handleContent (message){
-         console.log('Client received message:', message);
           if (message.type === 'answer' && isStarted) {
             pc.setRemoteDescription(new RTCSessionDescription(message));
             gotAnswer = true;
@@ -92,13 +94,7 @@
           } else if (message.content == 'needOffer'){
             sendMessage(storedOffer);
           } else if(message.goal == '3d'){
-            if(message.content == 'voxel'){
-                createVoxel(message.voxel);
-            } else if(message.content == 'arrow') {
-                createArrow(message.voxel, message.endPoint);
-            }else{
-              createSprite(message.content, message.voxel);
-            }
+            handleMessageWith3dGoal(message);
           }
       }
 
@@ -270,6 +266,12 @@
         console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
         window.requestAnimationFrame( animate );
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+        var toolRequest = [];
+        toolRequest.push({name:'insert box', type:'box', spriteLocation: null});
+        toolRequest.push({name:'insert arrow', type:'arrow', spriteLocation: null});
+        toolRequest.push({name:'insert jHipster', type:'sprite', spriteLocation: 'content/images/logo-jhipster.png'});
+        tools = AnnotationToolService.getAnnotationTools(toolRequest);
       }
 
       function animate(){
@@ -320,42 +322,52 @@
         }
       }
 
-      function createVoxel(voxelDto) {
-        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        voxel.position.x = voxelDto.x;
-        voxel.position.y = voxelDto.y;
-        voxel.position.z = voxelDto.z;
-        scene.add( voxel );
-        objects.push( voxel );
+      function handleMessageWith3dGoal(message){
+        var foundGroup
 
-        animate();
+        if(lastGroup){
+          if(lastGroup.id ==  message.group.id){
+            foundGroup = lastGroup;
+          }
+        }
+
+        if(!foundGroup){
+          angular.forEach(groups, function(group){
+            if(group.id == message.group.id){
+                foundGroup = group;
+            }
+          });
+        }
+        if(foundGroup){
+          switch(message.content){
+            case 'visiblity': foundGroup.visibleForUser = message.group.visibleForUser; break;
+            case 'discard': discardGroup(foundGroup); break;
+            default: insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
+          }
+          lastGroup = foundGroup;
+          animate();
+        } else {
+            var group = new Group(message.group);
+            groups.push(group);
+            lastGroup = group;
+            if(message.content != 'insert'){
+              handleMessageWith3dGoal(message);
+            }
+        }
+      }
+      function insertWithTool(voxelDtos, scene, group, type, location){
+        angular.forEach(tools, function(tool){
+        // console.log({tool:{type:tool.type, location:tool.location}, message:{type:type,location:location}});
+            if(tool.type == type && tool.location == location){
+              tool.actionManager.handleInsert(voxelDtos, scene, group);
+            }
+        });
       }
 
-      function createSprite(location, voxelDto){
-        var spriteMap = textureLoader.load(location);
-        var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
-
-        var sprite = new THREE.Sprite( spriteMaterial );
-        sprite.position.x = voxelDto.x;
-        sprite.position.y = voxelDto.y;
-        sprite.position.z = voxelDto.z;
-
-        scene.add( sprite );
-        objects.push( sprite );
-        sprites.push( sprite );
-
-        animate();
-      }
-
-      function createArrow(startPos, endPos){
-        var dir = new THREE.Vector3(startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z).normalize();
-        var origin = new THREE.Vector3(endPos.x, endPos.y, endPos.z);
-        var length = Math.sqrt(Math.pow(endPos.x-startPos.x, 2) +  Math.pow(endPos.y-startPos.y, 2) +  Math.pow(endPos.z-startPos.z, 2));
-        var hex = 0x0bf23d;
-        var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-        arrowHelper.line.material.linewidth = 2;
-        scene.add( arrowHelper );
-        animate();
+      function discardGroup(group) {
+        ThreejsSceneService.removeGroupFromScene(group);
+        var index = groups.indexOf(group);
+        groups.splice(index, 1);
       }
 
       function Group(groupDto){
@@ -363,7 +375,6 @@
         this.visibleForUser = groupDto.visibleForUser;
         this.objects = [];
         this.sprites = [];
-        this.messages = [];
       }
 
     }

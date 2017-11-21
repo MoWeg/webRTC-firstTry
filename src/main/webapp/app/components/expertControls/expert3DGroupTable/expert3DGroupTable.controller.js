@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Expert3DGroupTableController', Expert3DGroupTableController);
 
-    Expert3DGroupTableController.$inject = ['$scope', '$rootScope', 'JhiTrackerService'];
+    Expert3DGroupTableController.$inject = ['$scope', '$rootScope', 'JhiTrackerService', 'ThreejsSceneService'];
 
-    function Expert3DGroupTableController($scope, $rootScope, JhiTrackerService) {
+    function Expert3DGroupTableController($scope, $rootScope, JhiTrackerService, ThreejsSceneService) {
       var vm = this;
       var plane = $scope.plane;
       vm.groups = $scope.threejsgroups;
@@ -35,7 +35,7 @@
         group.visibleForUser = !group.visibleForUser;
         if(group.send){
           var groupDto = { id: group.id, visibleForUser: group.visibleForUser};
-          var initialMessage = {goal: '3d', content: 'visiblity', group:groupDto};
+          var initialMessage = {goal: '3d', content: 'visibility', group:groupDto};
           sendMessage(initialMessage);
         }
         animate();
@@ -55,6 +55,7 @@
           var initialMessage = {goal: '3d', content: 'discard', group:groupDto};
           sendMessage(initialMessage);
         }
+        ThreejsSceneService.removeGroupFromScene(group);
         vm.groups.splice(index, 1);
       }
 

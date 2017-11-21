@@ -10,7 +10,7 @@
             restrict: 'E',
             templateUrl: 'app/components/expertControls/expert3DTools/expert3DTools.html',
             scope: {
-              activegroup: '=',
+              threejsgroups: '=',
               scene: '=',
               raycaster: '=',
               rollovermesh: '=',

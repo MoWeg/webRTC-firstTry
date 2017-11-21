@@ -11,7 +11,7 @@
       var vm = this;
       //from outside
       var toolRequest = [];
-      var activeGroup = $scope.activegroup;
+      var activeGroup;
       var scene = $scope.scene;
       var raycaster = $scope.raycaster;
       var rollOverMesh = $scope.rollovermesh;
@@ -35,7 +35,12 @@
         vm.activeMovable = movable;
       }
 
+      $scope.$on('active-group-changed', function(event,args){
+        activeGroup = args;
+      });
+
       function init(){
+        activeGroup = $scope.threejsgroups[0];
         mouse = new THREE.Vector2();
         newPosY = 0;
 

@@ -9,9 +9,7 @@
     ThreejsSceneService.$inject = ['$q'];
 
     function ThreejsSceneService ($q) {
-      var scene;
-      var plane;
-      var raycaster;
+      var scene, plane, raycaster;
       var helperDeferred = $q.defer();
 
       var service = {
@@ -23,10 +21,6 @@
         getHelperPromise: getHelperPromise
       };
       return service;
-
-      // $scope.$on('helpers-added', function(event, args) {
-      //     helpers = args;
-      // });
 
       function getHelperPromise() {
           return helperDeferred.promise;
@@ -108,6 +102,7 @@
             }
             setHelperVisiblity(seesHelper);
           }
+
           if(sprites){
             angular.forEach(sprites, function(value, key) {
               var material = value.material;
@@ -127,6 +122,14 @@
           this.renderer.render( scene, camera );
         };
 
+        function setHelperVisiblity(visisbility){
+          if(helpers){
+            angular.forEach(helpers, function(value, key) {
+              value.object.visible = visisbility;
+            });
+          }
+        }
+
         this.setNewSize = function( newWidth, newHeight ){
           camera.aspect = newWidth / newHeight;
           camera.updateProjectionMatrix();
@@ -143,13 +146,6 @@
           return helpers;
         }
 
-        function setHelperVisiblity(visisbility){
-          if(helpers){
-            angular.forEach(helpers, function(value, key) {
-              value.object.visible = visisbility;
-            });
-          }
-        }
       }
 
       function addHelpers(scene, additionalCamera) {
@@ -169,7 +165,6 @@
         scene.add( camHelper );
         helpers.push({name: 'cam', object: camHelper});
 
-        // $rootScope.$broadcast('helpers-added', helpers);
         helperDeferred.resolve(helpers);
       }
     }

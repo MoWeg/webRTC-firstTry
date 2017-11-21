@@ -252,52 +252,6 @@
           }
           //////////////////////////////////////////////////////////////////////////////////
           // 3D////////////////////////////////////////////////
-          // canvas//navigator.getUserMedia = navigator.getUserMedia ||
-          //navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-
-        //////////////////////////////////////////////////////////////////////////////////
-        // function View( canvas, viewWidth, viewHeight, inputCamera, inputRenderer,  withHelper) {
-        //   var showHelper = withHelper;
-        //   var renderer = inputRenderer;
-        //   var camera = inputCamera;
-        //   canvas.appendChild(renderer.domElement);
-        //
-        //   this.render = function () {
-        //     view1CamHelper.visible = showHelper;
-        //     vm.gridHelper.visible = showHelper;
-        //     if(showHelper){
-        //       camera.lookAt(vm.scene.position);
-        //     }
-        //     angular.forEach(sprites, function(value, key) {
-        //       var material = value.material;
-        //       // var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
-        //       var scale = 1;
-        //       var imageWidth = 1;
-        //       var imageHeight = 1;
-        //       if ( material.map && material.map.image && material.map.image.width ) {
-        //         imageWidth = material.map.image.width;
-        //         imageHeight = material.map.image.height;
-        //       }
-        //       // sprite.material.rotation += 0.1 * ( i / l );
-        //       value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
-        //     });
-        //     renderer.render( vm.scene, camera );
-        //   };
-        //
-        //   this.setNewSize = function( newWidth, newHeight ){
-        //     camera.aspect = newWidth / newHeight;
-        //     camera.updateProjectionMatrix();
-        //     renderer.setSize(newWidth,newHeight);
-        //   };
-        //
-        //   this.setOrientationInfo = function(orientationInfo){
-        //     camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
-        //     camera.quaternion.multiply(orientationInfo.backCamMultiplier);
-        //     camera.quaternion.multiply(orientationInfo.screenAdjustment);
-        //   }
-        // }
-
         function init3D(){
             vm.scene = ThreejsSceneService.getScene();
             vm.raycaster = ThreejsSceneService.getRayCaster();
@@ -336,80 +290,9 @@
             views.push(userView);
             views.push(expertView);
             animate();
-
-            // var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
-            // renderer.setClearColor( 0x000000, 0 );
-            // renderer.setPixelRatio( window.devicePixelRatio );
-            // renderer.setSize( 400, 640);
-            //
-            //
-            // var renderer2  = new THREE.WebGLRenderer( { antialias: true } );
-            // renderer2.setClearColor( 0xffffff );
-            // renderer2.setPixelRatio( window.devicePixelRatio );
-            // renderer2.setSize( 640, 640 );
-            //
-            //
-            // var view1Cam = new THREE.PerspectiveCamera( 45, 400 / 640, 1, 10000 );
-            // view1Cam.position.set( 500, 800, 1300 );
-            // // view1Cam.lookAt( new THREE.Vector3() );
-            // viewWithCamera = new View( canvas1, 400, 640, view1Cam, renderer, false );
-            // view1CamHelper = new THREE.CameraHelper( view1Cam );
-            // view1CamHelper.position.set( 500, 800, 1300 );
-            // vm.scene.add( view1CamHelper );
-            //
-            // vm.view2Cam = new THREE.PerspectiveCamera( 45, w / h, 1, 30000 );
-            // //view2Cam.position.set( 1000, 1600, 2600 );
-            // vm.view2Cam.position.set( 900, 900, 1600 );
-            // vm.view2Cam.lookAt( vm.scene.position );
-            // viewWithoutCamera = new View( canvas2, fullWidth, fullHeight, vm.view2Cam, renderer2, true );
-            //
-            // // roll-over helpers
-            // var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
-            // rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-            // vm.rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-            // vm.scene.add( vm.rollOverMesh );
-            // // cubes
-            //
-            // // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
-            // // grid
-            // vm.gridHelper = new THREE.GridHelper( 2000, 100  );
-            // vm.scene.add( vm.gridHelper );
-            // //
-            // vm.raycaster = new THREE.Raycaster();
-            // mouse = new THREE.Vector2();
-            // var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-            // geometry.rotateX( - Math.PI / 2 );
-            // vm.plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-            // vm.scene.add( vm.plane );
-            // objects.push( vm.plane );
-            // // Lights
-            // var ambientLight = new THREE.AmbientLight( 0x606060 );
-            // vm.scene.add( ambientLight );
-            // var directionalLight = new THREE.DirectionalLight( 0xffffff );
-            // directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-            // vm.scene.add( directionalLight );
-            //
-            // // window.addEventListener('resize', function() {
-            // // //view2Cam.aspect = window.innerWidth / window.innerHeight;
-            // // //camera.aspect = myCanvas.width / myCanvas.height;
-            // // //camera.updateProjectionMatrix();
-            // // renderer.setSize( window.innerWidth, window.innerHeight );
-            // // }, false);
-            // views.push(viewWithCamera);
-            // views.push(viewWithoutCamera);
-            // animate();
-            // //window.requestAnimationFrame( animate );
-            // // viewWithCamera.render();
-            // // viewWithoutCamera.render();
-            // // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				    // // document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-            // // // document.addEventListener('mouseup', onDocumentMouseUp, false);
-				    // // document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				    // // document.addEventListener( 'keyup', onDocumentKeyUp, false );
           }
 
           function animate(){
-            // window.requestAnimationFrame( animate );
             angular.forEach(views, function(value, key) {
               value.render();
             });
@@ -434,9 +317,7 @@
               width = innerContainer.width;
             }
 
-            if(viewWithCamera != null){
-              viewWithCamera.setNewSize(width, height)
-            }
+            viewWithCamera.setNewSize(width, height);
           }
           function checkResize() {
             var height = remoteVideo.videoHeight;

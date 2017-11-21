@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService'];
+    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService', 'ThreejsSceneService'];
 
-    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService) {
+    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService, ThreejsSceneService) {
       var vm = this;
       //var isChannelReady;
       var isInitiator = $rootScope.isInitiator;
@@ -21,6 +21,7 @@
 
       // 3D stuff
       var container;
+      var view;
       var camera, scene, renderer;
       var plane, cube;
       var mouse, raycaster, isShiftDown = false;
@@ -256,56 +257,12 @@
 
 
       function init3D(){
-        //container = document.getElementById( 'innerContainer' );
-        //container = document.getElementById( 'innerContainer' );
-        container = innerContainer;
-        //camera = new THREE.PerspectiveCamera( 45, myCanvas.width /myCanvas.height, 1, 10000 );
-        camera = new THREE.PerspectiveCamera( 45, 640 / 400, 1, 10000 );
-        camera.position.set( 500, 800, 1300 );
-        camera.lookAt( new THREE.Vector3() );
-        scene = new THREE.Scene();
-        // // roll-over helpers
-        // var rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
-        // rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-        // rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-        // scene.add( rollOverMesh );
-        // // cubes
-        cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-        // cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c) } );
-        // // grid
-        // var gridHelper = new THREE.GridHelper( 1000, 20 );
-        // scene.add( gridHelper );
-        // //
-        raycaster = new THREE.Raycaster();
-        mouse = new THREE.Vector2();
-        var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
-        geometry.rotateX( - Math.PI / 2 );
-        plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-        scene.add( plane );
-        objects.push( plane );
-        // Lights
-        var ambientLight = new THREE.AmbientLight( 0x606060 );
-        scene.add( ambientLight );
-        var directionalLight = new THREE.DirectionalLight( 0xffffff );
-        directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-        scene.add( directionalLight );
-        renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
-        renderer.setClearColor( 0x000000, 0 );
-
-      //  rrenderer.setClearColor( 0xf0f0f0 );
-        renderer.setPixelRatio( window.devicePixelRatio );
-        //renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setSize( 640,400 );
-        //renderer.setSize( localVideo.width, localVideo.height );
-        //renderer.domElement = myCanvas;
-        //
-        //renderer.domElement.style.position = 'absolute';
-        container.appendChild( renderer.domElement );
-
+        scene = ThreejsSceneService.getScene();
+        camera = ThreejsSceneService.getCamera(400,640,1,10000,500,800,1300);
+        view = ThreejsSceneService.getView(innerContainer, 400, 640, camera, true, 0x000000, 0);
 
         window.addEventListener('resize', function() {
           camera.aspect = window.innerWidth / window.innerHeight;
-          //camera.aspect = myCanvas.width / myCanvas.height;
           camera.updateProjectionMatrix();
           renderer.setSize( window.innerWidth, window.innerHeight );
         }, false);
@@ -313,42 +270,20 @@
         animate();
         console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
         window.requestAnimationFrame( animate );
-//  window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-//  window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
-    //    window.addEventListener( 'devicemotion', deviceMotionHandler, false);
-      //  window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
       }
 
       function animate(){
-        angular.forEach(sprites, function(value, key) {
-          var material = value.material;
-          var scale = 1;
-          var imageWidth = 1;
-          var imageHeight = 1;
-          if ( material.map && material.map.image && material.map.image.width ) {
-            imageWidth = material.map.image.width;
-            imageHeight = material.map.image.height;
-          }
-          value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
-        });
-        renderer.render(scene, camera);
+        view.render();
       }
 
       function onDeviceOrientationChangeEvent(deviceEvent){
         var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
-        setOrientationInfo(orientationInfo);
+        view.setOrientationInfo(orientationInfo);
         sendOrientation(createDeviceOrientationDto(deviceEvent));
         checkResize();
         animate();
       }
-
-      function setOrientationInfo(orientationInfo){
-        camera.quaternion.setFromEuler(orientationInfo.eulerOrientation);
-        camera.quaternion.multiply(orientationInfo.backCamMultiplier);
-        camera.quaternion.multiply(orientationInfo.screenAdjustment);
-      }
-
       function createDeviceOrientationDto(event){
         return {
           'alpha': event.alpha,
@@ -373,14 +308,7 @@
           width = innerContainer.width;
         }
 
-        if(renderer != null && camera != null){
-
-          camera.aspect = width / height;
-          //camera.aspect = myCanvas.width / myCanvas.height;
-          camera.updateProjectionMatrix();
-          renderer.setSize( width, height);
-          //animate();
-        }
+        view.setNewSize(width, height);
       }
 
       function checkResize() {

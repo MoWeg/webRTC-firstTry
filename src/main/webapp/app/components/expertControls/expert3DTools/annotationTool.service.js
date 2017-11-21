@@ -93,13 +93,13 @@
         }
       }
 
-      function writeMessage(id, insert, content, position, endPosition){
+      function writeMessage(groupId, insert, content, position, endPosition){
         var startPointDto = getVoxelDto(position, insert);
         var endPointDto;
         if(endPosition){
           endPointDto = getVoxelDto(endPosition, insert);
         }
-        return {goal: '3d', content: content, voxel: startPointDto, endPoint:endPointDto, groupId: id};
+        return {goal: '3d', content: content, voxel: startPointDto, endPoint:endPointDto, group:{id: groupId}};
       }
 
       function getVoxelDto(position, insert){

@@ -19,6 +19,7 @@ public class SimpleChatMessageDTO {
 	private DeviceOrientationDto orientation;
 	private VoxelDto voxel;
 	private VoxelDto endPoint;
+	private GroupDto group;
 	
 	public String getContent() {
 		return content;
@@ -122,6 +123,14 @@ public class SimpleChatMessageDTO {
 
 	public void setEndPoint(VoxelDto endPoint) {
 		this.endPoint = endPoint;
+	}
+
+	public GroupDto getGroup() {
+		return group;
+	}
+
+	public void setGroup(GroupDto group) {
+		this.group = group;
 	}
 
 	@Override

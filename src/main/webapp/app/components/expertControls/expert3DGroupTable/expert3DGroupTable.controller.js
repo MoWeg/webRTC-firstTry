@@ -33,12 +33,28 @@
       }
       vm.setVisibleForUser = function (group) {
         group.visibleForUser = !group.visibleForUser;
+        if(group.send){
+          var groupDto = { id: group.id, visibleForUser: group.visibleForUser};
+          var initialMessage = {goal: '3d', content: 'visiblity', group:groupDto};
+          sendMessage(initialMessage);
+        }
         animate();
       }
       vm.send = function (group) {
+        var groupDto = { id: group.id, visibleForUser: group.visibleForUser};
+        var initialMessage = {goal: '3d', content: 'insert', group:groupDto};
+        sendMessage(initialMessage);
+        angular.forEach(group.messages, function(message){
+          sendMessage(message);
+        });
         group.send = true;
       }
-      vm.discard = function (index) {
+      vm.discard = function (index, group) {
+        if(group.send){
+          var groupDto = { id: group.id, visibleForUser: group.visibleForUser};
+          var initialMessage = {goal: '3d', content: 'discard', group:groupDto};
+          sendMessage(initialMessage);
+        }
         vm.groups.splice(index, 1);
       }
 
@@ -55,6 +71,9 @@
 
       function animate() {
         $rootScope.$broadcast('request-animation', $scope.threejsgroups);
+      }
+      function sendMessage(message){
+          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
       }
     }
 })();

@@ -93,7 +93,6 @@
             sendMessage(storedOffer);
           } else if(message.goal == '3d'){
             if(message.content == 'voxel'){
-                console.log(message.voxel);
                 createVoxel(message.voxel);
             } else if(message.content == 'arrow') {
                 createArrow(message.voxel, message.endPoint);
@@ -357,6 +356,14 @@
         arrowHelper.line.material.linewidth = 2;
         scene.add( arrowHelper );
         animate();
+      }
+
+      function Group(groupDto){
+        this.id = groupDto.id;
+        this.visibleForUser = groupDto.visibleForUser;
+        this.objects = [];
+        this.sprites = [];
+        this.messages = [];
       }
 
     }

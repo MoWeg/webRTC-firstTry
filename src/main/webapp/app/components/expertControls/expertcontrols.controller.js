@@ -22,11 +22,12 @@
       function Group(groupId, active){
         this.id = groupId
         this.active = active;
-        this.visible = false;
+        this.visible = true;
         this.send = false;
         this.visibleForUser = false;
         this.objects = [];
         this.sprites = [];
+        this.messages = [];
       }
       init();
     }

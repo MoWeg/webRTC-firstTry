@@ -29,9 +29,11 @@
       }
       vm.setVisible = function (group) {
         group.visible = !group.visible;
+        animate();
       }
       vm.setVisibleForUser = function (group) {
         group.visibleForUser = !group.visibleForUser;
+        animate();
       }
       vm.send = function (group) {
         group.send = true;
@@ -48,7 +50,11 @@
         this.visibleForUser = false;
         this.objects = [];
         this.sprites = [];
+        this.messages = [];
       }
 
+      function animate() {
+        $rootScope.$broadcast('request-animation', $scope.threejsgroups);
+      }
     }
 })();

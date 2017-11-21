@@ -83,7 +83,7 @@
         var scene = getScene();
         this.renderer = renderer;
         var camera = inputCamera;
-        var helpers, sprites;
+        var helpers;
         var seesHelper = false;
 
         getHelperPromise().then(function(args){
@@ -95,30 +95,40 @@
           seesHelper = true;
         }
 
-        this.render = function () {
+        this.render = function (groups) {
           if(helpers){
             if(seesHelper){
                 camera.lookAt(scene.position);
             }
             setHelperVisiblity(seesHelper);
           }
-
-          if(sprites){
-            angular.forEach(sprites, function(value, key) {
-              var material = value.material;
-              // var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
-              var scale = 1;
-              var imageWidth = 1;
-              var imageHeight = 1;
-              if ( material.map && material.map.image && material.map.image.width ) {
-                imageWidth = material.map.image.width;
-                imageHeight = material.map.image.height;
+          if(groups){
+            angular.forEach(groups, function(group) {
+              var visisbility = group.visibleForUser;
+              if(seesHelper){
+                  visisbility = group.visible;
               }
-              // sprite.material.rotation += 0.1 * ( i / l );
-              value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+
+              if(visisbility){
+                angular.forEach(group.sprites, function(value, key) {
+                  var material = value.material;
+                  // var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+                  var scale = 1;
+                  var imageWidth = 1;
+                  var imageHeight = 1;
+                  if ( material.map && material.map.image && material.map.image.width ) {
+                    imageWidth = material.map.image.width;
+                    imageHeight = material.map.image.height;
+                  }
+                  // sprite.material.rotation += 0.1 * ( i / l );
+                  value.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+                });
+              }
+              angular.forEach(group.objects, function(object) {
+                object.visible = visisbility;
+              });
             });
           }
-
           this.renderer.render( scene, camera );
         };
 

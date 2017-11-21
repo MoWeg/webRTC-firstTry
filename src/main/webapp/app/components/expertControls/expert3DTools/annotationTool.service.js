@@ -43,13 +43,14 @@
         var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
         var cubeMaterial;
 
-        this.action = function(intersect, scene, objects, sprites) {
+        this.action = function(intersect, scene, activeGroup) {
           var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
           voxel.position.copy( intersect.point ).add( intersect.face.normal );
           voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
           scene.add( voxel );
-          objects.push( voxel );
-          sendAnnotation(true, "voxel", voxel.position);
+          activeGroup.objects.push( voxel );
+          var message = writeMessage(activeGroup.id, true, "voxel", voxel.position);
+          activeGroup.messages.push( message );
         }
       }
 
@@ -57,21 +58,21 @@
         var spriteMap = textureLoader.load( spriteLocation );
         var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
 
-        this.action = function(intersect, scene, objects, sprites) {
+        this.action = function(intersect, scene, activeGroup) {
           var sprite = new THREE.Sprite( spriteMaterial );
           sprite.position.copy( intersect.point ).add( intersect.face.normal );
           sprite.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
           scene.add( sprite );
-          objects.push( sprite );
-          sprites.push( sprite );
-          sendAnnotation(true, spriteLocation, sprite.position);
+          activeGroup.sprites.push( sprite );
+          var message = writeMessage(activeGroup.id, true, spriteLocation, sprite.position);
+          activeGroup.messages.push( message );
         }
       }
 
       function ArrowManager(){
         var startPos = 0;
 
-        this.action = function(intersect, scene, objects, sprites){
+        this.action = function(intersect, scene, activeGroup){
           if(startPos == 0){
             startPos = intersect.point;
           } else {
@@ -84,20 +85,21 @@
             var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
             arrowHelper.line.material.linewidth = 2;
             scene.add( arrowHelper );
-
-            sendAnnotation(true, "arrow", startPos, endPos);
+            activeGroup.objects.push( arrowHelper );
+            var message = writeMessage(activeGroup.id, true, "arrow", startPos, endPos);
+            activeGroup.messages.push( message );
             startPos = 0;
           }
         }
       }
 
-      function sendAnnotation(insert, content, position, endPosition){
+      function writeMessage(id, insert, content, position, endPosition){
         var startPointDto = getVoxelDto(position, insert);
         var endPointDto;
         if(endPosition){
           endPointDto = getVoxelDto(endPosition, insert);
         }
-        JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:content ,voxel: startPointDto, endPoint:endPointDto});
+        return {goal: '3d', content: content, voxel: startPointDto, endPoint:endPointDto, groupId: id};
       }
 
       function getVoxelDto(position, insert){

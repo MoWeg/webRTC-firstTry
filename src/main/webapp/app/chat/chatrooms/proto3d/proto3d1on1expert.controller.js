@@ -38,6 +38,7 @@
       vm.rollOverMesh;
       vm.plane;
       var newPosY = 0;
+      var threejsgroups;
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -68,6 +69,7 @@
         hangup();
       });
       $scope.$on('request-animation', function(event, args) {
+        threejsgroups = args;
         animate();
       });
 
@@ -293,8 +295,8 @@
           }
 
           function animate(){
-            angular.forEach(views, function(value, key) {
-              value.render();
+            angular.forEach(views, function(view) {
+              view.render(threejsgroups);
             });
           }
 

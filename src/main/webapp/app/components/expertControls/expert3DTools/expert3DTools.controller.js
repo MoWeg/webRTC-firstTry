@@ -92,7 +92,7 @@
           // } else {
             if(vm.activeTool){
               intersect.point.y = intersect.point.y + newPosY;
-              vm.activeTool.actionManager.action(intersect, scene, activeGroup.objects, activeGroup.sprites);
+              vm.activeTool.actionManager.action(intersect, scene, activeGroup);
             }
           // }
           animate();
@@ -179,7 +179,7 @@
       }
 
       function animate() {
-        $rootScope.$broadcast('request-animation');
+        $rootScope.$broadcast('request-animation', $scope.threejsgroups);
       }
       init();
     }

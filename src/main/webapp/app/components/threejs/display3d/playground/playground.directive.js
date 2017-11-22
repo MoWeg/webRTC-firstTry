@@ -3,17 +3,17 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .directive('display3d', display3d);
+        .directive('playground', playground);
 
-    function display3d () {
+    function playground () {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/threejs/display3d/display3d.html',
+            templateUrl: 'app/components/threejs/display3d/playground/playground.html',
             scope: {
               reqclass: '@'
             },
             controllerAs: 'vm',
-            controller: 'Display3DController'
+            controller: 'PlaygroundController'
         };
 
         return directive;

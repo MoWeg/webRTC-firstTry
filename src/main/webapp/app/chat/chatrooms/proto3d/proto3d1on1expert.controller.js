@@ -274,7 +274,8 @@
             viewWithCamera = userView;
 
             var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
-            var expertView = ThreejsSceneService.getView(canvas2, w, h, expertCam, false, 0xffffff, 1, userCam);
+            var expertView = ThreejsSceneService.getView(canvas2, w, h, expertCam, false, 0xffffff, 1);
+            expertView.addSecondaryCam(userCam);
 
             vm.view2Cam = expertCam;
 

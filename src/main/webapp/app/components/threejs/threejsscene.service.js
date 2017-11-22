@@ -95,7 +95,7 @@
         return renderer;
       }
 
-      function View(viewWidth, viewHeight, inputCamera, renderer,  additionalCamera){
+      function View(viewWidth, viewHeight, inputCamera, renderer){
         var scene = getScene();
         this.renderer = renderer;
         var camera = inputCamera;
@@ -106,7 +106,7 @@
           helpers = args;
         });
 
-        if(additionalCamera){
+        this.addSecondaryCam = function (additionalCamera) {
           addHelpers(scene, additionalCamera);
           seesHelper = true;
         }

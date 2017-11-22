@@ -10,7 +10,8 @@
             restrict: 'E',
             templateUrl: 'app/components/threejs/display3d/display3d.html',
             scope: {
-              reqclass: '@'
+              reqclass: '@',
+              primarycam: '='
             },
             controllerAs: 'vm',
             controller: 'Display3DController'

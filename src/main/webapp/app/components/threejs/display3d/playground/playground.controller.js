@@ -9,20 +9,14 @@
 
     function PlaygroundController($scope, $element, ThreejsSceneService) {
       var vm = this;
-      var hasSecondaryCam = false;
+      var primaryCam = $scope.primarycam;
+      var secondaryCam = $scope.secondarycam;
       var view;
 
       vm.applyClasses = function() {
         return $scope.reqclass;
       }
 
-      $scope.$on('display3d-cam-added', function(event, args){
-        if(!hasSecondaryCam){
-          view.addSecondaryCam(args);
-          hasSecondaryCam = true;
-          $rootScope.$broadcast('display3d-cam-received');
-        }
-      });
       $scope.$on('request-animation', function(event, args) {
         view.render(args);
       });
@@ -37,8 +31,9 @@
         canvas.width = fullWidth;
         canvas.height = fullHeight;
 
-        var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
-        view = ThreejsSceneService.getView(canvas, w, h, expertCam, false, 0xffffff, 1);
+        // var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
+        view = ThreejsSceneService.getView(canvas, w, h, primaryCam, false, 0xffffff, 1);
+        view.addSecondaryCam(secondaryCam);
         view.render();
       }
       init3D();

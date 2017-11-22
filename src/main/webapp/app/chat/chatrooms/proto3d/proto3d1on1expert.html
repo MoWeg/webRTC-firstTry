@@ -10,7 +10,7 @@
         <button type="button" class="btn btn-secondary" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool}}</button>
       </div> -->
 
-      <expertcontrols scene="vm.scene" rollovermesh="vm.rollOverMesh" gridhelper="vm.gridHelper" raycaster="vm.raycaster" expertcamera="vm.view2Cam" plane="vm.plane"/>
+      <expertcontrols expertcam="vm.expertCam"/>
       <!-- <div class="list-group" ng-repeat="movable in vm.movables">
        <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeMovable == movable}" ng-click="vm.setActiveMovable(movable)">{{movable.name}}</a>
      </div>
@@ -19,11 +19,11 @@
         <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool.name}}</a>
       </div> -->
 
-      <div id='canvas2'>
+      <playground primarycam="vm.expertCam" secondarycam="vm.userCam" />
     </div>
 
       <div id='videos'>
-        <div id='canvas1' class='my-drawing-canvas is-absolut '/>
+        <display3d class='my-drawing-canvas is-absolut ' primarycam="vm.userCam"/>
           <video id='video' class='my-video is-absolut ' autoplay muted></video>
         </div>
       </div>

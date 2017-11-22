@@ -5,17 +5,18 @@
         .module('simpleWebrtcServerApp')
         .controller('ExpertControlsController', ExpertControlsController);
 
-    ExpertControlsController.$inject = ['$scope'];
+    ExpertControlsController.$inject = ['$scope', 'ThreejsSceneService'];
 
-    function ExpertControlsController($scope) {
+    function ExpertControlsController($scope, ThreejsSceneService) {
       var vm = this;
 
       vm.groups = [];
+      var plane = ThreejsSceneService.getPlane();
 
       function init() {
         var groupId = Math.round((Math.random() * 1000000) * 10);
         var newGroup = new Group(groupId, true);
-        newGroup.objects.push($scope.plane);
+        newGroup.objects.push(plane);
         vm.groups.push(newGroup);
       }
 

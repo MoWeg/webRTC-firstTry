@@ -9,7 +9,7 @@
 
     function Expert3DGroupTableController($scope, $rootScope, JhiTrackerService, ThreejsSceneService) {
       var vm = this;
-      var plane = $scope.plane;
+      var plane = ThreejsSceneService.getPlane();
       vm.groups = $scope.threejsgroups;
 
       vm.addGroup = function () {

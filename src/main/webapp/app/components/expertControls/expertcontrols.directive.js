@@ -10,12 +10,7 @@
             restrict: 'E',
             templateUrl: 'app/components/expertControls/expertcontrols.html',
             scope: {
-              scene: '=',
-              raycaster: '=',
-              rollovermesh: '=',
-              gridhelper: '=',
-              expertcamera: '=',
-              plane: '='
+              expertcam: '='
             },
             controllerAs: 'vm',
             controller: 'ExpertControlsController'

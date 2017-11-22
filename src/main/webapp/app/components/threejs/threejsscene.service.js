@@ -19,7 +19,9 @@
         getCamera: getCamera,
         getView: getView,
         getHelperPromise: getHelperPromise,
-        removeGroupFromScene: removeGroupFromScene
+        removeGroupFromScene: removeGroupFromScene,
+        getExpertCamera: getExpertCamera,
+        getUserCamera: getUserCamera
       };
       return service;
 
@@ -40,6 +42,16 @@
             })
           }
         }
+      }
+
+      function getExpertCamera() {
+        var w = 640, h = 640;
+        return getCamera(w,h,1,30000, 900, 900, 1600);
+      }
+
+      function getUserCamera() {
+        var w = 400, h = 640;
+        return getCamera(w,h,1,10000,500,800,1300);
       }
 
       function getScene() {

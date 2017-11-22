@@ -5,18 +5,19 @@
         .module('simpleWebrtcServerApp')
         .controller('Expert3DToolsController', Expert3DToolsController);
 
-    Expert3DToolsController.$inject = ['$scope', '$rootScope', 'AnnotationToolService'];
+    Expert3DToolsController.$inject = ['$scope', '$rootScope', 'AnnotationToolService', 'ThreejsSceneService'];
 
-    function Expert3DToolsController($scope, $rootScope, AnnotationToolService) {
+    function Expert3DToolsController($scope, $rootScope, AnnotationToolService, ThreejsSceneService) {
       var vm = this;
       //from outside
       var toolRequest = [];
       var activeGroup;
-      var scene = $scope.scene;
-      var raycaster = $scope.raycaster;
-      var rollOverMesh = $scope.rollovermesh;
-      var gridHelper = $scope.gridhelper;
-      var view2Cam = $scope.expertcamera;
+      var scene = ThreejsSceneService.getScene(); // $scope.scene;
+      var raycaster = ThreejsSceneService.getRayCaster();
+      var rollOverMesh;
+      var gridHelper;
+
+      var view2Cam = $scope.expertcam;
       var mouse;
       var newPosY;
 
@@ -34,6 +35,17 @@
       vm.setActiveMovable = function(movable){
         vm.activeMovable = movable;
       }
+
+      ThreejsSceneService.getHelperPromise().then(function(helpers) {
+        angular.forEach(helpers, function(value, key){
+          if(value.name == 'cursor'){
+            rollOverMesh =  value.object;
+          }
+          if(value.name == 'grid'){
+            gridHelper =  value.object;
+          }
+        });
+      });
 
       $scope.$on('active-group-changed', function(event,args){
         activeGroup = args;
@@ -61,42 +73,43 @@
       }
 
       function onDocumentMouseMove( event ) {
-        event.preventDefault();
-        mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        raycaster.setFromCamera( mouse, view2Cam );
-        var intersects = raycaster.intersectObjects( activeGroup.objects );
-        if ( intersects.length > 0 ) {
-          var intersect = intersects[ 0 ];
-          intersect.point.y = intersect.point.y + newPosY;
-          rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-          rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-        }
-        animate();
+          event.preventDefault();
+          mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+          raycaster.setFromCamera( mouse, view2Cam );
+          var intersects = raycaster.intersectObjects( activeGroup.objects );
+          if ( intersects.length > 0 ) {
+            var intersect = intersects[ 0 ];
+            intersect.point.y = intersect.point.y + newPosY;
+            rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+            rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+          }
+          animate();
+
       }
 
       function onDocumentMouseDown( event ) {
-        event.preventDefault();
-        mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        raycaster.setFromCamera( mouse, view2Cam );
-        var intersects = raycaster.intersectObjects( activeGroup.objects );
-        if ( intersects.length > 0 ) {
-          var intersect = intersects[ 0 ];
-          // delete cube
-          // if ( isShiftDown ) {
-          //   // if ( intersect.object != plane ) {
-          //   //   scene.remove( intersect.object );
-          //   //   objects.splice( objects.indexOf( intersect.object ), 1 );
-          //   //   //sendVoxel(voxel, false);
-          //   // }
-          // create cube
-          // } else {
-            if(vm.activeTool){
-              intersect.point.y = intersect.point.y + newPosY;
-              vm.activeTool.actionManager.action(intersect, scene, activeGroup);
-            }
-          // }
-          animate();
-        }
+          event.preventDefault();
+          mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+          raycaster.setFromCamera( mouse, view2Cam );
+          var intersects = raycaster.intersectObjects( activeGroup.objects );
+          if ( intersects.length > 0 ) {
+            var intersect = intersects[ 0 ];
+            // delete cube
+            // if ( isShiftDown ) {
+            //   // if ( intersect.object != plane ) {
+            //   //   scene.remove( intersect.object );
+            //   //   objects.splice( objects.indexOf( intersect.object ), 1 );
+            //   //   //sendVoxel(voxel, false);
+            //   // }
+            // create cube
+            // } else {
+              if(vm.activeTool){
+                intersect.point.y = intersect.point.y + newPosY;
+                vm.activeTool.actionManager.action(intersect, scene, activeGroup);
+              }
+            // }
+            animate();
+          }
       }
 
       function onDocumentKeyDown( event ) {

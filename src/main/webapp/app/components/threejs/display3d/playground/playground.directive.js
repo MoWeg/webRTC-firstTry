@@ -10,7 +10,9 @@
             restrict: 'E',
             templateUrl: 'app/components/threejs/display3d/playground/playground.html',
             scope: {
-              reqclass: '@'
+              reqclass: '@',
+              primarycam: '=',
+              secondarycam: '='
             },
             controllerAs: 'vm',
             controller: 'PlaygroundController'

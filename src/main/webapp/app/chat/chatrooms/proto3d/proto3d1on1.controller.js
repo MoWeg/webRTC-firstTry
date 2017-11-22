@@ -20,6 +20,7 @@
       var storedOffer = null;
 
       // 3D stuff
+      vm.userCam = ThreejsSceneService.getUserCamera();
       var container;
       var tools;
       var groups = [];
@@ -51,7 +52,7 @@
 
 
       var localVideo = document.querySelector('#video');
-      var innerContainer = document.querySelector('#innerContainer');
+      var innerContainer = document.querySelector('#videos');
 
       $scope.$on('$destroy', function() {
         hangup();
@@ -66,7 +67,7 @@
       // $scope.$watch(videoWidth, function(oldval, newval){
       //     resize3dModell(null, localVideo.videoWidth);
       // }, true);
-      //localVideo.addEventListener('resize', resize3dModell(localVideo.videoHeight,  localVideo.videoWidth));
+      localVideo.addEventListener('resize', resize3dModell(localVideo.videoHeight,  localVideo.videoWidth));
 
       //Signaling
       /////////////////////////////////////////////
@@ -246,25 +247,8 @@
       return SdpService.getOpus(sdp);
     }
     //////////////////////////////////////////////////////////////////////////////////
-    // 3D
-
-    //vm.resetCubes = resetCubes;
-
-
+  
       function init3D(){
-        scene = ThreejsSceneService.getScene();
-        camera = ThreejsSceneService.getCamera(400,640,1,10000,500,800,1300);
-        view = ThreejsSceneService.getView(innerContainer, 400, 640, camera, true, 0x000000, 0);
-
-        window.addEventListener('resize', function() {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize( window.innerWidth, window.innerHeight );
-        }, false);
-
-        animate();
-        console.log("X: "+camera.position.x +" Y: "+camera.position.y+" Z: "+camera.position.z);
-        window.requestAnimationFrame( animate );
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
         var toolRequest = [];
@@ -274,16 +258,10 @@
         tools = AnnotationToolService.getAnnotationTools(toolRequest);
       }
 
-      function animate(){
-        view.render();
-      }
-
+      //handle orientation and resize
       function onDeviceOrientationChangeEvent(deviceEvent){
-        var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
-        view.setOrientationInfo(orientationInfo);
         sendOrientation(createDeviceOrientationDto(deviceEvent));
-        checkResize();
-        animate();
+        setCamera(deviceEvent);
       }
       function createDeviceOrientationDto(event){
         return {
@@ -297,31 +275,38 @@
         JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'camera' ,orientation: newOrientation});
       }
 
-      function resize3dModell(height, width){
-        if(height != null){
-          innerContainer.height = height;
-        } else {
-          height = innerContainer.height;
-        }
-        if(width != null){
-          innerContainer.width = width;
-        }else{
-          width = innerContainer.width;
-        }
-
-        view.setNewSize(width, height);
-      }
-
       function checkResize() {
         var height = localVideo.videoHeight;
         var width = localVideo.videoWidth;
         if(height != oldVideoHeight||width != oldVideoWidth){
+          if(height != null){
+            innerContainer.height = height;
+          } else {
+            height = innerContainer.height;
+          }
+          if(width != null){
+            innerContainer.width = width;
+          }else{
+            width = innerContainer.width;
+          }
           resize3dModell(height, width);
           oldVideoHeight = height;
           oldVideoWidth = width;
+
+          return {height: heigth, width: width};
         }
       }
 
+      function setCamera(deviceEvent){
+        var size = checkResize();
+        $rootScope.$broadcast('set-camera-and-resize', {deviceEvent: deviceEvent, size:size})
+      }
+
+      function resize3dModell(height, width){
+          $rootScope.$broadcast('just-resize', {height: height, width:width})
+      }
+
+      /// handle 3D messages
       function handleMessageWith3dGoal(message){
         var foundGroup
 
@@ -357,7 +342,6 @@
       }
       function insertWithTool(voxelDtos, scene, group, type, location){
         angular.forEach(tools, function(tool){
-        // console.log({tool:{type:tool.type, location:tool.location}, message:{type:type,location:location}});
             if(tool.type == type && tool.location == location){
               tool.actionManager.handleInsert(voxelDtos, scene, group);
             }

@@ -9,11 +9,6 @@
 
     function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService) {
       var vm = this;
-      //
-      // var views = [];
-      // var sprites = [];
-      // var spriteMap = new THREE.TextureLoader().load( "content/images/logo-jhipster.png" );
-      // var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, transparent:true} );
 
       var isStarted = false;
       var gotOffer = false;
@@ -24,23 +19,6 @@
       var container;
       vm.expertCam = ThreejsSceneService.getExpertCamera();
       vm.userCam = ThreejsSceneService.getUserCamera();
-      // var cube;
-      // var mouse, isShiftDown = false;
-      // var rollOverMaterial;
-      // var cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-      // var cubeMaterial;
-      // var objects = [];
-      // var viewWithCamera;
-      // var viewWithoutCamera;
-      // vm.view2Cam;
-      // var view1CamHelper;
-      // vm.scene;
-      // vm.raycaster;
-      // vm.gridHelper;
-      // vm.rollOverMesh;
-      // vm.plane;
-      // var newPosY = 0;
-      // var threejsgroups;
 
       var oldVideoHeight = 0;
       var oldVideoWidth = 0;
@@ -70,16 +48,6 @@
       $scope.$on('$destroy', function() {
         hangup();
       });
-      // $scope.$on('request-animation', function(event, args) {
-      //   threejsgroups = args;
-      //   animate();
-      // });
-
-    //  init3D();
-      $scope.$watch(remoteVideo, function(oldval, newval){
-          //resize3dModell(remoteVideo.videoHeight, remoteVideo.videoWidth);
-          console.log('height: '+ remoteVideo.videoHeight +' width: '+remoteVideo.videoWidth);
-      }, true);
 
       remoteVideo.addEventListener('resize', resize3dModell(remoteVideo.videoHeight, remoteVideo.videoWidth));
 
@@ -256,40 +224,8 @@
           }
           //////////////////////////////////////////////////////////////////////////////////
           // 3D////////////////////////////////////////////////
-        // function init3D(){
-        //
-        //     var canvas1 = document.getElementById( 'canvas1' );
-        //     var canvas2 = document.getElementById( 'canvas2' );
-        //
-        //     var w = 640, h = 640;
-        //     var fullWidth = w * 2;
-        //     var fullHeight = h * 2;
-        //     canvas2.width = fullWidth;
-        //     canvas2.height = fullHeight;
-        //
-        //     var userCam = ThreejsSceneService.getCamera(400,640,1,10000,500,800,1300);
-        //     var userView = ThreejsSceneService.getView(canvas1, 400, 640, userCam, true, 0x000000, 0);
-        //     viewWithCamera = userView;
-        //
-        //     var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
-        //     var expertView = ThreejsSceneService.getView(canvas2, w, h, expertCam, false, 0xffffff, 1);
-        //     expertView.addSecondaryCam(userCam);
-        //
-        //     views.push(userView);
-        //     views.push(expertView);
-        //     animate();
-        //   }
-        //
-        //   function animate(){
-        //     angular.forEach(views, function(view) {
-        //       view.render(threejsgroups);
-        //     });
-        //   }
-
           function setCamera(deviceEvent){
             var size = checkResize();
-            // var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
-            // viewWithCamera.setOrientationInfo(orientationInfo);
             $rootScope.$broadcast('set-camera-and-resize', {deviceEvent: deviceEvent, size:size})
           }
 

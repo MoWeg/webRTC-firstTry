@@ -3,7 +3,7 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .directive('display3d', display3d);
+        .directive('display3ddynamic', display3d);
 
     function display3d () {
         var directive = {

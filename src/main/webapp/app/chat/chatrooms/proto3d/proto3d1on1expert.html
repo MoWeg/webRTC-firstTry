@@ -1,29 +1,12 @@
 <div>
   <h2> Video Chat</h2>
   <div id='container'>
-
-      <!-- <button ng-click="vm.resetCanvas()" class="btn btn-warning">
-        reset canvas <i class="glyphicon glyphicon-refresh"/>
-      </button> -->
-
-      <!-- <div class="btn-group btn-group-vertical right" role="group" ng-repeat="tool in vm.tools">
-        <button type="button" class="btn btn-secondary" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool}}</button>
-      </div> -->
-
       <expertcontrols expertcam="vm.expertCam"/>
-      <!-- <div class="list-group" ng-repeat="movable in vm.movables">
-       <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeMovable == movable}" ng-click="vm.setActiveMovable(movable)">{{movable.name}}</a>
-     </div>
-
-       <div class="list-group right" ng-repeat="tool in vm.tools">
-        <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActive(tool)">{{tool.name}}</a>
-      </div> -->
-
-      <playground primarycam="vm.expertCam" secondarycam="vm.userCam" />
+      <display3dplayground primarycam="vm.expertCam" secondarycam="vm.userCam" />
     </div>
 
       <div id='videos'>
-        <display3d class='my-drawing-canvas is-absolut ' primarycam="vm.userCam"/>
+        <display3ddynamic class='my-drawing-canvas is-absolut ' primarycam="vm.userCam"/>
           <video id='video' class='my-video is-absolut ' autoplay muted></video>
         </div>
       </div>

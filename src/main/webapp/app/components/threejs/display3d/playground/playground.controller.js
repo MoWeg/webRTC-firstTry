@@ -5,37 +5,45 @@
         .module('simpleWebrtcServerApp')
         .controller('PlaygroundController', PlaygroundController);
 
-    PlaygroundController.$inject = ['$scope', '$element', 'ThreejsSceneService'];
+    PlaygroundController.$inject = ['$scope', '$rootScope', '$element', 'ThreejsSceneService'];
 
-    function PlaygroundController($scope, $element, ThreejsSceneService) {
-      var vm = this;
-      var primaryCam = $scope.primarycam;
-      var secondaryCam = $scope.secondarycam;
-      var view;
+    function PlaygroundController($scope, $rootScope, $element, ThreejsSceneService) {
+        var vm = this;
+        var primaryCam = $scope.primarycam;
+        var secondaryCam = $scope.secondarycam;
+        var view;
 
-      vm.applyClasses = function() {
-        return $scope.reqclass;
-      }
+        vm.applyClasses = function() {
+            return $scope.reqclass;
+        }
+        vm.onMouseMove = function(event) {
+            // console.log(event);
+            $rootScope.$broadcast('mouse-move', event);
+        }
+        vm.onMouseDown = function(event) {
+            $rootScope.$broadcast('mouse-down', event);
+        }
 
-      $scope.$on('request-animation', function(event, args) {
-        view.render(args);
-      });
+        $scope.$on('request-animation', function(event, args) {
+            view.render(args);
+        });
 
 
-      function init3D(){
-        var canvas = $element[0].childNodes[0];
+        function init3D() {
+            var canvas = $element[0].childNodes[0];
 
-        var w = 640, h = 640;
-        var fullWidth = w * 2;
-        var fullHeight = h * 2;
-        canvas.width = fullWidth;
-        canvas.height = fullHeight;
+            var w = 640,
+                h = 640;
+            var fullWidth = w * 2;
+            var fullHeight = h * 2;
+            canvas.width = fullWidth;
+            canvas.height = fullHeight;
 
-        // var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
-        view = ThreejsSceneService.getView(canvas, w, h, primaryCam, false, 0xffffff, 1);
-        view.addSecondaryCam(secondaryCam);
-        view.render();
-      }
-      init3D();
+            // var expertCam = ThreejsSceneService.getCamera(w,h,1,30000, 900, 900, 1600);
+            view = ThreejsSceneService.getView(canvas, w, h, primaryCam, false, 0xffffff, 1);
+            view.addSecondaryCam(secondaryCam);
+            view.render();
+        }
+        init3D();
     }
 })();

@@ -5,14 +5,14 @@
         .module('simpleWebrtcServerApp')
         .directive('display3dplayground', playground);
 
-    function playground () {
+    function playground() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/threejs/display3d/display3d.html',
+            templateUrl: 'app/components/threejs/display3d/playground/playground.html',
             scope: {
-              reqclass: '@',
-              primarycam: '=',
-              secondarycam: '='
+                reqclass: '@',
+                primarycam: '=',
+                secondarycam: '='
             },
             controllerAs: 'vm',
             controller: 'PlaygroundController'

@@ -5,13 +5,13 @@
         .module('simpleWebrtcServerApp')
         .directive('display3ddynamic', display3d);
 
-    function display3d () {
+    function display3d() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/threejs/display3d/display3d.html',
+            templateUrl: 'app/components/threejs/display3d/dynamic/display3d.html',
             scope: {
-              reqclass: '@',
-              primarycam: '='
+                reqclass: '@',
+                primarycam: '='
             },
             controllerAs: 'vm',
             controller: 'Display3DController'

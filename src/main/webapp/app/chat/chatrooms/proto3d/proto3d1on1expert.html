@@ -1,14 +1,7 @@
 <div>
-  <h2> Video Chat</h2>
-  <div id='container'>
-      <expertcontrols expertcam="vm.expertCam"/>
-      <display3dplayground primarycam="vm.expertCam" secondarycam="vm.userCam" />
-    </div>
-
-      <div id='videos'>
-        <display3ddynamic class='my-drawing-canvas is-absolut ' primarycam="vm.userCam"/>
-          <video id='video' class='my-video is-absolut ' autoplay muted></video>
-        </div>
-      </div>
-    </div>
+    <h2> Video Chat</h2>
+    <expertcontrols expertcam="vm.expertCam" />
+    <display3dplayground primarycam="vm.expertCam" secondarycam="vm.userCam" />
+    <display3ddynamic class='my-drawing-canvas is-absolut ' primarycam="vm.userCam" />
+    <video id='video' class='my-video is-absolut ' autoplay muted></video>
 </div>

@@ -5,9 +5,10 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1Controller', Proto3D1on1Controller);
 
-    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService', 'ThreejsSceneService', 'AnnotationToolService'];
+    Proto3D1on1Controller.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'JhiTrackerService', 'SdpService', 'OrientationCalculator','UserMediaService', 'ThreejsSceneService', 'AnnotationToolService'];
 
-    function Proto3D1on1Controller($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService, ThreejsSceneService, AnnotationToolService) {
+    function Proto3D1on1Controller($rootScope, $scope, $state, $stateParams, JhiTrackerService, SdpService, OrientationCalculator, UserMediaService, ThreejsSceneService, AnnotationToolService) {
+      console.log($stateParams);
       var vm = this;
       //var isChannelReady;
       var isInitiator = $rootScope.isInitiator;
@@ -77,7 +78,7 @@
       });
 
       function sendMessage(message){
-          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+          JhiTrackerService.sendSimpleMessageToJsonUser($stateParams.partnerId, message);
       }
 
       function handleContent (message){
@@ -247,7 +248,7 @@
       return SdpService.getOpus(sdp);
     }
     //////////////////////////////////////////////////////////////////////////////////
-  
+
       function init3D(){
         window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
@@ -272,7 +273,8 @@
       }
 
       function sendOrientation(newOrientation) {
-        JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, {goal:'3d', content:'camera' ,orientation: newOrientation});
+        var message = {goal:'3d', content:'camera' ,orientation: newOrientation};
+        sendMessage(message);
       }
 
       function checkResize() {

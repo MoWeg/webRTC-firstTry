@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('Expert3DGroupTableController', Expert3DGroupTableController);
 
-    Expert3DGroupTableController.$inject = ['$scope', '$rootScope', 'JhiTrackerService', 'ThreejsSceneService'];
+    Expert3DGroupTableController.$inject = ['$scope', '$rootScope', 'ThreejsSceneService'];
 
-    function Expert3DGroupTableController($scope, $rootScope, JhiTrackerService, ThreejsSceneService) {
+    function Expert3DGroupTableController($scope, $rootScope, ThreejsSceneService) {
       var vm = this;
       var plane = ThreejsSceneService.getPlane();
       vm.groups = $scope.threejsgroups;
@@ -74,7 +74,7 @@
         $rootScope.$broadcast('request-animation', $scope.threejsgroups);
       }
       function sendMessage(message){
-          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+        $rootScope.$broadcast('send-message', message);
       }
     }
 })();

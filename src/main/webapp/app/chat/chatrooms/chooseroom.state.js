@@ -24,7 +24,6 @@
             },
             onEnter: ['JhiTrackerService', function(JhiTrackerService) {
                 JhiTrackerService.subscribeToAvailable();
-                JhiTrackerService.subscribeToSelf();
             }],
             onExit: ['JhiTrackerService', function(JhiTrackerService) {
                 JhiTrackerService.unsubscribeChatRooms();

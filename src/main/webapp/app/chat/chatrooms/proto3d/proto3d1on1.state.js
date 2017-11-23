@@ -22,11 +22,12 @@
                     controllerAs: 'vm'
                 }
             },
-            onEnter: ['JhiTrackerService', function(JhiTrackerService) {
-                JhiTrackerService.subscribeToSelf();
-            }],
-            onExit: ['JhiTrackerService', function(JhiTrackerService) {
-                JhiTrackerService.unsubscribeChatRooms();
+            params: {
+              id: null,
+              partnerId: null
+            },
+            onEnter: ['$stateParams','JhiTrackerService', function($stateParams, JhiTrackerService) {
+                JhiTrackerService.subscribeToSelf($stateParams.id);
             }]
         });
     }

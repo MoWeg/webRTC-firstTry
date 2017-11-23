@@ -32,18 +32,18 @@
          return users;
       }
 
-      function setUserAvailable() {
-        updateAvailability(true);
+      function setUserAvailable(id) {
+        updateAvailability(id, true);
       }
-      function setUserUnavailable() {
-        updateAvailability(false);
+      function setUserUnavailable(id) {
+        updateAvailability(id, false);
       }
-      function removeUser() {
-        AvailibilityService.delete({},{ chatId: $rootScope.myIdForChat});
+      function removeUser(id) {
+        AvailibilityService.delete({},{ chatId: id});
       }
 
-      function updateAvailability(availability){
-        AvailibilityService.post({}, {chatId: $rootScope.myIdForChat, available: availability }, onPostSuccess, onPostError);
+      function updateAvailability(id, availability){
+        AvailibilityService.post({}, {chatId: id, available: availability }, onPostSuccess, onPostError);
         function onPostSuccess(){
           console.log("Post was successful");
           JhiTrackerService.sendToAvailable();

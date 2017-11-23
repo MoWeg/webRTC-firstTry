@@ -5,11 +5,10 @@
         .module('simpleWebrtcServerApp')
         .controller('Proto3D1on1ExpertController', Proto3D1on1ExpertController);
 
-    Proto3D1on1ExpertController.$inject = ['$rootScope', '$scope', '$state', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService'];
+    Proto3D1on1ExpertController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService'];
 
-    function Proto3D1on1ExpertController($rootScope, $scope, $state, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService) {
+    function Proto3D1on1ExpertController($rootScope, $scope, $state, $stateParams, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService) {
       var vm = this;
-
       var isStarted = false;
       var gotOffer = false;
       var pc;
@@ -38,7 +37,7 @@
       /////////////////////////////////////////////
 
       function sendMessage(message){
-          JhiTrackerService.sendSimpleMessageToJsonUser($rootScope.partnerIdForChat, message);
+          JhiTrackerService.sendSimpleMessageToJsonUser($stateParams.partnerId, message);
       }
 
       JhiTrackerService.receiveInvite().then(null, null, function(received) {
@@ -47,6 +46,9 @@
 
       $scope.$on('$destroy', function() {
         hangup();
+      });
+      $scope.$on('send-message', function(event, message) {
+        sendMessage(message);
       });
 
       remoteVideo.addEventListener('resize', resize3dModell(remoteVideo.videoHeight, remoteVideo.videoWidth));

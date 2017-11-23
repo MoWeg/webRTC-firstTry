@@ -15,16 +15,16 @@
       vm.videochatWith = videochatWith;
       vm.drawWith = drawWith;
       vm.callExpert = callExpert;
+      vm.id =  Math.round((Math.random() * 1000000) * 10);
+      vm.partnerId;
 
-      if($rootScope.myIdForChat === null || angular.isUndefined($rootScope.myIdForChat)){
-        $rootScope.myIdForChat = Math.round((Math.random() * 1000000) * 10);
-        JhiTrackerService.subscriberToSelf();
-      }
-      ChatRoomService.setUserAvailable();
+
+      JhiTrackerService.subscribeToSelf(vm.id);
+
+      ChatRoomService.setUserAvailable(vm.id);
       getUsers();
 
       JhiTrackerService.receiveAvailable().then(null, null, function(received) {
-      //    receiveUser(received);
           getUsers();
       });
 
@@ -33,8 +33,8 @@
         function onGetSuccess(data, headers) {
              console.log("got availability from Server");
              angular.forEach(data, function(user, i){
-               if(user.chatId !=  $rootScope.myIdForChat){
-                 console.log("userid: " + user.chatId + " is not equal to " + $rootScope.myIdForChat)
+               if(user.chatId !=  vm.id){
+                 // console.log("userid: " + user.chatId + " is not equal to " + $rootScope.myIdForChat)
                  angular.forEach(vm.receivedUsers, function(alreadyReceivedUser, i){
                      if(user.userName == alreadyReceivedUser.userName){
                        vm.receivedUsers.splice(i, 1);
@@ -43,7 +43,7 @@
                   vm.receivedUsers.push(user);
                   if(vm.receivedUsers.length >= data.length){
                     angular.forEach(vm.receivedUsers, function(alreadyReceivedUser, i){
-                        foundInData = false;
+                        var foundInData = false;
                         angular.forEach(data, function(user, index){
                           if(user.userName == alreadyReceivedUser.userName){
                             foundInData = true;
@@ -63,48 +63,51 @@
       }
 
       function receiveUser(receivedUser){
-        if(receivedUser.content !== $rootScope.myIdForChat){
+        if(receivedUser.content !== id){
           vm.receivedUsers.push(receivedUser);
         }
       }
 
       function chatWith(index) {
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'chat', $rootScope.myIdForChat);
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'chat', vm.id);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
         ChatRoomService.setUserUnavailable();
+        $rootScope.myIdForChat = id;
         $state.go('simplechatroom');
         //$state.go('simple1on1');
       }
 
       function drawWith(index) {
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'draw', $rootScope.myIdForChat);
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'draw', vm.id);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
         ChatRoomService.setUserUnavailable();
+        $rootScope.myIdForChat = id;
         $state.go('simpledraw');
         //$state.go('simple1on1');
       }
 
       function videochatWith(index) {
         console.log('Client pressed videochatWith');
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'video', $rootScope.myIdForChat);
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'video', vm.id);
         $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
         $rootScope.isInitiator = true;
         ChatRoomService.setUserUnavailable();
+        $rootScope.myIdForChat = id;
         $state.go('simple1on1');
       }
 
       function callExpert(index) {
         console.log('Client pressed videochatWith');
-        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'expert', $rootScope.myIdForChat);
-        $rootScope.partnerIdForChat = vm.receivedUsers[index].chatId;
+        JhiTrackerService.sendSimpleMessageToUserWithGoal(vm.receivedUsers[index].chatId, 'expert', vm.id);
+        vm.partnerId = vm.receivedUsers[index].chatId;
         $rootScope.isInitiator = true;
         ChatRoomService.setUserUnavailable();
-        //$state.go('proto1on1');
-        $state.go('proto3d1on1');
+        $state.go('proto3d1on1',{id:vm.id, partnerId:vm.partnerId});
       }
 
       JhiTrackerService.receiveInvite().then(null, null, function(invite){
-        ChatRoomService.setUserUnavailable();
+        console.log("receive Invite");
+        ChatRoomService.setUserUnavailable(vm.id);
         if(invite.goal === 'video'){
           $rootScope.partnerIdForChat = invite.content;
           $rootScope.isInitiator = false;
@@ -119,9 +122,9 @@
           $state.go('simpledraw');
         }
         if(invite.goal === 'expert'){
-          $rootScope.partnerIdForChat = invite.content;
+          vm.partnerId = invite.content;
           //$state.go('proto1on1expert');
-          $state.go('proto3d1on1expert');
+          $state.go('proto3d1on1expert',{id:vm.id ,partnerId:vm.partnerId});
         }
       });
     }

@@ -60,8 +60,6 @@
         return service;
 
         function connect () {
-            $rootScope.myIdForChat = Math.round((Math.random() * 1000000) * 10);
-            //building absolute path so that websocket doesnt fail when deploying with a context path
             var loc = $window.location;
             var url = '//' + loc.host + loc.pathname + 'websocket/tracker';
             var socket = new SockJS(url);
@@ -199,12 +197,17 @@
             }
         }
 
-        function subscribeToSelf(){
+        function subscribeToSelf(id){
+          console.log("tracker my id: "+id);
+          if(!id){
+            console.log("tracker: no id subcribe to self");
+            id = $rootScope.myIdForChat;
+          }
           if (stompClient == null) {
               connect();
           }
           connected.promise.then(function() {
-              subscriberToSelf = stompClient.subscribe('/topic/rooms/receive/'+$rootScope.myIdForChat, function(data) {
+              subscriberToSelf = stompClient.subscribe('/topic/rooms/receive/'+id, function(data) {
                   listenerToSelf.notify(angular.fromJson(data.body));
               });
           }, null, null);
@@ -225,8 +228,12 @@
             }, null, null);
         }
 
-        function subscribeToPartner(){
-          subscribeToUser($rootScope.partnerIdForChat);
+        function subscribeToPartner(partnerId){
+          if(!partnerId){
+            console.log("tracker: no id subcribe to partner");
+            partnerId = $rootScope.partnerIdForChat
+          }
+          subscribeToUser(partnerId);
         }
 
         function receiveFromUser(){

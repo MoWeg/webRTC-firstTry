@@ -31,7 +31,10 @@
                 JhiTrackerService.subscribeToSelf($stateParams.id);
             }]
             // onExit: ['JhiTrackerService', function(JhiTrackerService) {
-            //     JhiTrackerService.unsubscribeChatRooms();
+            //     JhiTrackerService.sendSimpleMessageToJsonUser($stateParams.partnerId, {
+            //         goal: 'rtc',
+            //         content: 'bye'
+            //     });
             // }]
         });
     }

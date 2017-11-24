@@ -3,19 +3,30 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .controller('RtcRemoteVideoController', RtcRemoteVideoController);
+        .controller('RtcVideoController', RtcVideoController);
 
-    RtcRemoteVideoController.$inject = ['$rootScope', '$scope', '$element', 'SdpService'];
+    RtcVideoController.$inject = ['$rootScope', '$scope', '$element', 'SdpService', 'UserMediaService'];
 
-    function RtcRemoteVideoController($rootScope, $scope, $element, SdpService) {
+    function RtcVideoController($rootScope, $scope, $element, SdpService, UserMediaService) {
         var vm = this;
         var isStarted = false;
         var gotOffer = false;
+        var isInitiator = $scope.isinitiator;
         var video = $element[0].childNodes[0];
+        var localStream;
+        var gotAnswer, gotOffer;
         var pc;
+        var storedOffer, storedAnswer;
 
         var oldVideoHeight = 0;
         var oldVideoWidth = 0;
+
+        function init() {
+            if (isInitiator) {
+                UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+            }
+        }
+        init();
 
         //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
         var pc_config = {
@@ -40,7 +51,7 @@
         $scope.$on('rtc-message', function(event, args) {
             handleContent(args);
         });
-        $scope.$on('$destroy', function() {
+        $scope.$on('rtc-hangup', function() {
             hangup();
         });
         $scope.$on('check-resize', function() {
@@ -89,6 +100,9 @@
                 }
                 pc.setRemoteDescription(new RTCSessionDescription(message));
                 doAnswer();
+            } else if (message.type === 'answer' && isStarted) {
+                gotAnswer = true;
+                pc.setRemoteDescription(new RTCSessionDescription(message));
             } else if (message.type === 'candidate') {
                 if (isStarted && gotOffer) {
                     var candidate = new RTCIceCandidate({
@@ -106,10 +120,45 @@
                             content: 'needOffer'
                         });
                     }
+                    if (!gotAnswer) {
+                        sendMessage({
+                            goal: 'rtc',
+                            content: 'needAnswer'
+                        })
+                    }
                 }
-            } else if (message.content === 'bye' && isStarted && gotOffer) {
+            } else if (message.content === 'bye' && isStarted && gotAnswer) {
                 handleRemoteHangup();
+            } else if (message.content == 'needOffer') {
+                sendMessage(storedOffer);
+            } else if (message.content == 'needAnwser') {
+                sendMessage(storedOffer);
             }
+        }
+
+        ////////////////////////////////////////////////////
+        function maybeStart() {
+            if (!isStarted) {
+                createPeerConnection();
+                isStarted = true;
+            }
+        }
+
+        function handleUserMedia(stream) {
+            video.src = window.URL.createObjectURL(stream);
+            localStream = stream;
+            if (!isStarted && typeof localStream != 'undefined') {
+                createPeerConnection();
+                pc.addStream(localStream);
+                isStarted = true;
+                if (isInitiator) {
+                    doCall();
+                }
+            }
+        }
+
+        function handleUserMediaError(error) {
+            console.log('getUserMedia error: ', error);
         }
 
         if (location.hostname != "localhost") {
@@ -117,25 +166,15 @@
             //requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
         }
 
-        function maybeStart() {
-            console.log('maybeStart:')
-            if (!isStarted) {
-                createPeerConnection();
-                isStarted = true;
-            }
-        }
-
-
         function createPeerConnection() {
             try {
                 pc = new RTCPeerConnection(pc_config);
                 pc.onicecandidate = handleIceCandidate;
                 pc.onaddstream = handleRemoteStreamAdded;
                 pc.onremovestream = handleRemoteStreamRemoved;
-                console.log('Created RTCPeerConnnection');
             } catch (e) {
                 console.log('Failed to create PeerConnection, exception: ' + e.message);
-                alert('Cannot create RTCPeerConnection object.');
+                //alert('Cannot create RTCPeerConnection object.');
                 return;
             }
         }
@@ -143,7 +182,6 @@
         function handleIceCandidate(event) {
             if (event.candidate) {
                 sendMessage({
-                    goal: 'rtc',
                     type: 'candidate',
                     label: event.candidate.sdpMLineIndex,
                     id: event.candidate.sdpMid,
@@ -154,13 +192,30 @@
             }
         }
 
-        function handleCreateAnswerError(event) {
-            console.log('createAnswer() error: ', e);
+        function handleRemoteStreamAdded(event) {
+            video.src = window.URL.createObjectURL(event.stream);
+        }
+
+        function handleRemoteStreamRemoved(event) {
+            // console.log('Remote stream removed. Event: ', event);
+            handleRemoteHangup();
+        }
+
+        function handleCreateOfferError(event) {
+            console.log('createOffer() error: ', e);
+        }
+
+
+        function doCall() {
+            pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
         }
 
         function doAnswer() {
-            console.log('Sending answer to peer.');
             pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
+        }
+
+        function handleCreateAnswerError(event) {
+            console.log('createAnswer() error: ', e);
         }
 
         function setLocalAndSendMessage(sessionDescription) {
@@ -170,7 +225,11 @@
                 sessionDescription.sdp = preferOpus(oldSdp);
             }
             pc.setLocalDescription(sessionDescription);
-            console.log('setLocalAndSendMessage sending message', sessionDescription);
+            if (isInitiator) {
+                storedOffer = sessionDescription;
+            } else {
+                storedAnswer = sessionDescription;
+            }
             sendMessage(sessionDescription);
         }
 
@@ -203,17 +262,7 @@
             }
         }
 
-        function handleRemoteStreamAdded(event) {
-            console.log('Remote stream added.');
-            video.src = window.URL.createObjectURL(event.stream);
-        }
-
-        function handleRemoteStreamRemoved(event) {
-            console.log('Remote stream removed. Event: ', event);
-        }
-
         function hangup() {
-            console.log('Hanging up.');
             sendMessage({
                 goal: 'rtc',
                 content: 'bye'
@@ -222,9 +271,9 @@
         }
 
         function handleRemoteHangup() {
-            console.log('Session terminated.');
             stop();
             $state.go('chooseroom');
+            // isInitiator = false;
         }
 
         function stop() {
@@ -233,11 +282,14 @@
             // isVideoMuted = false;
             pc.close();
             pc = null;
-            //UserMediaService.closeAllStreams(localStream);
+            video.pause();
+            video.src = "";
+            UserMediaService.closeAllStreams(localStream);
         }
 
         function preferOpus(sdp) {
             return SdpService.getOpus(sdp);
         }
+
     }
 })();

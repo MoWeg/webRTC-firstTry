@@ -11,14 +11,20 @@
         var vm = this;
         var isStarted = false;
         var gotOffer = false;
+        var isInitiator = true;
         var video = $element[0].childNodes[0];
         var localStream;
+        var gotAnswer, gotOff;
         var pc;
+        var storedOffer, storedAnswer;
 
         var oldVideoHeight = 0;
         var oldVideoWidth = 0;
 
-        UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+        if (isInitiator) {
+            UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+        }
+
         //var pc_config = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'},{'url': 'stun:stun4.l.google.com:19302'},{'url': 'stun:stun1.l.google.com:19302'},{'url': 'stun:stun01.sipphone.com'},{'url': 'stun1.voiceeclipse.net'}]};
         var pc_config = {
             'iceServers': [{
@@ -84,21 +90,46 @@
         }
 
         function handleContent(message) {
-            if (message.type === 'answer' && isStarted) {
+            if (message.type === 'offer') {
+                gotOffer = true;
+                if (!isStarted) {
+                    maybeStart();
+                }
                 pc.setRemoteDescription(new RTCSessionDescription(message));
+                doAnswer();
+            } else if (message.type === 'answer' && isStarted) {
                 gotAnswer = true;
-            } else if (message.type === 'candidate' && isStarted && gotAnswer) {
-                var candidate = new RTCIceCandidate({
-                    sdpMLineIndex: message.label,
-                    candidate: message.candidate
-                });
-                pc.addIceCandidate(candidate);
+                pc.setRemoteDescription(new RTCSessionDescription(message));
+            } else if (message.type === 'candidate') {
+                if (isStarted && gotOffer) {
+                    var candidate = new RTCIceCandidate({
+                        sdpMLineIndex: message.label,
+                        candidate: message.candidate
+                    });
+                    pc.addIceCandidate(candidate);
+                } else {
+                    if (!isStarted) {
+                        maybeStart();
+                    }
+                    if (!gotOffer) {
+                        sendMessage({
+                            goal: 'rtc',
+                            content: 'needOffer'
+                        });
+                    }
+                    if (!gotAnswer) {
+                        sendMessage({
+                            goal: 'rtc',
+                            content: 'needAnswer'
+                        })
+                    }
+                }
             } else if (message.content === 'bye' && isStarted && gotAnswer) {
                 handleRemoteHangup();
             } else if (message.content == 'needOffer') {
                 sendMessage(storedOffer);
-            } else if (message.goal == '3d') {
-                handleMessageWith3dGoal(message);
+            } else if (message.content == 'needAnwser') {
+                sendMessage(storedOffer);
             }
         }
 
@@ -113,7 +144,6 @@
                 createPeerConnection();
                 pc.addStream(localStream);
                 isStarted = true;
-                console.log('isInitiator', isInitiator);
                 if (isInitiator) {
                     doCall();
                 }
@@ -173,6 +203,11 @@
             pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
         }
 
+        function doAnswer() {
+            console.log('Sending answer to peer.');
+            pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
+        }
+
         function setLocalAndSendMessage(sessionDescription) {
             // Set Opus as the preferred codec in SDP if Opus is present.
             if (sessionDescription.sdp != null && angular.isDefined(sessionDescription.sdp)) {
@@ -180,8 +215,11 @@
                 sessionDescription.sdp = preferOpus(oldSdp);
             }
             pc.setLocalDescription(sessionDescription);
-            console.log('setLocalAndSendMessage sending message', sessionDescription);
-            storedOffer = sessionDescription;
+            if (isInitiator) {
+                storedOffer = sessionDescription;
+            } else {
+                storedAnswer = sessionDescription;
+            }
             sendMessage(sessionDescription);
         }
 

@@ -11,11 +11,12 @@
         var vm = this;
         vm.expertCam;
         vm.userCam;
+        vm.isinitiator = $stateParams.isInitiator;
         var tools;
         var lastGroup;
 
         function init() {
-            if ($stateParams.isInitiator) {
+            if (vm.isinitiator) {
                 window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
 
                 var toolRequest = [];
@@ -50,6 +51,9 @@
         });
         $scope.$on('send-message', function(event, message) {
             sendMessage(message);
+        });
+        $scope.$on('$destroy', function() {
+            $rootScope.$broadcast('rtc-hangup');
         });
 
         function handleContent(message) {

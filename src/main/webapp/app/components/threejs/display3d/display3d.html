@@ -1,8 +1,5 @@
 <div>
-    <div ng-show="vm.hasExpertCam()" id="expertCanvas" ng-mousemove="vm.onMouseMove($event)" ng-mousedown="vm.onMouseDown($event)">
-    </div>
-    <div id="userCanvas" ng-class="vm.applyClasses()">
-    </div>
-    <rtcremotevideo ng-show="vm.hasExpertCam()" />
-    <rtclocalvideo ng-show="!vm.hasExpertCam()" />
+    <div ng-if="!vm.isinitiator" id="expertCanvas" ng-mousemove="vm.onMouseMove($event)" ng-mousedown="vm.onMouseDown($event)" />
+    <div id="userCanvas" ng-class="vm.applyClasses()" />
+    <rtcvideo isinitiator="vm.isinitiator" />
 </div>

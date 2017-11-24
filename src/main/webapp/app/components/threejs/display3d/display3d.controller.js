@@ -12,16 +12,26 @@
         // var id = Math.round((Math.random() * 1000000) * 10);
         var userCam = $scope.usercam;
         var expertCam = $scope.expertcam;
+        vm.isinitiator = $scope.isinitiator;
         var oldVideoHeight = 640;
         var oldVideoWidth = 400;
         var view;
         var expertView;
+        console.log({
+            title: "at Display3DController",
+            expertCam: expertCam,
+            isinitiator: vm.isinitiator
+        });
 
+        function checkIsInit() {
+            if (hasExpertCam == true) {
+                return false;
+            } else {
+                return true;
+            }
+        }
         vm.applyClasses = function() {
             return $scope.reqclass;
-        }
-        vm.hasExpertCam = function() {
-            return angular.isDefined(expertCam);
         }
         vm.onMouseMove = function(event) {
             // console.log(event);
@@ -60,7 +70,7 @@
         }
 
         function initExpert3D() {
-            if (vm.hasExpertCam()) {
+            if (vm.hasExpertCam) {
                 var expertCanvas = document.querySelector("#expertCanvas");
 
                 var w = 640,
@@ -88,13 +98,13 @@
         }
 
         function resize3dModell(height, width) {
-            if (height != null && height != oldVideoHeight) {
-                oldVideoHeight = height;
-            }
-            if (width != null && width != oldVideoWidth) {
-                oldVideoWidth = width;
-            }
-            view.setNewSize(oldVideoWidth, oldVideoHeight);
+            // if (height != null && height != oldVideoHeight) {
+            //     oldVideoHeight = height;
+            // }
+            // if (width != null && width != oldVideoWidth) {
+            //     oldVideoWidth = width;
+            // }
+            // view.setNewSize(oldVideoWidth, oldVideoHeight);
         }
 
         init3D();

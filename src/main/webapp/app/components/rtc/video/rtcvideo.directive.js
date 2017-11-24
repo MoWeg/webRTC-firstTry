@@ -3,20 +3,17 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .directive('display3d', display3d);
+        .directive('rtcvideo', rtcvideo);
 
-    function display3d() {
+    function rtcvideo() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/threejs/display3d/display3d.html',
+            templateUrl: 'app/components/rtc/video/rtcvideo.html',
             scope: {
-                reqclass: '@',
-                usercam: '=',
-                expertcam: '=',
                 isinitiator: '='
             },
             controllerAs: 'vm',
-            controller: 'Display3DController'
+            controller: 'RtcVideoController'
         };
 
         return directive;

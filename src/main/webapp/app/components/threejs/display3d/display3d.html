@@ -3,5 +3,6 @@
     </div>
     <div id="userCanvas" ng-class="vm.applyClasses()">
     </div>
-    <rtcremotevideo ng-if="vm.hasExpertCam()" />
+    <rtcremotevideo ng-show="vm.hasExpertCam()" />
+    <rtclocalvideo ng-show="!vm.hasExpertCam()" />
 </div>

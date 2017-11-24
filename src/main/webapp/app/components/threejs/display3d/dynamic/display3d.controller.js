@@ -7,7 +7,7 @@
 
     Display3DDynamicController.$inject = ['$rootScope', '$scope', '$element', 'ThreejsSceneService', 'OrientationCalculator'];
 
-    function Display3DController($rootScope, $scope, $element, ThreejsSceneService, OrientationCalculator) {
+    function Display3DDynamicController($rootScope, $scope, $element, ThreejsSceneService, OrientationCalculator) {
         var vm = this;
         // var id = Math.round((Math.random() * 1000000) * 10);
         var primaryCam = $scope.primarycam;

@@ -3,18 +3,19 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .directive('display3ddynamic', display3ddynamic);
+        .directive('display3d', display3d);
 
-    function display3ddynamic() {
+    function display3d() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/threejs/display3d/dynamic/display3d.html',
+            templateUrl: 'app/components/threejs/display3d/display3d.html',
             scope: {
                 reqclass: '@',
-                primarycam: '='
+                usercam: '=',
+                expertcam: '='
             },
             controllerAs: 'vm',
-            controller: 'Display3DDynamicController'
+            controller: 'Display3DController'
         };
 
         return directive;

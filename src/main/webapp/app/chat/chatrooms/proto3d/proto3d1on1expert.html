@@ -1,7 +1,8 @@
 <div>
     <h2> Video Chat</h2>
     <expertcontrols expertcam="vm.expertCam" />
-    <display3dplayground primarycam="vm.expertCam" secondarycam="vm.userCam" />
-    <display3ddynamic class='my-drawing-canvas is-absolut ' primarycam="vm.userCam" />
+    <!-- <display3dplayground primarycam="vm.expertCam" secondarycam="vm.userCam" />
+    <display3ddynamic class='my-drawing-canvas is-absolut ' primarycam="vm.userCam" /> -->
+    <display3d usercam="vm.userCam" expertcam="vm.expertCam" reqclass="my-drawing-canvas is-absolut" />
     <video id='video' class='my-video is-absolut ' autoplay muted></video>
 </div>

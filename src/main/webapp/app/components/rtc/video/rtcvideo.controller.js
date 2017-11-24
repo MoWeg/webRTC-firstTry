@@ -5,19 +5,20 @@
         .module('simpleWebrtcServerApp')
         .controller('RtcVideoController', RtcVideoController);
 
-    RtcVideoController.$inject = ['$rootScope', '$scope', '$element', 'SdpService', 'UserMediaService'];
+    RtcVideoController.$inject = ['$rootScope', '$scope', 'SdpService', 'UserMediaService'];
 
-    function RtcVideoController($rootScope, $scope, $element, SdpService, UserMediaService) {
+    function RtcVideoController($rootScope, $scope, SdpService, UserMediaService) {
         var vm = this;
         var isStarted = false;
         var gotOffer = false;
         var isInitiator = $scope.isinitiator;
-        var video = $element[0].childNodes[0];
+        var video = document.querySelector("#rtcvideo");
         var localStream;
         var gotAnswer, gotOffer;
         var pc;
         var storedOffer, storedAnswer;
 
+        var canResize = false;
         var oldVideoHeight = 0;
         var oldVideoWidth = 0;
 
@@ -55,42 +56,46 @@
             hangup();
         });
         $scope.$on('check-resize', function() {
-            var newSize = checkResize();
-            if (newSize) {
-                resize3dModell(newSize);
-            }
+            checkResize();
         });
-        video.addEventListener('resize', resize3dModell({
-            height: video.videoHeight,
-            width: video.videoWidth
-        }));
+        video.addEventListener('loadedmetadata', function() {
+            canResize = true;
+            checkResize();
+        })
+        video.addEventListener('resize', checkResize());
 
         function sendMessage(message) {
             $rootScope.$broadcast('send-message', message);
         }
 
         function resize3dModell(size) {
-            $rootScope.$broadcast('just-resize', size)
+            $rootScope.$broadcast('just-resize', size);
         }
 
         function checkResize() {
-            var height = video.videoHeight;
-            var width = video.videoWidth;
-            if (height != oldVideoHeight || width != oldVideoWidth) {
-                if (!height) {
-                    height = oldVideoHeight;
+            if (canResize) {
+                var height = video.videoHeight;
+                var width = video.videoWidth;
+                if (height != oldVideoHeight || width != oldVideoWidth) {
+                    if (!height) {
+                        height = oldVideoHeight;
+                    }
                     if (!width) {
                         width = oldVideoWidth;
                     }
-                    oldVideoHeight = height;
-                    oldVideoWidth = width;
-                    return {
-                        height: height,
-                        width: width
-                    };
+                    if (height != 0 || width != 0) {
+                        oldVideoHeight = height;
+                        oldVideoWidth = width;
+                        var size = {
+                            height: height,
+                            width: width
+                        };
+                        resize3dModell(size);
+                    }
                 }
             }
         }
+
 
         function handleContent(message) {
             if (message.type === 'offer') {
@@ -114,13 +119,13 @@
                     if (!isStarted) {
                         maybeStart();
                     }
-                    if (!gotOffer) {
+                    if (!gotOffer && !isInitiator) {
                         sendMessage({
                             goal: 'rtc',
                             content: 'needOffer'
                         });
                     }
-                    if (!gotAnswer) {
+                    if (!gotAnswer && isInitiator) {
                         sendMessage({
                             goal: 'rtc',
                             content: 'needAnswer'
@@ -272,7 +277,7 @@
 
         function handleRemoteHangup() {
             stop();
-            $state.go('chooseroom');
+            $rootScope.$broadcast('rtc-hung-up');
             // isInitiator = false;
         }
 
@@ -282,9 +287,11 @@
             // isVideoMuted = false;
             pc.close();
             pc = null;
-            video.pause();
-            video.src = "";
-            UserMediaService.closeAllStreams(localStream);
+            if (isInitiator) {
+                video.pause();
+                video.src = "";
+                UserMediaService.closeAllStreams(localStream);
+            }
         }
 
         function preferOpus(sdp) {

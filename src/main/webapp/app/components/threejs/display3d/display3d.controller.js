@@ -13,15 +13,11 @@
         var userCam = $scope.usercam;
         var expertCam = $scope.expertcam;
         vm.isinitiator = $scope.isinitiator;
+        $scope.expert = !vm.isinitiator;
         var oldVideoHeight = 640;
         var oldVideoWidth = 400;
         var view;
         var expertView;
-        console.log({
-            title: "at Display3DController",
-            expertCam: expertCam,
-            isinitiator: vm.isinitiator
-        });
 
         function checkIsInit() {
             if (hasExpertCam == true) {
@@ -46,18 +42,14 @@
             expertView.render(args);
         });
         $scope.$on('set-camera-and-resize', function(event, args) {
-            setCamera(args.deviceEvent, args.size);
+            setCamera(args.deviceEvent);
         });
         $scope.$on('just-resize', function(event, args) {
-            resize3dModell(args.height, args.width);
+            console.log("resize " + args.height + " " + args.width);
+            resize3dModell(args);
         });
 
         function init3D() {
-            init3DUser();
-            initExpert3D();
-        }
-
-        function init3DUser() {
             var canvas = document.querySelector("#userCanvas");
 
             canvas.width = oldVideoHeight;
@@ -66,13 +58,8 @@
             view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, userCam, true, 0x000000, 0);
 
             view.render();
-
-        }
-
-        function initExpert3D() {
-            if (vm.hasExpertCam) {
-                var expertCanvas = document.querySelector("#expertCanvas");
-
+            var expertCanvas = document.querySelector("#expertCanvas");
+            if (!vm.isinitiator) {
                 var w = 640,
                     h = 640;
                 var fullWidth = w * 2;
@@ -83,13 +70,12 @@
                 expertView = ThreejsSceneService.getView(expertCanvas, w, h, expertCam, false, 0xffffff, 1);
                 expertView.addSecondaryCam(userCam);
                 expertView.render();
+            } else {
+                expertCanvas.remove();
             }
         }
 
-        function setCamera(deviceEvent, size) {
-            if (size) {
-                resize3dModell(size.height, size.width);
-            }
+        function setCamera(deviceEvent) {
             if (deviceEvent) {
                 var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
                 view.setOrientationInfo(orientationInfo);
@@ -97,14 +83,16 @@
             view.render();
         }
 
-        function resize3dModell(height, width) {
-            // if (height != null && height != oldVideoHeight) {
-            //     oldVideoHeight = height;
-            // }
-            // if (width != null && width != oldVideoWidth) {
-            //     oldVideoWidth = width;
-            // }
-            // view.setNewSize(oldVideoWidth, oldVideoHeight);
+        function resize3dModell(size) {
+            var height = size.height;
+            var width = size.width;
+            if (height != null && height != oldVideoHeight) {
+                oldVideoHeight = height;
+            }
+            if (width != null && width != oldVideoWidth) {
+                oldVideoWidth = width;
+            }
+            view.setNewSize(oldVideoWidth, oldVideoHeight);
         }
 
         init3D();

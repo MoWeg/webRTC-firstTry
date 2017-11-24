@@ -1,5 +1,5 @@
 <div>
-    <div ng-if="!vm.isinitiator" id="expertCanvas" ng-mousemove="vm.onMouseMove($event)" ng-mousedown="vm.onMouseDown($event)" />
-    <div id="userCanvas" ng-class="vm.applyClasses()" />
+    <div id="expertCanvas" ng-mousemove="vm.onMouseMove($event)" ng-mousedown="vm.onMouseDown($event)" />
+    <div id="userCanvas" class="my-drawing-canvas is-absolut" />
     <rtcvideo isinitiator="vm.isinitiator" />
 </div>

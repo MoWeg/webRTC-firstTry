@@ -55,6 +55,9 @@
         $scope.$on('$destroy', function() {
             $rootScope.$broadcast('rtc-hangup');
         });
+        $scope.$on('rtc-hung-up', function() {
+            $state.go('chooseroom');
+        });
 
         function handleContent(message) {
             if (message.goal == '3d') {
@@ -72,7 +75,8 @@
             $rootScope.$broadcast('set-camera-and-resize', {
                 deviceEvent: deviceEvent,
                 size: null
-            })
+            });
+            $rootScope.$broadcast('check-resize');
         }
 
         function notifyRtc(message) {

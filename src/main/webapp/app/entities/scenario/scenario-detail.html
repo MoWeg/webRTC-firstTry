@@ -1,0 +1,45 @@
+
+<div>
+    <h2><span>Scenario</span> {{vm.scenario.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd>
+            <span>{{vm.scenario.name}}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+            <span>{{vm.scenario.description}}</span>
+        </dd>
+        <dt><span>Expert</span></dt>
+        <dd>
+            <span ng-repeat="expert in vm.scenario.experts">
+                {{expert.login}}{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span>Agent</span></dt>
+        <dd>
+            <span ng-repeat="agent in vm.scenario.agents">
+                {{agent.login}}{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span>Annotation As Picture</span></dt>
+        <dd>
+            <span ng-repeat="annotationAsPicture in vm.scenario.annotationAsPictures">
+                <a ui-sref="annotation-as-picture-detail({id: annotationAsPicture.id})">{{annotationAsPicture.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="scenario-detail.edit({id:vm.scenario.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down"> Edit</span>
+    </button>
+</div>

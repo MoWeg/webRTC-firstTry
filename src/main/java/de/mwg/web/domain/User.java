@@ -95,8 +95,39 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<PersistentToken> persistentTokens = new HashSet<>();
+    
+    @JsonIgnore
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JoinTable(name = "scenario_expert",
+               joinColumns = @JoinColumn(name="experts_id", referencedColumnName="id"),
+               inverseJoinColumns = @JoinColumn(name="scenarios_id", referencedColumnName="id"))
+    private Set<Scenario> expertScenarios = new HashSet<>();
+    @JsonIgnore
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JoinTable(name = "scenario_agent",
+               joinColumns = @JoinColumn(name="agents_id", referencedColumnName="id"),
+               inverseJoinColumns = @JoinColumn(name="scenarios_id", referencedColumnName="id"))
+    private Set<Scenario> agentScenarios = new HashSet<>();
 
-    public Long getId() {
+    public Set<Scenario> getExpertScenarios() {
+		return expertScenarios;
+	}
+
+	public void setExpertScenarios(Set<Scenario> expertScenarios) {
+		this.expertScenarios = expertScenarios;
+	}
+
+	public Set<Scenario> getAgentScenarios() {
+		return agentScenarios;
+	}
+
+	public void setAgentScenarios(Set<Scenario> agentScenarios) {
+		this.agentScenarios = agentScenarios;
+	}
+
+	public Long getId() {
         return id;
     }
 

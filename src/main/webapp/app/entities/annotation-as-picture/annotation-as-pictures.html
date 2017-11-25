@@ -1,0 +1,68 @@
+<div>
+    <h2>Annotation As Pictures</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="annotation-as-picture.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span >
+                        Create new Annotation As Picture
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                    <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="name"><span>Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="fileName"><span>File Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="path"><span>Path</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="folder"><span>Folder</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="toolName"><span>Tool Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="annotationAsPicture in vm.annotationAsPictures track by annotationAsPicture.id">
+                    <td><a ui-sref="annotation-as-picture-detail({id:annotationAsPicture.id})">{{annotationAsPicture.id}}</a></td>
+                    <td>{{annotationAsPicture.name}}</td>
+                    <td>{{annotationAsPicture.fileName}}</td>
+                    <td>{{annotationAsPicture.path}}</td>
+                    <td>{{annotationAsPicture.folder}}</td>
+                    <td>{{annotationAsPicture.toolName}}</td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="annotation-as-picture-detail({id:annotationAsPicture.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-sm-down"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="annotation-as-picture.edit({id:annotationAsPicture.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-sm-down"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="annotation-as-picture.delete({id:annotationAsPicture.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-sm-down"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">
+        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+    </div>
+    <uib-pager total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pager>
+</div>

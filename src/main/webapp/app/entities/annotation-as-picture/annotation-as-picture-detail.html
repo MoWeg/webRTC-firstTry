@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span>Annotation As Picture</span> {{vm.annotationAsPicture.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd>
+            <span>{{vm.annotationAsPicture.name}}</span>
+        </dd>
+        <dt><span>File Name</span></dt>
+        <dd>
+            <span>{{vm.annotationAsPicture.fileName}}</span>
+        </dd>
+        <dt><span>Path</span></dt>
+        <dd>
+            <span>{{vm.annotationAsPicture.path}}</span>
+        </dd>
+        <dt><span>Folder</span></dt>
+        <dd>
+            <span>{{vm.annotationAsPicture.folder}}</span>
+        </dd>
+        <dt><span>Tool Name</span></dt>
+        <dd>
+            <span>{{vm.annotationAsPicture.toolName}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="annotation-as-picture-detail.edit({id:vm.annotationAsPicture.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down"> Edit</span>
+    </button>
+</div>

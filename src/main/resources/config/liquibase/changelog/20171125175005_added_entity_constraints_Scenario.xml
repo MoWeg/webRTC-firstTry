@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity Scenario.
+    -->
+    <changeSet id="20171125175005-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="scenarios_id"
+                                 baseTableName="scenario_expert"
+                                 constraintName="fk_scenario_expert_scenarios_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="scenario"/>
+        <addForeignKeyConstraint baseColumnNames="experts_id"
+                                 baseTableName="scenario_expert"
+                                 constraintName="fk_scenario_expert_experts_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+        
+        <addForeignKeyConstraint baseColumnNames="scenarios_id"
+                                 baseTableName="scenario_agent"
+                                 constraintName="fk_scenario_agent_scenarios_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="scenario"/>
+        <addForeignKeyConstraint baseColumnNames="agents_id"
+                                 baseTableName="scenario_agent"
+                                 constraintName="fk_scenario_agent_agents_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+        
+        <addForeignKeyConstraint baseColumnNames="scenarios_id"
+                                 baseTableName="scenario_annotation_as_picture"
+                                 constraintName="fk_scenario_annotation_as_picture_scenarios_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="scenario"/>
+        <addForeignKeyConstraint baseColumnNames="annotation_as_pictures_id"
+                                 baseTableName="scenario_annotation_as_picture"
+                                 constraintName="fk_scenario_annotation_as_picture_annotation_as_pictures_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="annotation_as_picture"/>
+        
+    </changeSet>
+</databaseChangeLog>

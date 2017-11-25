@@ -42,7 +42,19 @@ public class CacheConfiguration {
             cm.createCache(de.mwg.web.domain.User.class.getName() + ".authorities", jcacheConfiguration);
             cm.createCache(de.mwg.web.domain.PersistentToken.class.getName(), jcacheConfiguration);
             cm.createCache(de.mwg.web.domain.User.class.getName() + ".persistentTokens", jcacheConfiguration);
+            
+            cm.createCache(de.mwg.web.domain.AnnotationAsPicture.class.getName(), jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Task.class.getName(), jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Scenario.class.getName(), jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Scenario.class.getName() + ".experts", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Scenario.class.getName() + ".agents", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Scenario.class.getName() + ".annotationAsPictures", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Scenario.class.getName() + ".tasks", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.AnnotationAsPicture.class.getName() + ".scenarios", jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
+            cm.createCache(de.mwg.web.domain.User.class.getName() + ".expertScenarios", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.User.class.getName() + ".agentScenarios", jcacheConfiguration);
+            cm.createCache(de.mwg.web.domain.Task.class.getName() + ".scenario", jcacheConfiguration);
         };
     }
 }

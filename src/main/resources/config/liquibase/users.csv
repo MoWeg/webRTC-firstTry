@@ -4,3 +4,5 @@ id;login;password_hash;first_name;last_name;email;image_url;activated;lang_key;c
 3;admin;$2a$06$mkTtnXyjcNuBAml6QVRo7uwDJynUmHPySdrSv3yXiU0e6RFM8h7XO;Administrator;Administrator;admin@localhost;;true;en;system;system
 4;user;$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K;User;User;user@localhost;;true;en;system;system
 5;user2;$2a$06$n8mMACesVOZUVdVMZmylXuShGluwCw/iMvSuHbPDfVvgbp4mdsp8m;User2;User2;user2@localhost;;true;en;system;system
+6;agent;$2a$10$UhVTYvwXrSu1cddmUN1bKO7JEqDvaQKdU/ErRnHol9R.620yvJejG;Adam;Agent;agent@localhost;;true;en;system;system
+7;expert;$2a$10$7iNuXBXyDq5hDo7a0PTnke.aycGkiYDZoERDReH0WCGv.RhO30ury;Elisa;Expert;expert@localhost;;true;en;system;system

@@ -5,3 +5,5 @@ user_id;authority_name
 3;ROLE_USER
 4;ROLE_USER
 5;ROLE_USER
+6;ROLE_AGENT
+7;ROLE_EXPERT

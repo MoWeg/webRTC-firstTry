@@ -6,6 +6,7 @@ import de.mwg.web.service.AnnotationAsPictureService;
 import de.mwg.web.web.rest.util.HeaderUtil;
 import de.mwg.web.web.rest.util.PaginationUtil;
 import de.mwg.web.service.dto.AnnotationAsPictureDTO;
+import de.mwg.web.service.dto.AnnotationAsPictureUploadDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +16,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +42,7 @@ public class AnnotationAsPictureResource {
     private final Logger log = LoggerFactory.getLogger(AnnotationAsPictureResource.class);
 
     private static final String ENTITY_NAME = "annotationAsPicture";
+    private static final String UPLOAD_FOLDER = "\\annotationsAsPictures";
 
     private final AnnotationAsPictureService annotationAsPictureService;
 
@@ -54,6 +64,53 @@ public class AnnotationAsPictureResource {
       //  if (annotationAsPictureDTO.getId() != null) {
          //   throw new BadRequestAlertException("A new annotationAsPicture cannot already have an ID", ENTITY_NAME, "idexists");
        // }
+        AnnotationAsPictureDTO result = annotationAsPictureService.save(annotationAsPictureDTO);
+        return ResponseEntity.created(new URI("/api/annotation-as-pictures/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            .body(result);
+    }
+    
+    /**
+     * POST  /annotation-as-pictures : Create a new annotationAsPicture.
+     *
+     * @param annotationAsPictureDTO the annotationAsPictureDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new annotationAsPictureDTO, or with status 400 (Bad Request) if the annotationAsPicture has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping("/annotation-as-pictures/upload")
+    @Timed
+    public ResponseEntity<AnnotationAsPictureDTO> createAnnotationAsPictureUpload(@Valid @RequestBody AnnotationAsPictureUploadDTO annotationAsPictureUploadDTO) throws URISyntaxException {
+      //  log.debug("REST request to save AnnotationAsPicture : {}", annotationAsPictureDTO);
+      //  if (annotationAsPictureDTO.getId() != null) {
+         //   throw new BadRequestAlertException("A new annotationAsPicture cannot already have an ID", ENTITY_NAME, "idexists");
+       // }
+    	AnnotationAsPictureDTO annotationAsPictureDTO = new AnnotationAsPictureDTO();
+        try {
+        	String originalFilename = annotationAsPictureUploadDTO.getFile().getOriginalFilename();
+        	
+        	File dir = new File(UPLOAD_FOLDER);
+        	if(!dir.isDirectory()){
+        		dir.mkdirs();
+        	}
+        	Date now = new Date();
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
+        	String timeStampFolderName = dateFormat.format(now);
+        	File timeStampFolder = new File(UPLOAD_FOLDER+"\\"+timeStampFolderName);
+        	timeStampFolder.mkdir();
+        	String pathToTimeStampFolder = timeStampFolder.getPath();
+            byte[] bytes = annotationAsPictureUploadDTO.getFile().getBytes();
+            Path path = Paths.get(pathToTimeStampFolder +"\\"+ originalFilename);
+            Files.write(path, bytes);
+            
+            
+            annotationAsPictureDTO.setFileName(originalFilename);
+            annotationAsPictureDTO.setFolder(timeStampFolderName);
+            annotationAsPictureDTO.setPath(dir.getPath());
+            annotationAsPictureDTO.setName(annotationAsPictureUploadDTO.getName());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         AnnotationAsPictureDTO result = annotationAsPictureService.save(annotationAsPictureDTO);
         return ResponseEntity.created(new URI("/api/annotation-as-pictures/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

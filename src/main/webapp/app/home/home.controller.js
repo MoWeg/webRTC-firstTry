@@ -7,7 +7,7 @@
 
     HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', '$rootScope'];
 
-    function HomeController ($scope, Principal, LoginService, $state, $rootScope) {
+    function HomeController($scope, Principal, LoginService, $state, $rootScope) {
         var vm = this;
 
         vm.account = null;
@@ -23,11 +23,11 @@
         function getAccount() {
             Principal.identity().then(function(account) {
                 vm.account = account;
-                $rootScope.myName = account.login;
                 vm.isAuthenticated = Principal.isAuthenticated;
             });
         }
-        function register () {
+
+        function register() {
             $state.go('register');
         }
     }

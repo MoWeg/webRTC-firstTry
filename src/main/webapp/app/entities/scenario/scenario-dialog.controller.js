@@ -7,25 +7,30 @@
 
     ScenarioDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Scenario', 'User', 'AnnotationAsPicture', 'Task'];
 
-    function ScenarioDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Scenario, User, AnnotationAsPicture, Task) {
+    function ScenarioDialogController($timeout, $scope, $stateParams, $uibModalInstance, entity, Scenario, User, AnnotationAsPicture, Task) {
         var vm = this;
 
         vm.scenario = entity;
         vm.clear = clear;
         vm.save = save;
-        vm.users = User.query();
+        vm.experts = User.query({
+            authority: "ROLE_EXPERT"
+        });
+        vm.agents = User.query({
+            authority: "ROLE_AGENT"
+        });
         vm.annotationaspictures = AnnotationAsPicture.query();
         vm.tasks = Task.query();
 
-        $timeout(function (){
+        $timeout(function() {
             angular.element('.form-group:eq(1)>input').focus();
         });
 
-        function clear () {
+        function clear() {
             $uibModalInstance.dismiss('cancel');
         }
 
-        function save () {
+        function save() {
             vm.isSaving = true;
             if (vm.scenario.id !== null) {
                 Scenario.update(vm.scenario, onSaveSuccess, onSaveError);
@@ -34,13 +39,13 @@
             }
         }
 
-        function onSaveSuccess (result) {
+        function onSaveSuccess(result) {
             $scope.$emit('simpleWebrtcServerApp:scenarioUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }
 
-        function onSaveError () {
+        function onSaveError() {
             vm.isSaving = false;
         }
 

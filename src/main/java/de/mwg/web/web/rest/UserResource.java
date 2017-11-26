@@ -14,6 +14,7 @@ import de.mwg.web.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -149,8 +150,13 @@ public class UserResource {
      */
     @GetMapping("/users")
     @Timed
-    public ResponseEntity<List<UserDTO>> getAllUsers(@ApiParam Pageable pageable) {
-        final Page<UserDTO> page = userService.getAllManagedUsers(pageable);
+    public ResponseEntity<List<UserDTO>> getAllUsers(@ApiParam Pageable pageable, @RequestParam(required = false, value="authority") String authorityName) {
+    	Page<UserDTO> page;
+    	if(StringUtils.isNotBlank(authorityName)){
+    		page = userService.getAllByAuthorityName(authorityName, pageable);
+    	}else{
+    		page = userService.getAllManagedUsers(pageable);
+    	}
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/users");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

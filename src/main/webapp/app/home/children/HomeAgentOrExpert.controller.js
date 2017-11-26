@@ -30,11 +30,13 @@
         vm.receivedUsers;
         vm.transition = transition;
         vm.loadPage = loadPage;
-        vm.hasAvailable = hasAvailable;
+        vm.hasAvailable = hasAvailableExperts;
         vm.callExpert = callExpert;
+        var hasExperts = false;
+        var hasAgents = false;
 
         $scope.$on('$destroy', function() {
-            JhiTrackerService.unsubscribeChatRooms();
+            JhiTrackerService.unsubscribeToAvailable();
         });
         JhiTrackerService.receiveAvailable().then(null, null, function(received) {
             getUsers();
@@ -96,16 +98,7 @@
                     scenario.availableAgents = [];
                 }
             });
-            // angular.forEach(vm.scenarios, function(scenario) {
-            //     scenario.availableExperts = [];
-            //     angular.forEach(scenario.experts, function(expert) {
-            //         angular.forEach(vm.receivedUsers, function(user) {
-            //             if (expert.id == user.chatId) {
-            //                 scenario.availableExperts.push(user);
-            //             }
-            //         });
-            //     });
-            // });
+            makePositiveAlert(vm.scenarios);
         }
 
         function FilterByIds(expertsOrAgents) {
@@ -116,6 +109,21 @@
             this.execute = function(element) {
                 return expertsOrAgentsIds.find(id => id == element.chatId);
             };
+        }
+
+        function makePositiveAlert(scenarios) {
+            if (isExpert && !hasAgents) {
+                if (scenarios.some(hasAvailableAgents)) {
+                    hasAgents = true;
+                    AlertService.success("Agents Online");
+                }
+            }
+            if (!isExpert && !hasExperts) {
+                if (scenarios.some(hasAvailableExperts)) {
+                    hasExperts = true;
+                    AlertService.success("Experts Online");
+                }
+            }
         }
 
 
@@ -136,9 +144,15 @@
             return expert.available;
         }
 
-        function hasAvailable(scenario) {
+        function hasAvailableExperts(scenario) {
             if (scenario.availableExperts) {
                 return scenario.availableExperts.some(isAvailable);
+            }
+        }
+
+        function hasAvailableAgents(scenario) {
+            if (scenario.availableAgents) {
+                return scenario.availableAgents.some(isAvailable);
             }
         }
 

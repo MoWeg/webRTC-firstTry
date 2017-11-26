@@ -87,9 +87,16 @@ public class ScenarioResource {
      */
     @GetMapping("/scenarios")
     @Timed
-    public ResponseEntity<List<ScenarioDTO>> getAllScenarios(Pageable pageable) {
+    public ResponseEntity<List<ScenarioDTO>> getAllScenarios(Pageable pageable, @RequestParam(value="expertId", required=false) Long expertId, @RequestParam(value="agentId", required=false) Long agentId) {
         log.debug("REST request to get a page of Scenarios");
-        Page<ScenarioDTO> page = scenarioService.findAll(pageable);
+        Page<ScenarioDTO> page;
+        if(expertId != null){
+        	page = scenarioService.findAllByExpertId(expertId, pageable);
+        } else if(agentId != null){
+        	page = scenarioService.findAllByAgentId(agentId, pageable);
+        } else  {
+        	page = scenarioService.findAll(pageable);
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/scenarios");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

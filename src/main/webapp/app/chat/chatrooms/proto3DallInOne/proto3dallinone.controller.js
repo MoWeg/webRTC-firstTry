@@ -14,6 +14,7 @@
         vm.isinitiator = $stateParams.isInitiator;
         var tools;
         var lastGroup;
+        var groups = [];
 
         function init() {
             if (vm.isinitiator) {
@@ -56,7 +57,7 @@
             $rootScope.$broadcast('rtc-hangup');
         });
         $scope.$on('rtc-hung-up', function() {
-            $state.go('chooseroom');
+            $state.go('home');
         });
 
         function handleContent(message) {

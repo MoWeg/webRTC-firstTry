@@ -83,4 +83,16 @@ public class ScenarioServiceImpl implements ScenarioService{
         log.debug("Request to delete Scenario : {}", id);
         scenarioRepository.delete(id);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<ScenarioDTO> findAllByExpertId(Long expertId, Pageable pageable) {
+		return scenarioRepository.findAllByExpertsId(pageable, expertId).map(scenarioMapper::toDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<ScenarioDTO> findAllByAgentId(Long agentId, Pageable pageable) {
+		return scenarioRepository.findAllByAgentsId(pageable, agentId).map(scenarioMapper::toDto);
+	}
 }

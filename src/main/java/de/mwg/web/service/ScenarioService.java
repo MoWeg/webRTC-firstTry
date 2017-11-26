@@ -24,6 +24,9 @@ public interface ScenarioService {
      * @return the list of entities
      */
     Page<ScenarioDTO> findAll(Pageable pageable);
+    
+    Page<ScenarioDTO> findAllByExpertId(Long expertId, Pageable pageable);
+    Page<ScenarioDTO> findAllByAgentId(Long agentId, Pageable pageable);
 
     /**
      * Get the "id" scenario.

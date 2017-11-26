@@ -11,6 +11,7 @@
         var vm = this;
         var isStarted = false;
         var gotOffer = false;
+        var gotAnswer = false;
         var isInitiator = $scope.isinitiator;
         var video = document.querySelector("#rtcvideo");
         var localStream;
@@ -99,15 +100,19 @@
 
         function handleContent(message) {
             if (message.type === 'offer') {
-                gotOffer = true;
-                if (!isStarted) {
-                    maybeStart();
+                if (!gotOffer) {
+                    gotOffer = true;
+                    if (!isStarted) {
+                        maybeStart();
+                    }
+                    pc.setRemoteDescription(new RTCSessionDescription(message));
+                    doAnswer();
                 }
-                pc.setRemoteDescription(new RTCSessionDescription(message));
-                doAnswer();
             } else if (message.type === 'answer' && isStarted) {
-                gotAnswer = true;
-                pc.setRemoteDescription(new RTCSessionDescription(message));
+                if (!gotAnswer) {
+                    gotAnswer = true;
+                    pc.setRemoteDescription(new RTCSessionDescription(message));
+                }
             } else if (message.type === 'candidate') {
                 if (isStarted && gotOffer) {
                     var candidate = new RTCIceCandidate({
@@ -132,7 +137,7 @@
                         })
                     }
                 }
-            } else if (message.content === 'bye' && isStarted && gotAnswer) {
+            } else if (message.content === 'bye' && isStarted) {
                 handleRemoteHangup();
             } else if (message.content == 'needOffer') {
                 sendMessage(storedOffer);

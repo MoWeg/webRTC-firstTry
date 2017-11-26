@@ -12,7 +12,7 @@
             parent: 'chat',
             url: '/proto3dallIn1',
             data: {
-                authorities: ['ROLE_USER'],
+                authorities: ['ROLE_USER', 'ROLE_EXPERT', 'ROLE_AGENT'],
                 pageTitle: 'Chat With VIDEO!!!'
             },
             views: {

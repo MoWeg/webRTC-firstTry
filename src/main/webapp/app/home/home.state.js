@@ -21,6 +21,38 @@
                     controllerAs: 'vm'
                 }
             }
+        }).state('home-agent', {
+            parent: 'home',
+            data: {
+                authorities: ['ROLE_AGENT']
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/home/children/agent.html',
+                    controller: 'HomeAgentOrExpertController',
+                    controllerAs: 'vm'
+                }
+            },
+            params: {
+                id: null,
+                expert: false
+            }
+        }).state('home-expert', {
+            parent: 'home',
+            data: {
+                authorities: ['ROLE_EXPERT']
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/home/children/expert.html',
+                    controller: 'HomeAgentOrExpertController',
+                    controllerAs: 'vm'
+                }
+            },
+            params: {
+                id: null,
+                expert: false
+            }
         });
     }
 })();

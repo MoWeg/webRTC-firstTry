@@ -24,6 +24,19 @@
             Principal.identity().then(function(account) {
                 vm.account = account;
                 vm.isAuthenticated = Principal.isAuthenticated;
+                if (vm.isAuthenticated) {
+                    if (vm.account.authorities[0] == 'ROLE_EXPERT') {
+                        $state.go('home-expert', {
+                            id: vm.account.id,
+                            expert: true
+                        })
+                    } else if (vm.account.authorities[0] == 'ROLE_AGENT') {
+                        $state.go('home-agent', {
+                            id: vm.account.id,
+                            expert: false
+                        })
+                    }
+                }
             });
         }
 

@@ -81,19 +81,24 @@ public class AnnotationAsPictureResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new annotationAsPictureDTO, or with status 400 (Bad Request) if the annotationAsPicture has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping("/annotation-as-pictures/upload")
+    //@PostMapping(value = "/annotation-as-pictures/file", headers = "content-type=multipart/*", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/annotation-as-pictures/file")
     @Timed
-    public ResponseEntity<AnnotationAsPictureDTO> createAnnotationAsPictureUpload(@RequestParam("file") MultipartFile file, @RequestParam("name") String name, @RequestParam("toolName") String toolName) throws URISyntaxException {
-      //public ResponseEntity<AnnotationAsPictureDTO> createAnnotationAsPictureUpload(@Valid @RequestBody AnnotationAsPictureUploadDTO annotationAsPictureUploadDTO) throws URISyntaxException {
+    public ResponseEntity<AnnotationAsPictureDTO> createAnnotationAsPictureUpload(@RequestParam("file") MultipartFile file) throws URISyntaxException {
+    /*
+    public ResponseEntity<AnnotationAsPictureDTO> createAnnotationAsPictureUpload(@Valid @RequestBody AnnotationAsPictureUploadDTO annotationAsPictureUploadDTO) throws URISyntaxException {
     	//  log.debug("REST request to save AnnotationAsPicture : {}", annotationAsPictureDTO);
       //  if (annotationAsPictureDTO.getId() != null) {
          //   throw new BadRequestAlertException("A new annotationAsPicture cannot already have an ID", ENTITY_NAME, "idexists");
        // }
-    	//MultipartFile file = annotationAsPictureUploadDTO.getFile();
-    	//String name = annotationAsPictureUploadDTO.getName();
-    	//String toolName = annotationAsPictureUploadDTO.getToolName();
+    	MultipartFile file = annotationAsPictureUploadDTO.getFile();
+    	String name = annotationAsPictureUploadDTO.getName();
+    	String toolName = annotationAsPictureUploadDTO.getToolName();
+    	*/
     	AnnotationAsPictureDTO annotationAsPictureDTO = new AnnotationAsPictureDTO();
         try {
+        	String name = file.getOriginalFilename();
+        	
         	String originalFilename = file.getOriginalFilename();
         	
         	File dir = new File(UPLOAD_FOLDER);
@@ -108,14 +113,12 @@ public class AnnotationAsPictureResource {
         	String pathToTimeStampFolder = timeStampFolder.getPath();
             byte[] bytes = file.getBytes();
             Path path = Paths.get(pathToTimeStampFolder +"\\"+ originalFilename);
-            Files.write(path, bytes);
-            
+            Files.write(path, bytes);          
             
             annotationAsPictureDTO.setFileName(originalFilename);
             annotationAsPictureDTO.setFolder(timeStampFolderName);
             annotationAsPictureDTO.setPath(dir.getPath());
             annotationAsPictureDTO.setName(name);
-            annotationAsPictureDTO.setToolName(toolName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -176,7 +179,7 @@ public class AnnotationAsPictureResource {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(annotationAsPictureDTO));
     }
     
-    @GetMapping("/annotation-as-pictures/download/{id}")
+    @GetMapping("/annotation-as-pictures/file/{id}")
     @Timed
     public HttpEntity<byte[]> getPicture(@PathVariable Long id) throws Exception {
         log.debug("REST request to download AnnotationAsPicture : {}", id);

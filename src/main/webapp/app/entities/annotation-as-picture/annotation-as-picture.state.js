@@ -113,8 +113,8 @@
                 },
                 onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                     $uibModal.open({
-                        templateUrl: 'app/entities/annotation-as-picture/annotation-as-picture-dialog.html',
-                        controller: 'AnnotationAsPictureDialogController',
+                        templateUrl: 'app/entities/annotation-as-picture/annotation-as-picture-file-dialog.html',
+                        controller: 'AnnotationAsPictureDialogFileController',
                         controllerAs: 'vm',
                         backdrop: 'static',
                         size: 'lg',
@@ -122,11 +122,9 @@
                             entity: function() {
                                 return {
                                     name: null,
-                                    fileName: null,
-                                    path: null,
-                                    folder: null,
                                     toolName: null,
-                                    id: null
+                                    id: null,
+                                    file: null,
                                 };
                             }
                         }

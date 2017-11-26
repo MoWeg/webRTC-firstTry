@@ -1,0 +1,40 @@
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myAnnotationAsPictureLabel">Create or edit a Annotation As Picture</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.annotationAsPictureFile.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id" ng-model="vm.annotationAsPictureFile.id" readonly />
+        </div>
+        <!-- <div class="form-group">
+            <label class="control-label" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name" ng-model="vm.annotationAsPictureFile.name" required/>
+            <div ng-show="editForm.name.$invalid">
+                <p class="help-block" ng-show="editForm.name.$error.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_toolName">Tool Name</label>
+            <input type="text" class="form-control" name="toolName" id="field_toolName" ng-model="vm.annotationAsPictureFile.toolName" />
+        </div> -->
+        <div class "form-group">
+            <label class="control-label" for="field_toolName">Tool Name</label>
+            <input type="file" class="form-control" name="file" id="field_file" ng-model="vm.annotationAsPictureFile.file" read-file-as-form-data/>
+        </div>
+
+    </div>
+    <div class="modal-footer ">
+        <button type="button " class="btn btn-default " data-dismiss="modal " ng-click="vm.clear() ">
+            <span class="glyphicon glyphicon-ban-circle "></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit " ng-disabled="editForm.$invalid || vm.isSaving || vm.isReading" class="btn btn-primary ">
+            <span class="glyphicon glyphicon-save "></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

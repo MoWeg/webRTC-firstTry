@@ -135,7 +135,7 @@
         }
         /// handle 3D messages
         function handleMessageWith3dGoal(message) {
-            var foundGroup
+            var foundGroup;
 
             if (lastGroup) {
                 if (lastGroup.id == message.group.id) {
@@ -144,25 +144,36 @@
             }
 
             if (!foundGroup) {
-                angular.forEach(groups, function(group) {
-                    if (group.id == message.group.id) {
-                        foundGroup = group;
-                    }
+                foundGroup = groups.find(function(group) {
+                    group.id == message.group.id;
                 });
+                // angular.forEach(groups, function(group) {
+                //     if (group.id == message.group.id) {
+                //         foundGroup = group;
+                //     }
+                // });
             }
             if (foundGroup) {
-                switch (message.content) {
-                    case 'visiblity':
-                        foundGroup.visibleForUser = message.group.visibleForUser;
-                        break;
-                    case 'discard':
-                        discardGroup(foundGroup);
-                        break;
-                    default:
-                        insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
+                // switch (message.content) {
+                //     case 'visiblity':
+                //         foundGroup.visibleForUser = message.group.visibleForUser;
+                //         break;
+                //     case 'discard':
+                //         discardGroup(foundGroup);
+                //         break;
+                //     default:
+                //         insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
+                // }
+                if (message.content == 'visiblity') {
+                    foundGroup.visibleForUser = message.group.visibleForUser;
+                } else if (message.content == 'discard') {
+                    discardGroup(foundGroup);
+                } else {
+                    console.log(message);
+                    insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
                 }
                 lastGroup = foundGroup;
-                animate(groups);
+                animate();
             } else {
                 var group = new Group(message.group);
                 groups.push(group);
@@ -174,14 +185,33 @@
         }
 
         function insertWithTool(voxelDtos, scene, group, type, location) {
-            angular.forEach(tools, function(tool) {
-                if (tool.type == type && tool.location == location) {
-                    tool.actionManager.handleInsert(voxelDtos, scene, group);
-                }
-            });
+            var toolFilter = new ToolFilter(type, location);
+            var tool = tools.find(ToolFilter.execute);
+            console.log(tool);
+            tool.handleInsert(voxelDtos, scene, group);
+            //
+            // angular.forEach(tools, function(tool) {
+            //     if (tool.type == type && tool.location == location) {
+            //         tool.actionManager.handleInsert(voxelDtos, scene, group);
+            //     }
+
         }
 
-        function animate(groups) {
+        function ToolFilter(type, location) {
+            var toolType = type;
+            var toolSpriteLocation = location;
+
+            this.execute = function(tool) {
+                var result = tool.type == toolType;
+                if (toolSpriteLocation) {
+                    var hasSamelocation = tool.location == toolSpriteLocation;
+                    result = result && hasSamelocation;
+                }
+                return result;
+            }
+        }
+
+        function animate() {
             $rootScope.$broadcast('request-animation', groups);
         }
 

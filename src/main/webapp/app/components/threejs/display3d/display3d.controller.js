@@ -20,6 +20,8 @@
         var view;
         var expertView;
         var groups;
+        var canvas;
+        var expertCanvas;
         // var filler;
 
         function checkIsInit() {
@@ -57,21 +59,24 @@
 
         function init3D() {
             // filler = document.querySelector("#filler");
-            var canvas = document.querySelector("#userCanvas");
+            canvas = document.querySelector("#userCanvas");
 
             canvas.width = oldVideoHeight;
             canvas.height = oldVideoWidth;
+            canvas.style.marginTop = -oldVideoHeight + 'px';
 
             view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, userCam, true, 0x000000, 0);
 
-            var expertCanvas = document.querySelector("#expertCanvas");
+            expertCanvas = document.querySelector("#expertCanvas");
             if (!vm.isinitiator) {
                 var w = 640,
                     h = 640;
-                var fullWidth = w * 2;
-                var fullHeight = h * 2;
-                expertCanvas.width = fullWidth;
-                expertCanvas.height = fullHeight;
+                // var fullWidth = w * 2;
+                // var fullHeight = h * 2;
+                expertCanvas.width = h;
+                expertCanvas.height = w;
+                expertCanvas.style.marginTop = -oldVideoHeight + 'px';
+                expertCanvas.style.marginLeft = -oldVideoWidth + 'px';
 
                 expertView = ThreejsSceneService.getView(expertCanvas, w, h, expertCam, false, 0xffffff, 1);
                 expertView.addSecondaryCam(userCam);
@@ -111,9 +116,6 @@
             }
             var expertWidth = rootWidth - oldVideoWidth;
             var expertHeight = 640;
-            if (expertHeight < oldVideoHeight) {
-                expertHeight = oldVideoHeight;
-            }
             if (expertView) {
                 expertView.setNewSize(expertWidth, 640);
             }
@@ -121,6 +123,10 @@
             //     expertHeight = oldVideoHeight;
             // }
             view.setNewSize(oldVideoWidth, oldVideoHeight);
+            canvas.style.marginTop = -(oldVideoHeight + 5) + 'px';
+            expertCanvas.style.marginTop = -(oldVideoHeight + 5) + 'px';
+            expertCanvas.style.marginLeft = oldVideoWidth + 'px';
+            expertCanvas.style.marginBottom = '10px';
             //filler.style.marginTop = expertHeight;
             //filler.m(rootWidth);
             animate();

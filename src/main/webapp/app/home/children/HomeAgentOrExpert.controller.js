@@ -37,6 +37,7 @@
 
         $scope.$on('$destroy', function() {
             JhiTrackerService.unsubscribeToAvailable();
+            ChatRoomService.setUserUnavailable(vm.id);
         });
         JhiTrackerService.receiveAvailable().then(null, null, function(received) {
             getUsers();

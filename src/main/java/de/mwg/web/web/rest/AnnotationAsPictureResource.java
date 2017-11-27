@@ -46,7 +46,7 @@ public class AnnotationAsPictureResource {
     private final Logger log = LoggerFactory.getLogger(AnnotationAsPictureResource.class);
 
     private static final String ENTITY_NAME = "annotationAsPicture";
-    private static final String UPLOAD_FOLDER = "..\\annotationsAsPictures";
+    private static final String UPLOAD_FOLDER = "src\\main\\webapp\\content\\images\\annotations";
 
     private final AnnotationAsPictureService annotationAsPictureService;
 

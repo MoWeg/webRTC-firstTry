@@ -119,6 +119,7 @@ public class AnnotationAsPictureResource {
             annotationAsPictureDTO.setFolder(timeStampFolderName);
             annotationAsPictureDTO.setPath(dir.getPath());
             annotationAsPictureDTO.setName(name);
+            annotationAsPictureDTO.setToolName("Sprite");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -213,6 +214,13 @@ public class AnnotationAsPictureResource {
     @Timed
     public ResponseEntity<Void> deleteAnnotationAsPicture(@PathVariable Long id) {
         log.debug("REST request to delete AnnotationAsPicture : {}", id);
+        AnnotationAsPictureDTO annotationAsPictureDTO = annotationAsPictureService.findOne(id);
+        String fileName = annotationAsPictureDTO.getFileName();
+        String timeStampFolderPath = annotationAsPictureDTO.getPath()+"\\"+annotationAsPictureDTO.getFolder();
+        File annotationToDelete = new File(timeStampFolderPath+"\\"+fileName);
+        annotationToDelete.delete();
+        File TimeStampFolder = new File(timeStampFolderPath);
+        TimeStampFolder.delete();
         annotationAsPictureService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }

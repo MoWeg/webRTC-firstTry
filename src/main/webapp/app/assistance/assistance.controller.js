@@ -18,31 +18,38 @@
         var scene;
 
         function init() {
+            var toolRequest = createToolRequestFor($stateParams.scenario);
+            AnnotationToolService.initAnnotationTools(toolRequest);
             if (vm.isinitiator) {
                 window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
-
-                var toolRequest = [];
-                toolRequest.push({
-                    name: 'insert box',
-                    type: 'box',
-                    spriteLocation: null
-                });
-                toolRequest.push({
-                    name: 'insert arrow',
-                    type: 'arrow',
-                    spriteLocation: null
-                });
-                toolRequest.push({
-                    name: 'insert jHipster',
-                    type: 'sprite',
-                    spriteLocation: 'content/images/logo-jhipster.png'
-                });
-                tools = AnnotationToolService.getAnnotationTools(toolRequest);
+                tools = AnnotationToolService.getAnnotationTools();
                 scene = ThreejsSceneService.getScene();
             } else {
                 vm.expertCam = ThreejsSceneService.getExpertCamera();
             }
             vm.userCam = ThreejsSceneService.getUserCamera();
+        }
+
+        function createToolRequestFor(scenario) {
+            var toolRequest = [];
+            toolRequest.push({
+                name: 'insert box',
+                type: 'Box',
+                spriteLocation: null
+            });
+            toolRequest.push({
+                name: 'insert arrow',
+                type: 'Arrow',
+                spriteLocation: null
+            });
+            angular.forEach(scenario.annotationAsPictures, function(annotation) {
+                toolRequest.push({
+                    name: annotation.name,
+                    type: annotation.toolName,
+                    spriteLocation: 'content/images/annotations/' + annotation.folder + '/' + annotation.fileName
+                });
+            });
+            return toolRequest;
         }
 
         function sendMessage(message) {
@@ -88,28 +95,6 @@
 
         function notifyRtc(message) {
             $rootScope.$broadcast('rtc-message', message)
-        }
-
-        function init3D() {
-            window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
-
-            var toolRequest = [];
-            toolRequest.push({
-                name: 'insert box',
-                type: 'box',
-                spriteLocation: null
-            });
-            toolRequest.push({
-                name: 'insert arrow',
-                type: 'arrow',
-                spriteLocation: null
-            });
-            toolRequest.push({
-                name: 'insert jHipster',
-                type: 'sprite',
-                spriteLocation: 'content/images/logo-jhipster.png'
-            });
-            tools = AnnotationToolService.getAnnotationTools(toolRequest);
         }
 
         //handle orientation and resize

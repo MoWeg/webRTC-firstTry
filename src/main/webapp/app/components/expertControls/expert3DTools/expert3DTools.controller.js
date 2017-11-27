@@ -9,8 +9,6 @@
 
     function Expert3DToolsController($scope, $rootScope, AnnotationToolService, ThreejsSceneService) {
         var vm = this;
-        //from outside
-        var toolRequest = [];
         var activeGroup;
         var scene = ThreejsSceneService.getScene(); // $scope.scene;
         var raycaster = new THREE.Raycaster();
@@ -70,23 +68,7 @@
             mouse = new THREE.Vector2();
             newPosY = 0;
 
-            toolRequest.push({
-                name: 'insert box',
-                type: 'box',
-                spriteLocation: null
-            })
-            toolRequest.push({
-                name: 'insert arrow',
-                type: 'arrow',
-                spriteLocation: null
-            })
-            toolRequest.push({
-                name: 'insert jHipster',
-                type: 'sprite',
-                spriteLocation: 'content/images/logo-jhipster.png'
-            })
-
-            vm.tools = AnnotationToolService.getAnnotationTools(toolRequest);
+            vm.tools = AnnotationToolService.getAnnotationTools();
 
             vm.movables.push(movableGrid);
             vm.movables.push(movableCam);

@@ -24,17 +24,17 @@
                 var toolRequest = [];
                 toolRequest.push({
                     name: 'insert box',
-                    type: 'box',
+                    type: 'Box',
                     spriteLocation: null
                 });
                 toolRequest.push({
                     name: 'insert arrow',
-                    type: 'arrow',
+                    type: 'Arrow',
                     spriteLocation: null
                 });
                 toolRequest.push({
                     name: 'insert jHipster',
-                    type: 'sprite',
+                    type: 'Sprite',
                     spriteLocation: 'content/images/logo-jhipster.png'
                 });
                 tools = AnnotationToolService.getAnnotationTools(toolRequest);

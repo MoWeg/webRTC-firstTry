@@ -134,7 +134,7 @@
                 });
             }
             if (foundGroup) {
-                if (message.content == 'visiblity') {
+                if (message.content == 'visibility') {
                     foundGroup.visibleForUser = message.group.visibleForUser;
                 } else if (message.content == 'discard') {
                     discardGroup(foundGroup);

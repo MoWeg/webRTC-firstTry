@@ -80,6 +80,7 @@
             vm.groups.splice(index, 1);
             if (vm.groups.length == 0) {
                 vm.addGroup();
+                groups[0].visible = true;
                 vm.setActive(groups[0]);
             }
         }

@@ -167,6 +167,9 @@
                                 value.scale.set(scale * imageWidth, scale * imageHeight, 1.0);
                             });
                         }
+                        angular.forEach(group.sprites, function(object) {
+                            object.visible = visisbility;
+                        });
                         angular.forEach(group.objects, function(object) {
                             object.visible = visisbility;
                         });

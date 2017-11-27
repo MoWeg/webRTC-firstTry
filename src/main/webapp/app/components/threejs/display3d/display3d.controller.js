@@ -49,6 +49,9 @@
             console.log("resize " + args.height + " " + args.width);
             resize3dModell(args);
         });
+        $scope.$on('reset-3d', function(event, message) {
+            ThreejsSceneService.resetScene();
+        });
 
         function init3D() {
             var canvas = document.querySelector("#userCanvas");

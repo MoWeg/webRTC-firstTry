@@ -57,6 +57,7 @@
         });
         $scope.$on('$destroy', function() {
             $rootScope.$broadcast('rtc-hangup');
+            $rootScope.$broadcast('reset-3d');
             if (vm.isinitiator) {
                 window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
             }

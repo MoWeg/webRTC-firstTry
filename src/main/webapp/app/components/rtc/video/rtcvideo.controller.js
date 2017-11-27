@@ -26,6 +26,8 @@
         function init() {
             if (isInitiator) {
                 UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+            } else {
+
             }
         }
         init();

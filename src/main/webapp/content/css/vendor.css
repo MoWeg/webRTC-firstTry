@@ -5837,3 +5837,12 @@ button.close {
 
 .right {
   float: right; }
+
+.left {
+  float: left; }
+
+.well {
+  width: inherit; }
+
+.filler {
+  color: #f5f5f5; }

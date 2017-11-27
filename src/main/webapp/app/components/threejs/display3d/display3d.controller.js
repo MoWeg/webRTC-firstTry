@@ -16,9 +16,11 @@
         $scope.expert = !vm.isinitiator;
         var oldVideoHeight = 640;
         var oldVideoWidth = 400;
+        var rootWidth = $(".well")[0].childNodes[0].clientWidth;
         var view;
         var expertView;
         var groups;
+        // var filler;
 
         function checkIsInit() {
             if (hasExpertCam == true) {
@@ -54,6 +56,7 @@
         });
 
         function init3D() {
+            // filler = document.querySelector("#filler");
             var canvas = document.querySelector("#userCanvas");
 
             canvas.width = oldVideoHeight;
@@ -106,9 +109,23 @@
             if (width != null && width != oldVideoWidth) {
                 oldVideoWidth = width;
             }
+            var expertWidth = rootWidth - oldVideoWidth;
+            var expertHeight = 640;
+            if (expertHeight < oldVideoHeight) {
+                expertHeight = oldVideoHeight;
+            }
+            if (expertView) {
+                expertView.setNewSize(expertWidth, 640);
+            }
+            // } else {
+            //     expertHeight = oldVideoHeight;
+            // }
             view.setNewSize(oldVideoWidth, oldVideoHeight);
+            //filler.style.marginTop = expertHeight;
+            //filler.m(rootWidth);
             animate();
         }
+
 
         init3D();
     }

@@ -86,19 +86,20 @@
 
         function onGetUserSuccess(data, headers) {
             vm.receivedUsers = data;
+            if (vm.receivedUsers) {
+                angular.forEach(vm.scenarios, function(scenario) {
+                    var filter = new FilterByIds(scenario.experts);
+                    scenario.availableExperts = vm.receivedUsers.filter(filter.execute);
 
-            angular.forEach(vm.scenarios, function(scenario) {
-                var filter = new FilterByIds(scenario.experts);
-                scenario.availableExperts = vm.receivedUsers.filter(filter.execute);
+                    var filter = new FilterByIds(scenario.agents);
+                    scenario.availableAgents = vm.receivedUsers.filter(filter.execute);
 
-                var filter = new FilterByIds(scenario.agents);
-                scenario.availableAgents = vm.receivedUsers.filter(filter.execute);
-
-                if (!scenario.availableAgents) {
-                    scenario.availableAgents = [];
-                }
-            });
-            makePositiveAlert(vm.scenarios);
+                    if (!scenario.availableAgents) {
+                        scenario.availableAgents = [];
+                    }
+                });
+                makePositiveAlert(vm.scenarios);
+            }
         }
 
         function FilterByIds(expertsOrAgents) {
@@ -107,7 +108,7 @@
                 expertsOrAgentsIds.push(user.id);
             });
             this.execute = function(element) {
-                return expertsOrAgentsIds.find(id => id == element.chatId);
+                return expertsOrAgentsIds.some(id => id == element.chatId);
             };
         }
 

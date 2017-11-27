@@ -61,6 +61,7 @@
             angular.forEach(group.messages, function(message) {
                 sendMessage(message);
             });
+            group.active = false;
             group.send = true;
         }
         vm.discard = function(index, group) {
@@ -80,10 +81,10 @@
             vm.groups.splice(index, 1);
             if (vm.groups.length == 0) {
                 vm.addGroup();
-                groups[0].visible = true;
-                vm.setActive(groups[0]);
+                vm.groups[0].visible = true;
+                vm.setActive(vm.groups[0]);
             }
-        }
+        };
 
         function Group(groupId, active) {
             this.id = groupId

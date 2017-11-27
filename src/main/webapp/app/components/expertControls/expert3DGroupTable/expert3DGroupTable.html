@@ -1,39 +1,52 @@
 <div>
-  <h2> Groups</h2>
-  <button class="btn btn-success right" ng-click="vm.addGroup()"
-          >add Group <i class="glyphicon glyphicon-comment"/></button>
-  <div class="table-responsive">
-      <table class="table table-striped">
-          <thead>
-              <tr>
-                  <th>Edit</th>
-                  <th>Group</th>
-                  <th>Visible</th>
-                  <th>Visible For User</th>
-                  <th>Actions</th>
-              </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="group in vm.groups">
-                <td>
-                  <input type="checkbox" ng-checked="group.active" ng-click="vm.setActive(group)"/>
-                </td>
-                <td>Group {{$index}}</td>
-                <td>
-                  <input type="checkbox" ng-checked="group.visible" ng-click="vm.setVisible(group)"/>
-                </td>
-                <td>
-                  <input type="checkbox" ng-checked="group.visibleForUser" ng-click="vm.setVisibleForUser(group)"/>
-                </td>
-                <td>
-                  <button class="btn btn-success" ng-click="vm.send(group)"
-                          ng-disabled = "group.send"
-                        >Send <i class="glyphicon glyphicon-comment"/></button>
-                  <button class="btn btn-danger" ng-click="vm.discard($index, group)"
-                        >Discard <i class="glyphicon glyphicon-comment"/></button>
-                </td>
-            </tr>
-          </tbody>
-      </table>
-  </div>
+    <h2> Groups</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ng-click="vm.addGroup()">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span >
+                        Create new Group
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Edit</th>
+                    <th>Group</th>
+                    <th>Visible</th>
+                    <th>Visible For User</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="group in vm.groups">
+                    <td>
+                        <input type="checkbox" ng-checked="group.active" ng-click="vm.setActive(group)" ng-disabled="group.send" />
+                    </td>
+                    <td>Group {{$index}}</td>
+                    <td>
+                        <input type="checkbox" ng-checked="group.visible" ng-click="vm.setVisible(group)" />
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-checked="group.visibleForUser" ng-click="vm.setVisibleForUser(group)" />
+                    </td>
+                    <td>
+                        <button class="btn btn-success" ng-click="vm.send(group)" ng-disabled="group.send">
+                          Send <i ng-class="group.send? 'glyphicon glyphicon-check' : 'glyphicon glyphicon-share'"/>
+                        </button>
+                        <button ng-class="group.send? 'btn btn-danger' : 'btn btn-warning'" ng-click="vm.discard($index, group)">
+                          Discard <i ng-class="group.send? 'glyphicon glyphicon-remove' : 'glyphicon glyphicon-erase'"/>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -15,7 +15,7 @@
                     <td>{{scenario.name}}</td>
                     <td>{{scenario.description}}</td>
                     <td>
-                        <button class="btn btn-success" ng-click="vm.callExpert(scenario.availableExperts)" ng-disabled="!vm.hasAvailable(scenario)">
+                        <button class="btn btn-success" ng-click="vm.callExpert(scenario)" ng-disabled="!vm.hasAvailable(scenario)">
                           Call Expert
                           <i class="glyphicon glyphicon-facetime-video"/>
                         </button>

@@ -44,7 +44,12 @@
         });
         JhiTrackerService.receiveInvite().then(null, null, function(invite) {
             if (invite.goal === 'expert') {
-                goToCall(invite.content, false);
+                if (invite.type) {
+                    var scenarioFinder = new ScenarioFinder(invite.type)
+                    var relevantScenario = vm.scenarios.find(scenarioFinder.execute);
+                    goToCall(invite.content, false, relevantScenario);
+                }
+
             }
         });
 
@@ -113,6 +118,13 @@
             };
         }
 
+        function ScenarioFinder(scenarioId) {
+            var relevantId = scenarioId;
+            this.execute = function(element) {
+                return element.id == scenarioId;
+            }
+        }
+
         function makePositiveAlert(scenarios) {
             if (scenarios) {
                 if (isExpert && !hasAgents) {
@@ -160,18 +172,29 @@
             }
         }
 
-        function callExpert(availableExperts) {
-            var expert = availableExperts.find(isAvailable);
-            JhiTrackerService.sendSimpleMessageToUserWithGoal(expert.chatId, 'expert', vm.id);
-            goToCall(expert.chatId, true);
+        function callExpert(scenario) {
+            var expert = scenario.availableExperts.find(isAvailable);
+            // JhiTrackerService.sendSimpleMessageToUserWithGoal(expert.chatId, 'expert', vm.id);
+            sendMessage(expert.chatId, scenario.id);
+            goToCall(expert.chatId, true, scenario);
         }
 
-        function goToCall(partnerId, isInitiator) {
+        function sendMessage(addresseeId, scenarioId) {
+            var message = {
+                goal: 'expert',
+                content: vm.id,
+                type: scenarioId
+            };
+            JhiTrackerService.sendSimpleMessageToJsonUser(addresseeId, message);
+        }
+
+        function goToCall(partnerId, isInitiator, scenario) {
             ChatRoomService.setUserUnavailable(vm.id);
-            $state.go('proto3dallIn1', {
+            $state.go('assistance', {
                 id: vm.id,
                 partnerId: partnerId,
-                isInitiator: isInitiator
+                isInitiator: isInitiator,
+                scenario: scenario
             });
         }
         init();

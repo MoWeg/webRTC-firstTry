@@ -142,34 +142,17 @@
                     foundGroup = lastGroup;
                 }
             }
-
             if (!foundGroup) {
                 foundGroup = groups.find(function(group) {
                     group.id == message.group.id;
                 });
-                // angular.forEach(groups, function(group) {
-                //     if (group.id == message.group.id) {
-                //         foundGroup = group;
-                //     }
-                // });
             }
             if (foundGroup) {
-                // switch (message.content) {
-                //     case 'visiblity':
-                //         foundGroup.visibleForUser = message.group.visibleForUser;
-                //         break;
-                //     case 'discard':
-                //         discardGroup(foundGroup);
-                //         break;
-                //     default:
-                //         insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
-                // }
                 if (message.content == 'visiblity') {
                     foundGroup.visibleForUser = message.group.visibleForUser;
                 } else if (message.content == 'discard') {
                     discardGroup(foundGroup);
                 } else {
-                    console.log(message);
                     insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
                 }
                 lastGroup = foundGroup;
@@ -186,15 +169,10 @@
 
         function insertWithTool(voxelDtos, scene, group, type, location) {
             var toolFilter = new ToolFilter(type, location);
-            var tool = tools.find(ToolFilter.execute);
-            console.log(tool);
-            tool.handleInsert(voxelDtos, scene, group);
-            //
-            // angular.forEach(tools, function(tool) {
-            //     if (tool.type == type && tool.location == location) {
-            //         tool.actionManager.handleInsert(voxelDtos, scene, group);
-            //     }
-
+            var tool = tools.find(toolFilter.execute);
+            if (tool) {
+                tool.actionManager.handleInsert(voxelDtos, scene, group);
+            }
         }
 
         function ToolFilter(type, location) {

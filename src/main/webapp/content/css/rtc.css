@@ -24,4 +24,8 @@
   width: inherit; }
 
 .filler {
-  color: #f5f5f5; }
+  color: #f5f5f5;
+  z-index: 0; }
+
+.expert-view {
+  cursor: none; }

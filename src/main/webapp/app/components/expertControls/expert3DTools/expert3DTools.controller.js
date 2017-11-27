@@ -78,9 +78,11 @@
         }
 
         function onDocumentMouseMove(event) {
-            // event.preventDefault();
-            console.log(window);
-            mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+            // event.preventDefault();window.innerWidth 1
+            // mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+
+            var position = calculate(event);
+            mouse.set(position.x, position.y);
             raycaster.setFromCamera(mouse, view2Cam);
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {
@@ -92,9 +94,28 @@
             animate();
         }
 
+        function calculate(event) {
+            var divisorY = window.innerHeight;
+            var y = -(event.clientY / divisorY) * 2 + 1;
+
+            var divisorX = $(".well")[0].childNodes[0].clientWidth;
+            var baseMinusX = 2;
+            var diff = event.clientX - divisorX;
+            var diffCent = diff / 100;
+            var dynamicMinusX = diffCent * 0.85;
+            var actualMinusX = baseMinusX - dynamicMinusX;
+            var x = (event.clientX / divisorX) * 2 - actualMinusX;
+
+            return {
+                x: x,
+                y: y
+            };
+        }
+
         function onDocumentMouseDown(event) {
             // event.preventDefault();
-            mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+            var position = calculate(event);
+            mouse.set(position.x, position.y);
             raycaster.setFromCamera(mouse, view2Cam);
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {

@@ -10,7 +10,7 @@
     function stateConfig($stateProvider) {
         $stateProvider.state('assistance', {
             parent: 'home',
-            url: '/assistance',
+            url: 'assistance',
             data: {
                 authorities: ['ROLE_EXPERT', 'ROLE_AGENT'],
                 pageTitle: 'Chat With VIDEO!!!'

@@ -25,19 +25,27 @@
                 vm.account = account;
                 vm.isAuthenticated = Principal.isAuthenticated;
                 if (vm.isAuthenticated) {
-                    if (vm.account.authorities[0] == 'ROLE_EXPERT') {
+                    if (vm.account.authorities.find(isExpert)) {
                         $state.go('home-expert', {
                             id: vm.account.id,
                             expert: true
-                        })
-                    } else if (vm.account.authorities[0] == 'ROLE_AGENT') {
+                        });
+                    } else if (vm.account.authorities.find(isAgent)) {
                         $state.go('home-agent', {
                             id: vm.account.id,
                             expert: false
-                        })
+                        });
                     }
                 }
             });
+        }
+
+        function isExpert(authority) {
+            return authority == 'ROLE_EXPERT';
+        }
+
+        function isAgent(authority) {
+            return authority == 'ROLE_AGENT';
         }
 
         function register() {

@@ -18,6 +18,7 @@
         var oldVideoWidth = 400;
         var view;
         var expertView;
+        var groups;
 
         function checkIsInit() {
             if (hasExpertCam == true) {
@@ -38,8 +39,8 @@
         }
 
         $scope.$on('request-animation', function(event, args) {
-            view.render(args);
-            expertView.render(args);
+            groups = args;
+            animate();
         });
         $scope.$on('set-camera-and-resize', function(event, args) {
             setCamera(args.deviceEvent);
@@ -57,7 +58,6 @@
 
             view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, userCam, true, 0x000000, 0);
 
-            view.render();
             var expertCanvas = document.querySelector("#expertCanvas");
             if (!vm.isinitiator) {
                 var w = 640,
@@ -69,10 +69,10 @@
 
                 expertView = ThreejsSceneService.getView(expertCanvas, w, h, expertCam, false, 0xffffff, 1);
                 expertView.addSecondaryCam(userCam);
-                expertView.render();
             } else {
                 expertCanvas.remove();
             }
+            animate();
         }
 
         function setCamera(deviceEvent) {
@@ -80,7 +80,18 @@
                 var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
                 view.setOrientationInfo(orientationInfo);
             }
-            view.render();
+            animate();
+        }
+
+        function animate() {
+            window.requestAnimationFrame(renderViews);
+        }
+
+        function renderViews() {
+            view.render(groups);
+            if (expertView) {
+                expertView.render(groups);
+            }
         }
 
         function resize3dModell(size) {
@@ -93,6 +104,7 @@
                 oldVideoWidth = width;
             }
             view.setNewSize(oldVideoWidth, oldVideoHeight);
+            animate();
         }
 
         init3D();

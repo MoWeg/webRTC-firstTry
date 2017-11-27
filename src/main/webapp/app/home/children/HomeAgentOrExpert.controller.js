@@ -108,21 +108,23 @@
                 expertsOrAgentsIds.push(user.id);
             });
             this.execute = function(element) {
-                return expertsOrAgentsIds.some(id => id == element.chatId);
+                return expertsOrAgentsIds.find(id => id == element.chatId);
             };
         }
 
         function makePositiveAlert(scenarios) {
-            if (isExpert && !hasAgents) {
-                if (scenarios.some(hasAvailableAgents)) {
-                    hasAgents = true;
-                    AlertService.success("Agents Online");
+            if (scenarios) {
+                if (isExpert && !hasAgents) {
+                    if (scenarios.some(hasAvailableAgents)) {
+                        hasAgents = true;
+                        AlertService.success("Agents Online");
+                    }
                 }
-            }
-            if (!isExpert && !hasExperts) {
-                if (scenarios.some(hasAvailableExperts)) {
-                    hasExperts = true;
-                    AlertService.success("Experts Online");
+                if (!isExpert && !hasExperts) {
+                    if (scenarios.some(hasAvailableExperts)) {
+                        hasExperts = true;
+                        AlertService.success("Experts Online");
+                    }
                 }
             }
         }
@@ -160,7 +162,7 @@
         function callExpert(availableExperts) {
             var expert = availableExperts.find(isAvailable);
             JhiTrackerService.sendSimpleMessageToUserWithGoal(expert.chatId, 'expert', vm.id);
-            goToCall(expert.chatId, true)
+            goToCall(expert.chatId, true);
         }
 
         function goToCall(partnerId, isInitiator) {

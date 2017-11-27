@@ -15,6 +15,7 @@
         var tools;
         var lastGroup;
         var groups = [];
+        var scene;
 
         function init() {
             if (vm.isinitiator) {
@@ -37,6 +38,7 @@
                     spriteLocation: 'content/images/logo-jhipster.png'
                 });
                 tools = AnnotationToolService.getAnnotationTools(toolRequest);
+                scene = ThreejsSceneService.getScene();
             } else {
                 vm.expertCam = ThreejsSceneService.getExpertCamera();
             }
@@ -55,6 +57,9 @@
         });
         $scope.$on('$destroy', function() {
             $rootScope.$broadcast('rtc-hangup');
+            if (vm.isinitiator) {
+                window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
+            }
         });
         $scope.$on('rtc-hung-up', function() {
             $state.go('home');
@@ -157,7 +162,7 @@
                         insertWithTool([message.voxel, message.endPoint], scene, lastGroup, message.content, message.type);
                 }
                 lastGroup = foundGroup;
-                animate();
+                animate(groups);
             } else {
                 var group = new Group(message.group);
                 groups.push(group);
@@ -174,6 +179,10 @@
                     tool.actionManager.handleInsert(voxelDtos, scene, group);
                 }
             });
+        }
+
+        function animate(groups) {
+            $rootScope.$broadcast('request-animation', groups);
         }
 
         function discardGroup(group) {

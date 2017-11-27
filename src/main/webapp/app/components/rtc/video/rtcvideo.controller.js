@@ -290,8 +290,10 @@
             isStarted = false;
             // isAudioMuted = false;
             // isVideoMuted = false;
-            pc.close();
-            pc = null;
+            if (pc) {
+                pc.close();
+                pc = null;
+            }
             if (isInitiator) {
                 video.pause();
                 video.src = "";

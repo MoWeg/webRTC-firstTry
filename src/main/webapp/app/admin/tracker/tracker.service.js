@@ -46,7 +46,7 @@
             subscribeToAvailable: subscribeToAvailable,
             receiveAvailable: receiveAvailable,
             sendToAvailable: sendToAvailable,
-            unsubscribeToAvailable: unsubscribeToAvailable
+            unsubscribeToAvailable: unsubscribeToAvailable,
 
             subscribeToSelf: subscribeToSelf,
             receiveInvite: receiveInvite,

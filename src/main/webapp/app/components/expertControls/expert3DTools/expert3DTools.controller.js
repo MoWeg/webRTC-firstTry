@@ -83,6 +83,7 @@
 
             var position = calculate(event);
             mouse.set(position.x, position.y);
+
             raycaster.setFromCamera(mouse, view2Cam);
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {
@@ -95,14 +96,22 @@
         }
 
         function calculate(event) {
-            var divisorY = window.innerHeight;
+            var divisorY = $(".well")[0].childNodes[0].clientHeight + 640;
             var y = -(event.clientY / divisorY) * 2 + 1;
+            // var divisorY = $(".well")[0].childNodes[0].clientHeight;
+            // var basePlusY = 1;
+            // var diffY = divisorY - event.clientY;
+            // var diffYCent = diffY / 100;
+            // var dynamicPlusY = diffYCent * 0.4;
+            // var actualPlusY = basePlusY + dynamicPlusY;
+            // var y = -(event.clientY / divisorY) * 2 + actualPlusY;
+
 
             var divisorX = $(".well")[0].childNodes[0].clientWidth;
             var baseMinusX = 2;
-            var diff = event.clientX - divisorX;
-            var diffCent = diff / 100;
-            var dynamicMinusX = diffCent * 0.85;
+            var diffX = event.clientX - divisorX;
+            var diffXCent = diffX / 100;
+            var dynamicMinusX = diffXCent * 0.85;
             var actualMinusX = baseMinusX - dynamicMinusX;
             var x = (event.clientX / divisorX) * 2 - actualMinusX;
 

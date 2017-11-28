@@ -6,9 +6,9 @@
         .module('simpleWebrtcServerApp')
         .factory('TaskFinderService', TaskFinderService);
 
-    TaskFinderService.$inject = [];
+    TaskFinderService.$inject = ['Task'];
 
-    function TaskFinderService() {
+    function TaskFinderService(Task) {
 
         var service = {
             getNextTask: getNextTask,
@@ -41,13 +41,13 @@
                     return true;
                 }
             });
-            return recursiveFindFirst(lastTask);
+            return recursiveFindFirst(lastTask, tasks);
         }
 
-        function recursiveFindFirst(task) {
-            var previousTask = getPreviousTask(task);
+        function recursiveFindFirst(task, tasks) {
+            var previousTask = getPreviousTask(task, tasks);
             if (previousTask) {
-                return recursiveFindFirst(previousTask);
+                return recursiveFindFirst(previousTask, tasks);
             } else {
                 return task;
             }
@@ -56,9 +56,6 @@
         function initTasksForScenarioId(scenarioId) {
             var tasks = Task.query({
                 scenarioId: scenarioId
-            });
-            angular.forEach(tasks, function(task) {
-                task.groups = [];
             });
             return tasks;
         }

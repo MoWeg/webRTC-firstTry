@@ -8,7 +8,7 @@
     function Expertgroups() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/expert/groups.html',
+            templateUrl: 'app/components/expert/groups/groups.html',
             scope: {
                 tasks: '='
             },

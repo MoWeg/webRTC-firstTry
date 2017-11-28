@@ -83,18 +83,19 @@
         function onDocumentMouseMove(event) {
             // event.preventDefault();window.innerWidth 1
             // mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
-
-            var position = calculate(event);
-            mouse.set(position.x, position.y);
-            raycaster.setFromCamera(mouse, view2Cam);
-            var intersects = raycaster.intersectObjects(activeGroup.objects, true);
-            if (intersects.length > 0) {
-                var intersect = intersects[0];
-                intersect.point.y = intersect.point.y + newPosY;
-                rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
-                rollOverMesh.position.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
+            if (activeGroup) {
+                var position = calculate(event);
+                mouse.set(position.x, position.y);
+                raycaster.setFromCamera(mouse, view2Cam);
+                var intersects = raycaster.intersectObjects(activeGroup.objects, true);
+                if (intersects.length > 0) {
+                    var intersect = intersects[0];
+                    intersect.point.y = intersect.point.y + newPosY;
+                    rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
+                    rollOverMesh.position.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
+                }
+                animate();
             }
-            animate();
         }
 
         function calculate(event) {
@@ -127,18 +128,21 @@
 
         function onDocumentMouseDown(event) {
             // event.preventDefault();
-            var position = calculate(event);
-            mouse.set(position.x, position.y);
-            raycaster.setFromCamera(mouse, view2Cam);
-            var intersects = raycaster.intersectObjects(activeGroup.objects, true);
-            if (intersects.length > 0) {
-                var intersect = intersects[0];
-                if (vm.activeTool && activeGroup) {
-                    intersect.point.y = intersect.point.y + newPosY;
-                    vm.activeTool.actionManager.action(intersect, scene, activeGroup);
+            if (activeGroup) {
+                var position = calculate(event);
+                mouse.set(position.x, position.y);
+                raycaster.setFromCamera(mouse, view2Cam);
+                var intersects = raycaster.intersectObjects(activeGroup.objects, true);
+                if (intersects.length > 0) {
+                    var intersect = intersects[0];
+                    if (vm.activeTool && activeGroup) {
+                        intersect.point.y = intersect.point.y + newPosY;
+                        vm.activeTool.actionManager.action(intersect, scene, activeGroup);
+                    }
+                    animate();
                 }
-                animate();
             }
+
         }
 
         function onDocumentKeyDown(event) {

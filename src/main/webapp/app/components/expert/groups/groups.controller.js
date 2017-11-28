@@ -14,16 +14,29 @@
         vm.activeTask = TaskFinderService.findFirstTask(tasks);
         vm.activeGroup;
 
-        vm.setActive(vm.activeTask.groups[0]);
+        init();
 
-        vm.addGroup = function() {
-            var groupId = Math.round((Math.random() * 1000000) * 10);
-            var newGroup = new Group(groupId, false);
-            newGroup.objects.push(plane);
+        function init() {
+            angular.forEach(tasks, function(task) {
+                task.groups = [];
+                task.groups.push(createGroup());
+            });
+            setActive(vm.activeTask.groups[0]);
+        }
+
+        function addGroup() {
+            var newGroup = createGroup();
             vm.activeTask.groups.push(newGroup);
         }
 
-        vm.setActive = function(group) {
+        function createGroup() {
+            var groupId = Math.round((Math.random() * 1000000) * 10);
+            var newGroup = new Group(groupId, false);
+            newGroup.objects.push(plane);
+            return newGroup;
+        }
+
+        function setActive(group) {
             angular.forEach(vm.activeTask.groups, function(value, key) {
                 value.active = false;
             });
@@ -31,6 +44,11 @@
             vm.activeGroup = group;
             $rootScope.$broadcast('active-group-changed', group);
         }
+
+        vm.addGroup = addGroup;
+
+        vm.setActive = setActive;
+
         vm.setVisible = function(group) {
             group.visible = !group.visible;
             animate();

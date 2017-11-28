@@ -11,7 +11,6 @@
         var vm = this;
         var plane = ThreejsSceneService.getPlane();
         var tasks = $scope.tasks;
-        vm.activeTask = TaskFinderService.findFirstTask(tasks);
         vm.activeGroup;
 
         init();
@@ -21,6 +20,7 @@
                 task.groups = [];
                 task.groups.push(createGroup());
             });
+            vm.activeTask = TaskFinderService.findFirstTask(tasks);
             setActive(vm.activeTask.groups[0]);
         }
 

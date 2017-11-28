@@ -12,6 +12,7 @@
         var tasks = $scope.tasks;
         vm.activeTask;
         vm.showText = false;
+        vm.changeShowText = changeShowText;
 
         function init() {
             vm.activeTask = TaskFinderService.findFirstTask(tasks);

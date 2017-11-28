@@ -11,7 +11,13 @@
         var vm = this;
         var plane = ThreejsSceneService.getPlane();
         var tasks = $scope.tasks;
-        vm.activeGroup;
+
+        $scope.$on('active-task-changed', function(event, args) {
+            deactivateAllGroups(true);
+            vm.activeTask = args;
+            findEditableGroup();
+            animate();
+        });
 
         init();
 
@@ -21,12 +27,8 @@
                 task.groups.push(createGroup());
             });
             vm.activeTask = TaskFinderService.findFirstTask(tasks);
+            vm.activeTask.groups[0].visible = true;
             setActive(vm.activeTask.groups[0]);
-        }
-
-        function addGroup() {
-            var newGroup = createGroup();
-            vm.activeTask.groups.push(newGroup);
         }
 
         function createGroup() {
@@ -36,25 +38,21 @@
             return newGroup;
         }
 
-        function setActive(group) {
+        function deactivateAllGroups(withVisibility) {
             angular.forEach(vm.activeTask.groups, function(value, key) {
                 value.active = false;
+                if (withVisibility) {
+                    value.visible = false;
+                    if (value.visibleForUser) {
+                        value.visibleForUser = false;
+                        changeVisibilityIfSend(value);
+                    }
+                }
             });
-            group.active = true;
-            vm.activeGroup = group;
-            $rootScope.$broadcast('active-group-changed', group);
-        }
-
-        vm.addGroup = addGroup;
-
-        vm.setActive = setActive;
-
-        vm.setVisible = function(group) {
-            group.visible = !group.visible;
             animate();
         }
-        vm.setVisibleForUser = function(group) {
-            group.visibleForUser = !group.visibleForUser;
+
+        function changeVisibilityIfSend(group) {
             if (group.send) {
                 var groupDto = {
                     id: group.id,
@@ -67,6 +65,49 @@
                 };
                 sendMessage(initialMessage);
             }
+        }
+
+        function findEditableGroup() {
+            if (vm.activeTask.groups.length == 0) {
+                fillIfLast();
+            }
+            var notYetSendGroup = vm.activeTask.groups.find(function(element) {
+                return !element.send;
+            })
+            if (!notYetSendGroup) {
+                fillIfLast();
+            } else {
+                setActive(notYetSendGroup);
+            }
+        }
+
+        function fillIfLast() {
+            var group = createGroup();
+            vm.activeTask.groups.push(group)
+            setActive(group);
+        }
+
+        function setActive(group) {
+            deactivateAllGroups(false);
+            group.visible = true;
+            group.active = true;
+            $rootScope.$broadcast('active-group-changed', group);
+        }
+
+        vm.setActive = setActive;
+
+        vm.addGroup = function() {
+            var newGroup = createGroup();
+            vm.activeTask.groups.push(newGroup);
+        };
+
+        vm.setVisible = function(group) {
+            group.visible = !group.visible;
+            animate();
+        }
+        vm.setVisibleForUser = function(group) {
+            group.visibleForUser = !group.visibleForUser;
+            changeVisibilityIfSend(group);
             animate();
         }
         vm.send = function(group) {
@@ -85,6 +126,7 @@
             });
             group.active = false;
             group.send = true;
+            findEditableGroup();
         }
         vm.discard = function(index, group) {
             if (group.send) {
@@ -101,11 +143,8 @@
             }
             ThreejsSceneService.removeGroupFromScene(group);
             vm.activeTask.groups.splice(index, 1);
-            if (vm.activeTask.groups.length == 0) {
-                vm.addGroup();
-                vm.activeTask.groups[0].visible = true;
-                vm.setActive(vm.activeTask.groups[0]);
-            }
+            findEditableGroup();
+            animate();
         };
 
         function Group(groupId, active) {
@@ -119,8 +158,11 @@
             this.messages = [];
         }
 
-        function animate() {
-            $rootScope.$broadcast('request-animation', vm.activeTask.groups);
+        function animate(groups) {
+            if (!groups) {
+                groups = vm.activeTask.groups;
+            }
+            $rootScope.$broadcast('request-animation', groups);
         }
 
         function sendMessage(message) {

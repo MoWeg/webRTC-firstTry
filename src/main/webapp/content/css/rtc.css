@@ -38,11 +38,17 @@
   outline: none;
   border: none; }
 
+.color-white {
+  background-color: #fff; }
+
 .color-light {
   background-color: #fafafa; }
 
-.color-darker {
+.color-less-light {
   background-color: #f8f8f8; }
+
+.color-darker {
+  background-color: #e5e5e5; }
 
 .inherit-z {
   z-index: inherit; }
@@ -53,3 +59,8 @@
 
 .is-relative {
   position: relative; }
+
+.nav-tab-content {
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 15px; }

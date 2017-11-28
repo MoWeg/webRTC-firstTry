@@ -4,5 +4,6 @@
         <showtask ng-if="vm.tasks" tasks="vm.tasks" class="my-task big-div" />
         <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" class="big-div my-drawing-canvas" />
     </div>
+    <controltask ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
     <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
 </div>

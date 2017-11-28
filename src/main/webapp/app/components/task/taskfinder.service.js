@@ -14,7 +14,9 @@
             getNextTask: getNextTask,
             getPreviousTask: getPreviousTask,
             findFirstTask: findFirstTask,
-            initTasksForScenarioId: initTasksForScenarioId
+            initTasksForScenarioId: initTasksForScenarioId,
+            hasNextTask: hasNextTask,
+            hasPreviousTask: hasPreviousTask
         };
         return service;
 
@@ -26,7 +28,7 @@
 
         function getPreviousTask(task, tasks) {
             return tasks.find(function(element) {
-                return element.nextTaskId == task.id;
+                return task.id == element.nextTaskId;
             });
         }
 
@@ -58,6 +60,33 @@
                 scenarioId: scenarioId
             });
             return tasks;
+        }
+
+        function hasNextTask(task, tasks) {
+            if (!task || !tasks) {
+                return false;
+            }
+            if (!task.nextTaskId) {
+                return false;
+            }
+            if (tasks.lenth == 1 || tasks.length == 0) {
+                return false;
+            }
+            return tasks.some(function(element) {
+                return task.nextTaskId == element.id;
+            });
+        }
+
+        function hasPreviousTask(task, tasks) {
+            if (!task || !tasks) {
+                return false;
+            }
+            if (tasks.lenth == 1 || tasks.length == 0) {
+                return false;
+            }
+            return tasks.some(function(element) {
+                return task.id == element.nextTaskId;
+            });
         }
     }
 })();

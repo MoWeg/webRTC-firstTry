@@ -3,17 +3,17 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .directive('experttools', ExpertTools);
+        .directive('controltask', ControlTask);
 
-    function ExpertTools() {
+    function ControlTask() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/expert/tools/tools.html',
+            templateUrl: 'app/components/task/controltask.html',
             scope: {
-                expertcam: '='
+                tasks: '='
             },
             controllerAs: 'vm',
-            controller: 'ExpertToolsController'
+            controller: 'ControlTaskController'
         };
 
         return directive;

@@ -14,20 +14,16 @@
         vm.showText = false;
         vm.changeShowText = changeShowText;
 
+        $scope.$on('active-task-changed', function(event, args) {
+            vm.activeTask = args;
+        });
+
         function init() {
             vm.activeTask = TaskFinderService.findFirstTask(tasks);
         }
 
         function changeShowText() {
             vm.showText = !vm.showText;
-        }
-
-        function setNextTaskActive() {
-            vm.activeTask = TaskFinderService.getNextTask(vm.activeTask, tasks);
-        }
-
-        function setPreviousTaskActive(task) {
-            vm.activeTask = TaskFinderService.getPreviousTask(vm.activeTask, tasks);
         }
         init();
     }

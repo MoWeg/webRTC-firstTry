@@ -248,7 +248,7 @@
         }
 
         function animate() {
-            $rootScope.$broadcast('request-animation', $scope.threejsgroups);
+            $rootScope.$broadcast('request-animation', activeGroup);
         }
         init();
     }

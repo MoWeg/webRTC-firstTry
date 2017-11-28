@@ -48,12 +48,20 @@
     border: none;
 }
 
+.color-white {
+  background-color: #fff;
+}
+
 .color-light {
     background-color: #fafafa;
 }
 
+.color-less-light {
+    background-color: #f8f8f8;//#f8f8f8;
+}
+
 .color-darker {
-    background-color: #f8f8f8;
+    background-color: #e5e5e5;//#f8f8f8;
 }
 
 .inherit-z {
@@ -67,4 +75,10 @@
 
 .is-relative {
     position: relative;
+}
+
+.nav-tab-content {
+    padding-top: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
 }

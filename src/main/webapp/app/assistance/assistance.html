@@ -1,8 +1,8 @@
-<div style="position:relative">
-    <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" style="position:relative; display:block; overflow:auto" />
-    <div style="position:relative">
-        <showtask ng-if="vm.tasks" tasks="vm.tasks" style="position:absolute; z-index:1; top:20px; left:20px" />
+<div class="is-relative">
+    <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" class="big-div is-relative" />
+    <div class="is-relative big-div">
+        <showtask ng-if="vm.tasks" tasks="vm.tasks" class="my-task big-div" />
+        <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" class="big-div my-drawing-canvas" />
     </div>
-    <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" />
-    <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" />
+    <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
 </div>

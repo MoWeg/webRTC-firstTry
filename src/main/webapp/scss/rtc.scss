@@ -1,22 +1,20 @@
-.my-video {
-    //width: 640px;
-    //height: 400px;
-    z-index: 1;
-}
-
-.is-under {
-    margin-left: -640px;
-}
-
 .is-absolut {
     position: absolute;
 }
 
+.my-video {
+    z-index: 1;
+}
+
 .my-drawing-canvas {
-    //opacity: 0.2;
-    // width: 640px;
-    // height: 400px;
-    z-index: 10;
+    z-index: 2;
+}
+
+.my-task {
+    position: absolute;
+    z-index: 3;
+    top: 20px;
+    left: 20px;
 }
 
 .underlay {
@@ -60,4 +58,13 @@
 
 .inherit-z {
     z-index: inherit;
+}
+
+.big-div {
+    display: block;
+    overflow: auto;
+}
+
+.is-relative {
+    position: relative;
 }

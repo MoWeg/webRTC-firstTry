@@ -9,7 +9,6 @@
 
     function Display3DController($rootScope, $scope, $element, ThreejsSceneService, OrientationCalculator) {
         var vm = this;
-        // var id = Math.round((Math.random() * 1000000) * 10);
         var userCam = $scope.usercam;
         var expertCam = $scope.expertcam;
         vm.isinitiator = $scope.isinitiator;
@@ -21,7 +20,6 @@
         var groups;
         var canvas;
         var expertCanvas;
-        // var filler;
 
         function checkIsInit() {
             if (hasExpertCam == true) {
@@ -30,16 +28,13 @@
                 return true;
             }
         }
-        vm.applyClasses = function() {
-            return $scope.reqclass;
-        }
+
         vm.onMouseMove = function(event) {
             $rootScope.$broadcast('mouse-move', event);
         }
         vm.onMouseDown = function(event) {
             $rootScope.$broadcast('mouse-down', event);
         }
-
         $scope.$on('request-animation', function(event, args) {
             groups = args;
             animate();
@@ -55,25 +50,19 @@
         });
 
         function init3D() {
-            // filler = document.querySelector("#filler");
             canvas = document.querySelector("#userCanvas");
 
             canvas.width = oldVideoHeight;
             canvas.height = oldVideoWidth;
-            canvas.style.marginTop = -oldVideoHeight + 'px';
 
             view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, userCam, true, 0x000000, 0);
 
             expertCanvas = document.querySelector("#expertCanvas");
             if (!vm.isinitiator) {
-                var w = 640,
-                    h = 640;
-                // var fullWidth = w * 2;
-                // var fullHeight = h * 2;
+                var w = 640;
+                var h = 640;
                 expertCanvas.width = h;
                 expertCanvas.height = w;
-                expertCanvas.style.marginTop = -oldVideoHeight + 'px';
-                expertCanvas.style.marginLeft = -oldVideoWidth + 'px';
 
                 expertView = ThreejsSceneService.getView(expertCanvas, w, h, expertCam, false, 0xffffff, 1);
                 expertView.addSecondaryCam(userCam);
@@ -116,16 +105,7 @@
             if (expertView) {
                 expertView.setNewSize(expertWidth, 640);
             }
-            // } else {
-            //     expertHeight = oldVideoHeight;
-            // }
             view.setNewSize(oldVideoWidth, oldVideoHeight);
-            canvas.style.marginTop = -(oldVideoHeight + 5) + 'px';
-            expertCanvas.style.marginTop = -(oldVideoHeight + 5) + 'px';
-            expertCanvas.style.marginLeft = oldVideoWidth + 'px';
-            expertCanvas.style.marginBottom = '10px';
-            //filler.style.marginTop = expertHeight;
-            //filler.m(rootWidth);
             animate();
         }
 

@@ -114,7 +114,9 @@
                 expertsOrAgentsIds.push(user.id);
             });
             this.execute = function(element) {
-                return expertsOrAgentsIds.find(id => id == element.chatId);
+                return expertsOrAgentsIds.find(function(id) {
+                    return id == element.chatId;
+                });
             };
         }
 

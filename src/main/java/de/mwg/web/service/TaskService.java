@@ -24,6 +24,8 @@ public interface TaskService {
      * @return the list of entities
      */
     Page<TaskDTO> findAll(Pageable pageable);
+    
+    Page<TaskDTO> findAllByScenarioId(Pageable pageable, Long scenarioId);
 
     /**
      * Get the "id" task.

@@ -83,4 +83,10 @@ public class TaskServiceImpl implements TaskService{
         log.debug("Request to delete Task : {}", id);
         taskRepository.delete(id);
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<TaskDTO> findAllByScenarioId(Pageable pageable, Long scenarioId) {
+		return taskRepository.findAllByScenarioId(pageable, scenarioId).map(taskMapper::toDto);
+	}
 }

@@ -86,9 +86,15 @@ public class TaskResource {
      */
     @GetMapping("/tasks")
     @Timed
-    public ResponseEntity<List<TaskDTO>> getAllTasks(Pageable pageable) {
+    public ResponseEntity<List<TaskDTO>> getAllTasks(Pageable pageable, @RequestParam(value="scenarioId", required=false) Long scenarioId) {
         log.debug("REST request to get a page of Tasks");
-        Page<TaskDTO> page = taskService.findAll(pageable);
+        Page<TaskDTO> page;
+        if(scenarioId != null){
+        	page = taskService.findAllByScenarioId(pageable, scenarioId);
+        } else {
+        	page = taskService.findAll(pageable);
+        }
+        
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/tasks");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

@@ -33,7 +33,7 @@
         function createToolRequestFor(scenario) {
             var toolRequest = [];
             toolRequest.push({
-                name: 'insert box',
+                name: 'insert Marker',
                 type: 'Box',
                 spriteLocation: null
             });

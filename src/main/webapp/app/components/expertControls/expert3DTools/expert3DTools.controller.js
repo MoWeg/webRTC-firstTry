@@ -62,6 +62,10 @@
         $scope.$on('mouse-down', function(event, args) {
             onDocumentMouseDown(args);
         });
+        $scope.$on('$destroy', function() {
+            document.removeEventListener('keydown', onDocumentKeyDown, false);
+            document.removeEventListener('keyup', onDocumentKeyUp, false);
+        });
 
         function init() {
             activeGroup = $scope.threejsgroups[0];
@@ -83,7 +87,7 @@
 
             var position = calculate(event);
             mouse.set(position.x, position.y);
-
+            console.log(mouse);
             raycaster.setFromCamera(mouse, view2Cam);
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {
@@ -96,15 +100,17 @@
         }
 
         function calculate(event) {
-            var divisorY = $(".well")[0].childNodes[0].clientHeight + 640;
-            var y = -(event.clientY / divisorY) * 2 + 1;
+            // var divisorY = $(".well")[0].childNodes[0].clientHeight + 640;
+            var divisorY = window.innerHeight;
+            var actualPlusY = 0.65;
+            // var y = -(event.clientY / divisorY) * 2 + 1;
             // var divisorY = $(".well")[0].childNodes[0].clientHeight;
             // var basePlusY = 1;
             // var diffY = divisorY - event.clientY;
             // var diffYCent = diffY / 100;
             // var dynamicPlusY = diffYCent * 0.4;
             // var actualPlusY = basePlusY + dynamicPlusY;
-            // var y = -(event.clientY / divisorY) * 2 + actualPlusY;
+            var y = -(event.clientY / divisorY) * 2 + actualPlusY;
 
 
             var divisorX = $(".well")[0].childNodes[0].clientWidth;

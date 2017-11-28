@@ -13,7 +13,6 @@
         var userCam = $scope.usercam;
         var expertCam = $scope.expertcam;
         vm.isinitiator = $scope.isinitiator;
-        $scope.expert = !vm.isinitiator;
         var oldVideoHeight = 640;
         var oldVideoWidth = 400;
         var rootWidth = $(".well")[0].childNodes[0].clientWidth;
@@ -35,7 +34,6 @@
             return $scope.reqclass;
         }
         vm.onMouseMove = function(event) {
-            // console.log(event);
             $rootScope.$broadcast('mouse-move', event);
         }
         vm.onMouseDown = function(event) {
@@ -50,7 +48,6 @@
             setCamera(args.deviceEvent);
         });
         $scope.$on('just-resize', function(event, args) {
-            console.log("resize " + args.height + " " + args.width);
             resize3dModell(args);
         });
         $scope.$on('reset-3d', function(event, message) {

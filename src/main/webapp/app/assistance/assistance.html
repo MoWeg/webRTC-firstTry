@@ -1,5 +1,6 @@
 <div style="position:relative">
+    <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" style="position:relative" />
     <showtask ng-if="vm.tasks" tasks="vm.tasks" style="position:absolute; z-index:1; top:20px; left:20px" />
     <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" />
-    <expertcontrols ng-if="vm.expertCam" expertcam="vm.expertCam" />
+    <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" />
 </div>

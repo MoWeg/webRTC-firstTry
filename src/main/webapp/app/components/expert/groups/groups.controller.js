@@ -3,24 +3,28 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .controller('Expert3DGroupTableController', Expert3DGroupTableController);
+        .controller('ExpertGroupsController', ExpertGroupsController);
 
-    Expert3DGroupTableController.$inject = ['$scope', '$rootScope', 'ThreejsSceneService'];
+    ExpertGroupsController.$inject = ['$scope', '$rootScope', 'ThreejsSceneService', 'TaskFinderService'];
 
-    function Expert3DGroupTableController($scope, $rootScope, ThreejsSceneService) {
+    function ExpertGroupsController($scope, $rootScope, ThreejsSceneService, TaskFinderService) {
         var vm = this;
         var plane = ThreejsSceneService.getPlane();
-        vm.groups = $scope.threejsgroups;
+        var tasks = $scope.tasks;
+        vm.activeTask = TaskFinderService.findFirstTask(tasks);
+        vm.activeGroup;
+
+        vm.setActive(vm.activeTask.groups[0]);
 
         vm.addGroup = function() {
             var groupId = Math.round((Math.random() * 1000000) * 10);
             var newGroup = new Group(groupId, false);
             newGroup.objects.push(plane);
-            vm.groups.push(newGroup);
+            vm.activeTask.groups.push(newGroup);
         }
 
         vm.setActive = function(group) {
-            angular.forEach(vm.groups, function(value, key) {
+            angular.forEach(vm.activeTask.groups, function(value, key) {
                 value.active = false;
             });
             group.active = true;
@@ -78,11 +82,11 @@
                 sendMessage(initialMessage);
             }
             ThreejsSceneService.removeGroupFromScene(group);
-            vm.groups.splice(index, 1);
-            if (vm.groups.length == 0) {
+            vm.activeTask.groups.splice(index, 1);
+            if (vm.activeTask.groups.length == 0) {
                 vm.addGroup();
-                vm.groups[0].visible = true;
-                vm.setActive(vm.groups[0]);
+                vm.activeTask.groups[0].visible = true;
+                vm.setActive(vm.activeTask.groups[0]);
             }
         };
 
@@ -98,7 +102,7 @@
         }
 
         function animate() {
-            $rootScope.$broadcast('request-animation', $scope.threejsgroups);
+            $rootScope.$broadcast('request-animation', vm.activeTask.groups);
         }
 
         function sendMessage(message) {

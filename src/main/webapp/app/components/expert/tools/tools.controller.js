@@ -3,11 +3,11 @@
 
     angular
         .module('simpleWebrtcServerApp')
-        .controller('Expert3DToolsController', Expert3DToolsController);
+        .controller('ExpertToolsController', ExpertToolsController);
 
-    Expert3DToolsController.$inject = ['$scope', '$rootScope', 'AnnotationToolService', 'ThreejsSceneService'];
+    ExpertToolsController.$inject = ['$scope', '$rootScope', 'AnnotationToolService', 'ThreejsSceneService'];
 
-    function Expert3DToolsController($scope, $rootScope, AnnotationToolService, ThreejsSceneService) {
+    function ExpertToolsController($scope, $rootScope, AnnotationToolService, ThreejsSceneService) {
         var vm = this;
         var activeGroup;
         var scene = ThreejsSceneService.getScene(); // $scope.scene;
@@ -68,7 +68,6 @@
         });
 
         function init() {
-            activeGroup = $scope.threejsgroups[0];
             mouse = new THREE.Vector2();
             newPosY = 0;
 
@@ -134,7 +133,7 @@
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {
                 var intersect = intersects[0];
-                if (vm.activeTool) {
+                if (vm.activeTool && activeGroup) {
                     intersect.point.y = intersect.point.y + newPosY;
                     vm.activeTool.actionManager.action(intersect, scene, activeGroup);
                 }

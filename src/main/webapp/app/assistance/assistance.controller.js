@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('AssistanceController', AssistanceController);
 
-    AssistanceController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'Task', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService', 'AnnotationToolService'];
+    AssistanceController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'TaskFinderService', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService', 'AnnotationToolService'];
 
-    function AssistanceController($rootScope, $scope, $state, $stateParams, Task, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService, AnnotationToolService) {
+    function AssistanceController($rootScope, $scope, $state, $stateParams, TaskFinderService, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService, AnnotationToolService) {
         var vm = this;
         vm.expertCam;
         vm.userCam;
@@ -18,9 +18,7 @@
         var scene;
 
         function init() {
-            vm.tasks = Task.query({
-                scenarioId: $stateParams.scenario.id
-            })
+            vm.tasks = TaskFinderService.initTasksForScenarioId($stateParams.scenario.id);
             var toolRequest = createToolRequestFor($stateParams.scenario);
             AnnotationToolService.initAnnotationTools(toolRequest);
             if (vm.isinitiator) {

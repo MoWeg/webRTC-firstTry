@@ -1,5 +1,5 @@
-<div>
-    <h2> Video Chat</h2>
+<div style="position:relative">
+    <showtask ng-if="vm.tasks" tasks="vm.tasks" style="position:absolute; z-index:1; top:20px; left:20px" />
     <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" />
     <expertcontrols ng-if="vm.expertCam" expertcam="vm.expertCam" />
 </div>

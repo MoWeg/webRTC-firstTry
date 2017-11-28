@@ -1,34 +1,63 @@
-  .my-video{
+.my-video {
     //width: 640px;
     //height: 400px;
-    z-index: 1
-  }
-  .is-under{
+    z-index: 1;
+}
+
+.is-under {
     margin-left: -640px;
-  }
-  .is-absolut{
+}
+
+.is-absolut {
     position: absolute;
-  }
-  .my-drawing-canvas{
+}
+
+.my-drawing-canvas {
     //opacity: 0.2;
     // width: 640px;
     // height: 400px;
-    z-index: 10
-  }
-  .underlay{
+    z-index: 10;
+}
+
+.underlay {
     width: 740px;
     height: 500px;
-  }
-  .right {
-      float: right;
-  }
-  .left {
-      float: left;
-  }
-  .well{
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+.well {
     width: inherit;
-  }
-.filler{
-  color: #f5f5f5;
-  z-index: 0;
+}
+
+.filler {
+    color: #f5f5f5;
+    z-index: 0;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    width: fit-content;
+    outline: none;
+    border: none;
+}
+
+.color-light {
+    background-color: #fafafa;
+}
+
+.color-darker {
+    background-color: #f8f8f8;
+}
+
+.inherit-z {
+    z-index: inherit;
 }

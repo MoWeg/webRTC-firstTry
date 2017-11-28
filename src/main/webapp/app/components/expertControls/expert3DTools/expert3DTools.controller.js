@@ -87,7 +87,6 @@
 
             var position = calculate(event);
             mouse.set(position.x, position.y);
-            console.log(mouse);
             raycaster.setFromCamera(mouse, view2Cam);
             var intersects = raycaster.intersectObjects(activeGroup.objects, true);
             if (intersects.length > 0) {

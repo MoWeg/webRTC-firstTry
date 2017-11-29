@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('NavbarController', NavbarController);
 
-    NavbarController.$inject = ['$state', 'Auth', 'Principal', 'ProfileService', 'LoginService'];
+    NavbarController.$inject = ['$state', '$scope', 'Auth', 'Principal', 'ProfileService', 'LoginService'];
 
-    function NavbarController ($state, Auth, Principal, ProfileService, LoginService) {
+    function NavbarController($state, $scope, Auth, Principal, ProfileService, LoginService) {
         var vm = this;
 
         vm.isNavbarCollapsed = true;
@@ -23,6 +23,20 @@
         vm.toggleNavbar = toggleNavbar;
         vm.collapseNavbar = collapseNavbar;
         vm.$state = $state;
+        vm.wantsNavBar = wantsNavBar;
+        var showNav = true;
+
+        $scope.$on('remove-navbar', function(event, args) {
+            console.warn("remove navbar");
+            showNav = false;
+        });
+        $scope.$on('show-navbar', function(event, args) {
+            showNav = true;
+        });
+
+        function wantsNavBar() {
+            return showNav;
+        }
 
         function login() {
             collapseNavbar();

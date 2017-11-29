@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default" role="navigation">
+<nav ng-if="vm.wantsNavBar() == true" class="navbar navbar-default" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" ng-click="vm.toggleNavbar()">

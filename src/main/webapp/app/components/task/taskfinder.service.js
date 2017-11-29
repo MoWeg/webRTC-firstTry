@@ -16,9 +16,16 @@
             findFirstTask: findFirstTask,
             initTasksForScenarioId: initTasksForScenarioId,
             hasNextTask: hasNextTask,
-            hasPreviousTask: hasPreviousTask
+            hasPreviousTask: hasPreviousTask,
+            findById: findById
         };
         return service;
+
+        function findById(taskId, tasks) {
+            return tasks.find(function(element) {
+                return taskId == element.id;
+            });
+        }
 
         function getNextTask(task, tasks) {
             return tasks.find(function(element) {

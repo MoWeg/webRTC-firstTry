@@ -43,12 +43,22 @@
                 vm.activeTask = task;
                 vm.hasNext = TaskFinderService.hasNextTask(vm.activeTask, vm.tasks);
                 notifyTaskChange();
+                var message = {
+                    goal: 'task',
+                    content: task.id
+                }
+                sendMessage(message);
             }
         }
 
         function notifyTaskChange() {
             $rootScope.$broadcast('active-task-changed', vm.activeTask);
         }
+
+        function sendMessage(message) {
+            $rootScope.$broadcast('send-message', message);
+        }
+
         init();
     }
 })();

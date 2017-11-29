@@ -81,6 +81,8 @@
                 } else {
                     handleMessageWith3dGoal(message);
                 }
+            } else if (message.goal == 'task') {
+                notifyTaskChange(message);
             } else {
                 notifyRtc(message);
             }
@@ -95,7 +97,17 @@
         }
 
         function notifyRtc(message) {
-            $rootScope.$broadcast('rtc-message', message)
+            $rootScope.$broadcast('rtc-message', message);
+        }
+
+        function notifyTaskChange(message) {
+            var taskId = message.content;
+            if (taskId) {
+                var task = TaskFinderService.findById(taskId, vm.tasks);
+                if (task) {
+                    $rootScope.$broadcast('active-task-changed', task);
+                }
+            }
         }
 
         //handle orientation and resize

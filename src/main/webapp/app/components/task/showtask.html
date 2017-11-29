@@ -1,11 +1,11 @@
 <div class="inherit-z">
     <div class="flex-container inherit-z color-light">
         <h4 class="inherit-z">Task: {{vm.activeTask.name}}</h4>
-        <button class="btn btn-info btn-sm inherit-z" ng-click="vm.changeShowText()" style="margin-left:20px">
+        <button class="btn btn-info btn-sm inherit-z" ng-click="vm.changeShowText()" style="margin-left:20px" ng-disabled="vm.disabled">
           <span class="glyphicon glyphicon-eye-open"></span>
         </button>
     </div>
-    <div ng-show="vm.showText" class="flex-container inherit-z color-darker">
+    <div ng-show="vm.showText === true" class="flex-container inherit-z color-darker">
         <p>{{vm.activeTask.description}}</p>
     </div>
 </div>

@@ -10,7 +10,8 @@
             restrict: 'E',
             templateUrl: 'app/components/task/showtask.html',
             scope: {
-                tasks: '='
+                tasks: '=',
+                isagent: '='
             },
             controllerAs: 'vm',
             controller: 'ShowTaskController'

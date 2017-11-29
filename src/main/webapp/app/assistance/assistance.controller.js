@@ -82,7 +82,11 @@
                     handleMessageWith3dGoal(message);
                 }
             } else if (message.goal == 'task') {
-                notifyTaskChange(message);
+                if (message.content == 'click') {
+                    nofityTaskClick();
+                } else {
+                    notifyTaskChange(message);
+                }
             } else {
                 notifyRtc(message);
             }
@@ -108,6 +112,10 @@
                     $rootScope.$broadcast('active-task-changed', task);
                 }
             }
+        }
+
+        function nofityTaskClick() {
+            $rootScope.$broadcast('show-task-text');
         }
 
         //handle orientation and resize

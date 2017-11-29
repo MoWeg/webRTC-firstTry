@@ -58,6 +58,7 @@
             newPosY = 0;
 
             vm.tools = AnnotationToolService.getAnnotationTools();
+            vm.activeTool = vm.tools[0];
         }
 
         function onDocumentMouseMove(event) {

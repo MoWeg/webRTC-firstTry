@@ -28,14 +28,6 @@
         var tabPressed = false;
         vm.movables = [movableGrid, movableCam];
         vm.activeMovable = movableGrid;
-        // vm.activeMovable = movableGrid;
-        // vm.changed = function() {
-        //     if (vm.toggleValue) {
-        //         vm.activeMovable = movableGrid;
-        //     } else {
-        //         vm.activeMovable = movableCam;
-        //     }
-        // };
 
         ThreejsSceneService.getHelperPromise().then(function(helpers) {
             angular.forEach(helpers, function(value, key) {

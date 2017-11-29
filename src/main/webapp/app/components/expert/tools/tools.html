@@ -1,6 +1,7 @@
-<div class="flex-container big-div color-white nav-tab-content">
-    <h3>Available Tools:</h3>
-    <div class="list-group" ng-repeat="tool in vm.tools">
-        <a class="list-group-item list-group-item-action list-group-item-light" ng-class="{active : vm.activeTool == tool}" ng-click="vm.setActiveTool(tool)">{{tool.name}}</a>
+<div class="inherit-z">
+    <div class="flex-container inherit-z color-light">
+        <span class="glyphicon glyphicon-pencil inherit-z" style="margin-right:10px; margin-top:10px; margin-bottom:10px;"></span>
+        <select class="form-control" ng-model="vm.activeTool" ng-options="tool.name for tool in vm.tools">
+            </select>
     </div>
 </div>

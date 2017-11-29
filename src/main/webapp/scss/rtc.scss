@@ -17,9 +17,16 @@
     right: 20px;
 }
 
-.my-task {
+.my-tool  {
     position: absolute;
     z-index: 4;
+    bottom: 20px;
+    right: 20px;
+}
+
+.my-task {
+    position: absolute;
+    z-index: 5;
     top: 20px;
     left: 20px;
 }

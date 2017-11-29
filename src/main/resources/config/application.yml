@@ -49,7 +49,7 @@ spring:
         multipart:
             max-file-size: 2048KB
             max-request-size: 2048KB
-            
+
 security:
     basic:
         enabled: false
@@ -96,7 +96,7 @@ jhipster:
         license:
         license-url:
     ribbon:
-        display-on-active-profiles: dev
+        display-on-active-profiles:
 
 # ===================================================================
 # Application specific properties

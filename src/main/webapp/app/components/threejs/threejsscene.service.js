@@ -54,7 +54,7 @@
         function getExpertCamera() {
             var w = 640,
                 h = 640;
-            return getCamera(w, h, 1, 30000, 900, 900, 1600);
+            return getCamera(w, h, 1, 30000, 500, 800, 1300);
         }
 
         function getUserCamera() {
@@ -140,9 +140,6 @@
 
             this.render = function(groups) {
                 if (helpers) {
-                    if (seesHelper) {
-                        camera.lookAt(scene.position);
-                    }
                     setHelperVisiblity(seesHelper);
                 }
                 if (groups) {

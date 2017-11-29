@@ -13,7 +13,7 @@
         var scene = ThreejsSceneService.getScene(); // $s
         var view2Cam = $scope.expertcam;
         var newPosY;
-        vm.toggleValue = true;
+        vm.isInSync = true;
 
         var movableGrid = {
             name: 'grid',
@@ -28,6 +28,8 @@
         var tabPressed = false;
         vm.movables = [movableGrid, movableCam];
         vm.activeMovable = movableGrid;
+        vm.syncWithUser = syncWithUser;
+        vm.lookAtScene = lookAtScene;
 
         ThreejsSceneService.getHelperPromise().then(function(helpers) {
             angular.forEach(helpers, function(value, key) {
@@ -126,7 +128,6 @@
             }
             var oldPos = view2Cam.position.x;
             view2Cam.position.x = oldPos + direction;
-            view2Cam.lookAt(scene);
             animate();
         }
 
@@ -142,12 +143,16 @@
                 var oldPos = view2Cam.position.z;
                 view2Cam.position.z = oldPos + direction;
             }
-            view2Cam.lookAt(scene);
             animate();
         }
 
-        function resetCamera() {
-            view2Cam.position.set(900, 900, 1600);
+        function syncWithUser() {
+            vm.isInSync = !vm.isInSync;
+            $rootScope.$broadcast('camera-sync-change', vm.isInSync);
+        }
+
+        function lookAtScene() {
+            view2Cam.lookAt(scene.position);
             animate();
         }
 

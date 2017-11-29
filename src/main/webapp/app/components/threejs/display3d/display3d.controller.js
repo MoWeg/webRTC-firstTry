@@ -20,6 +20,8 @@
         var groups;
         var canvas;
         var expertCanvas;
+        var expertInSync = true;
+        var lastOrientationInfo;
 
         function checkIsInit() {
             if (hasExpertCam == true) {
@@ -40,6 +42,17 @@
                 groups = args;
             }
             animate();
+        });
+        $scope.$on('camera-sync-change', function(event, args) {
+            if (args) {
+                if (args != expertInSync) {
+                    expertCam.position.copy(userCam.position);
+                    if (lastOrientationInfo) {
+                        expertView.setOrientationInfo(lastOrientationInfo);
+                    }
+                }
+            }
+            expertInSync = args;
         });
         $scope.$on('set-camera-and-resize', function(event, args) {
             setCamera(args.deviceEvent);
@@ -78,6 +91,12 @@
             if (deviceEvent) {
                 var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
                 view.setOrientationInfo(orientationInfo);
+                if (expertView) {
+                    if (expertInSync) {
+                        expertView.setOrientationInfo(orientationInfo);
+                    }
+                }
+                lastOrientationInfo = orientationInfo;
             }
             animate();
         }

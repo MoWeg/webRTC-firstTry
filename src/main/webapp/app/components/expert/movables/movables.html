@@ -3,7 +3,13 @@
         <!-- <toggle class="inherit-z" on="Grid" off="Camera" ng-model="vm.toggleValue" ng-change="vm.changed()" onstyle="btn-warning" offstyle="btn-info">
         </toggle> -->
         <!-- <input type="checkbox" checked data-toggle="toggle" data-onstyle="warning" data-offstyle="info" ng-click="vm.changed()"> -->
-        <span class="glyphicon glyphicon-move inherit-z" style="margin-right:10px; margin-top:10px; margin-bottom:10px;"></span>
+        <span class="glyphicon glyphicon-move inherit-z" style="margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px;"></span>
+        <button class="btn btn-sm inherit-z" ng-click="vm.syncWithUser()" ng-class="vm.isInSync? 'btn-success' : btn-default" style="margin-left:20px">
+          <span class="glyphicon glyphicon-link"></span>
+        </button>
+        <button class="btn btn-danger btn-sm inherit-z" ng-click="vm.lookAtScene()" style="margin-right:10px">
+          <span class="glyphicon glyphicon-map-marker"></span>
+        </button>
         <select class="form-control" ng-model="vm.activeMovable" ng-options="movable.name for movable in vm.movables">
           </select>
     </div>

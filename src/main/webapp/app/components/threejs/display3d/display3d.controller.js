@@ -36,7 +36,9 @@
             $rootScope.$broadcast('mouse-down', event);
         }
         $scope.$on('request-animation', function(event, args) {
-            groups = args;
+            if (args) {
+                groups = args;
+            }
             animate();
         });
         $scope.$on('set-camera-and-resize', function(event, args) {

@@ -14,12 +14,11 @@
 
         $scope.$on('active-task-changed', function(event, args) {
             deactivateAllGroups(true);
-            vm.activeTask = args;
-            findEditableGroup();
             animate();
+            vm.activeTask = args;
+            var group = findEditableGroup();
+            setActive(group);
         });
-
-        init();
 
         function init() {
             angular.forEach(tasks, function(task) {
@@ -29,6 +28,7 @@
             vm.activeTask = TaskFinderService.findFirstTask(tasks);
             vm.activeTask.groups[0].visible = true;
             setActive(vm.activeTask.groups[0]);
+            animate();
         }
 
         function createGroup() {
@@ -49,7 +49,6 @@
                     }
                 }
             });
-            animate();
         }
 
         function changeVisibilityIfSend(group) {
@@ -68,23 +67,25 @@
         }
 
         function findEditableGroup() {
+            var group;
             if (vm.activeTask.groups.length == 0) {
-                fillIfLast();
+                group = fillIfLast();
             }
             var notYetSendGroup = vm.activeTask.groups.find(function(element) {
                 return !element.send;
             })
             if (!notYetSendGroup) {
-                fillIfLast();
+                group = fillIfLast();
             } else {
-                setActive(notYetSendGroup);
+                group = notYetSendGroup;
             }
+            return group;
         }
 
         function fillIfLast() {
             var group = createGroup();
             vm.activeTask.groups.push(group)
-            setActive(group);
+            return group
         }
 
         function setActive(group) {
@@ -92,6 +93,7 @@
             group.visible = true;
             group.active = true;
             $rootScope.$broadcast('active-group-changed', group);
+            animate();
         }
 
         vm.setActive = setActive;
@@ -126,7 +128,8 @@
             });
             group.active = false;
             group.send = true;
-            findEditableGroup();
+            var newActive = findEditableGroup();
+            setActive(newActive);
         }
         vm.discard = function(index, group) {
             if (group.send) {
@@ -143,8 +146,8 @@
             }
             ThreejsSceneService.removeGroupFromScene(group);
             vm.activeTask.groups.splice(index, 1);
-            findEditableGroup();
-            animate();
+            var newActive = findEditableGroup();
+            setActive(newActive);
         };
 
         function Group(groupId, active) {
@@ -158,15 +161,14 @@
             this.messages = [];
         }
 
-        function animate(groups) {
-            if (!groups) {
-                groups = vm.activeTask.groups;
-            }
-            $rootScope.$broadcast('request-animation', groups);
+        function animate() {
+            $rootScope.$broadcast('request-animation', vm.activeTask.groups);
         }
 
         function sendMessage(message) {
             $rootScope.$broadcast('send-message', message);
         }
+
+        init();
     }
 })();

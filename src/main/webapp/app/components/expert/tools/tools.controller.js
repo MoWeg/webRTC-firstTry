@@ -127,7 +127,7 @@
         }
 
         function animate() {
-            $rootScope.$broadcast('request-animation', activeGroup);
+            $rootScope.$broadcast('request-animation');
         }
         init();
     }

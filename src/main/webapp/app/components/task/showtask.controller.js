@@ -19,9 +19,7 @@
             vm.activeTask = args;
         });
         $scope.$on('show-task-text', function(event, args) {
-            console.warn("show text");
             vm.showText = !vm.showText;
-            console.warn(vm.showText);
         });
 
         function init() {

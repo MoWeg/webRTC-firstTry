@@ -48,10 +48,6 @@
         $scope.$on('mouse-down', function(event, args) {
             onDocumentMouseDown(args);
         });
-        $scope.$on('$destroy', function() {
-            document.removeEventListener('keydown', onDocumentKeyDown, false);
-            document.removeEventListener('keyup', onDocumentKeyUp, false);
-        });
 
         function init() {
             mouse = new THREE.Vector2();

@@ -1,9 +1,10 @@
 <div class="is-relative">
-    <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" class="big-div is-relative" />
     <div class="is-relative big-div">
         <showtask ng-if="vm.tasks" tasks="vm.tasks" class="my-task big-div" />
+        <expertmovables ng-if="vm.expertCam" expertcam="vm.expertCam" class="my-movable right big-div" />
         <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" class="big-div my-drawing-canvas" />
     </div>
     <controltask ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
+    <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" class="big-div is-relative" />
     <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
 </div>

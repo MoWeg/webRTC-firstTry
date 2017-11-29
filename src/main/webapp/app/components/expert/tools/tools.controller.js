@@ -19,28 +19,11 @@
         var mouse;
         var newPosY;
 
-        var movableGrid = {
-            name: 'grid',
-            leftOrRight: moveGridLeftOrRight,
-            upOrDown: moveGridUpOrDown
-        }
-        var movableCam = {
-            name: 'camera',
-            leftOrRight: moveCamLeftOrRight,
-            upOrDown: moveCamUpOrDown
-        }
-        var tabPressed = false;
-
         vm.tools = [];
         vm.activeTool = null;
-        vm.movables = [];
-        vm.activeMovable = movableGrid;
         vm.setActiveTool = function(tool) {
             vm.activeTool = tool;
         };
-        vm.setActiveMovable = function(movable) {
-            vm.activeMovable = movable;
-        }
 
         ThreejsSceneService.getHelperPromise().then(function(helpers) {
             angular.forEach(helpers, function(value, key) {
@@ -53,6 +36,9 @@
             });
         });
 
+        $scope.$on('cursor-y-changed', function(event, args) {
+            newPosY = args;
+        });
         $scope.$on('active-group-changed', function(event, args) {
             activeGroup = args;
         });
@@ -72,12 +58,6 @@
             newPosY = 0;
 
             vm.tools = AnnotationToolService.getAnnotationTools();
-
-            vm.movables.push(movableGrid);
-            vm.movables.push(movableCam);
-
-            document.addEventListener('keydown', onDocumentKeyDown, false);
-            document.addEventListener('keyup', onDocumentKeyUp, false);
         }
 
         function onDocumentMouseMove(event) {
@@ -143,108 +123,6 @@
                 }
             }
 
-        }
-
-        function onDocumentKeyDown(event) {
-            switch (event.keyCode) {
-                case 9:
-                    event.preventDefault();
-                    tabPressed = !tabPressed;
-                    break;
-                case 16:
-                    isShiftDown = true;
-                    break;
-                case 27:
-                    event.preventDefault();
-                    resetCamera();
-                    break;
-                case 65:
-                case 37:
-                    event.preventDefault();
-                    vm.activeMovable.leftOrRight(false);
-                    break;
-                case 87:
-                case 38:
-                    event.preventDefault();
-                    vm.activeMovable.upOrDown(true);
-                    break;
-                case 68:
-                case 39:
-                    event.preventDefault();
-                    vm.activeMovable.leftOrRight(true);
-                    break;
-                case 83:
-                case 40:
-                    event.preventDefault();
-                    vm.activeMovable.upOrDown(false);
-                    break;
-            }
-        }
-
-        function onDocumentKeyUp(event) {
-            switch (event.keyCode) {
-                case 16:
-                    isShiftDown = false;
-                    break;
-            }
-        }
-
-        function moveGridUpOrDown(positive) {
-            var direction = 50;
-            if (!positive) {
-                direction = -50;
-            }
-            if (tabPressed) {
-                var oldPos = gridHelper.position.z;
-                gridHelper.position.z = oldPos + direction;
-            } else {
-                var oldPos = gridHelper.position.y;
-                newPosY = oldPos + direction;
-                gridHelper.position.y = newPosY;
-            }
-            animate();
-        }
-
-        function moveGridLeftOrRight(positive) {
-            var direction = 50;
-            if (!positive) {
-                direction = -50;
-            }
-            var oldPos = gridHelper.position.x;
-            gridHelper.position.x = oldPos + direction;
-            animate();
-        }
-
-        function moveCamLeftOrRight(positive) {
-            var direction = 200;
-            if (!positive) {
-                direction = -200;
-            }
-            var oldPos = view2Cam.position.x;
-            view2Cam.position.x = oldPos + direction;
-            view2Cam.lookAt(scene);
-            animate();
-        }
-
-        function moveCamUpOrDown(positive) {
-            var direction = -200;
-            if (!positive) {
-                direction = 200;
-            }
-            if (tabPressed) {
-                var oldPos = view2Cam.position.y;
-                view2Cam.position.y = oldPos + direction;
-            } else {
-                var oldPos = view2Cam.position.z;
-                view2Cam.position.z = oldPos + direction;
-            }
-            view2Cam.lookAt(scene);
-            animate();
-        }
-
-        function resetCamera() {
-            view2Cam.position.set(900, 900, 1600);
-            animate();
         }
 
         function animate() {

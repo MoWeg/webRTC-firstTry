@@ -23,7 +23,7 @@ spring:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:mysql://localhost:3306/simple_webrtc_server?useUnicode=true&characterEncoding=utf8&useSSL=false
         username: root
-        password:
+        password: ENC($2b$10$YOeji6XxSy.BPtWeN9yzEuPQQLk4wE7.nxiZuEh9f1uqf5Vmy7C2.)
         hikari:
             data-source-properties:
                 cachePrepStmts: true
@@ -69,7 +69,9 @@ liquibase:
 #        keyAlias: simple_webrtc_server
 # ===================================================================
 server:
+    address: 127.0.0.1
     port: 8080
+    use-forward-headers: true
     compression:
         enabled: true
         mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json

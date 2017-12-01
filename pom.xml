@@ -375,6 +375,13 @@
             <scope>test</scope>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
+
+        <!--  jasypt -->
+        <dependency>
+          <groupId>com.github.ulisesbocchio</groupId>
+          <artifactId>jasypt-spring-boot-starter</artifactId>
+          <version>1.16</version>
+        </dependency>
     </dependencies>
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>

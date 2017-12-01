@@ -61,7 +61,7 @@
                     break;
                 case 27:
                     event.preventDefault();
-                    resetCamera();
+                    // resetCamera();
                     break;
                 case 65:
                 case 37:

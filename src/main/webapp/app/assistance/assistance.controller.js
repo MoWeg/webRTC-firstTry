@@ -25,7 +25,6 @@
                 window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
                 tools = AnnotationToolService.getAnnotationTools();
                 scene = ThreejsSceneService.getScene();
-                $rootScope.$broadcast('remove-navbar');
             } else {
                 vm.expertCam = ThreejsSceneService.getExpertCamera();
             }
@@ -69,7 +68,6 @@
             $rootScope.$broadcast('reset-3d');
             if (vm.isinitiator) {
                 window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
-                $rootScope.$broadcast('show-navbar');
             }
         });
         $scope.$on('rtc-hung-up', function() {

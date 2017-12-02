@@ -30,12 +30,7 @@
                     function readFile(file) {
                         var formData = new FormData();
                         formData.append('file', file);
-                        scope.$emit('reading-file-done');
                         return formData;
-                        // return {
-                        //   Content-Disposition: formData.get('file'),
-                        //   Content-Type: formData.get('file').type
-                        // };
                     }
 
                 }); //change

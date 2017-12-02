@@ -10,22 +10,9 @@
             <label for="id">ID</label>
             <input type="text" class="form-control" id="id" name="id" ng-model="vm.annotationAsPictureFile.id" readonly />
         </div>
-        <!-- <div class="form-group">
-            <label class="control-label" for="field_name">Name</label>
-            <input type="text" class="form-control" name="name" id="field_name" ng-model="vm.annotationAsPictureFile.name" required/>
-            <div ng-show="editForm.name.$invalid">
-                <p class="help-block" ng-show="editForm.name.$error.required">
-                    This field is required.
-                </p>
-            </div>
-        </div>
-        <div class="form-group">
+        <div>
             <label class="control-label" for="field_toolName">Tool Name</label>
-            <input type="text" class="form-control" name="toolName" id="field_toolName" ng-model="vm.annotationAsPictureFile.toolName" />
-        </div> -->
-        <div class "form-group">
-            <label class="control-label" for="field_toolName">Tool Name</label>
-            <input type="file" class="form-control" name="file" id="field_file" ng-model="vm.annotationAsPictureFile.file" read-file-as-form-data/>
+            <input type="file" name="file" id="field_file" ng-model="vm.annotationAsPictureFile.file" read-file-as-form-data/>
         </div>
 
     </div>

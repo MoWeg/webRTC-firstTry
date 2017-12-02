@@ -10,6 +10,7 @@ import de.mwg.web.service.mapper.ScenarioMapper;
 import de.mwg.web.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -122,6 +123,7 @@ public class ScenarioResourceIntTest {
     }
 
     @Test
+    @Ignore
     @Transactional
     public void createScenarioWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = scenarioRepository.findAll().size();

@@ -5,9 +5,9 @@
         .module('simpleWebrtcServerApp')
         .controller('AssistanceController', AssistanceController);
 
-    AssistanceController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'TaskFinderService', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService', 'AnnotationToolService'];
+    AssistanceController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'JhiTrackerService', 'SdpService', 'OrientationCalculator', 'ThreejsSceneService', 'AnnotationToolService'];
 
-    function AssistanceController($rootScope, $scope, $state, $stateParams, TaskFinderService, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService, AnnotationToolService) {
+    function AssistanceController($rootScope, $scope, $state, $stateParams, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService, AnnotationToolService) {
         var vm = this;
         vm.expertCam;
         vm.userCam;
@@ -107,10 +107,7 @@
         function notifyTaskChange(message) {
             var taskId = message.content;
             if (taskId) {
-                var task = TaskFinderService.findById(taskId, vm.tasks);
-                if (task) {
-                    $rootScope.$broadcast('active-task-changed', task);
-                }
+                $rootScope.$broadcast('active-task-changed', taskId);
             }
         }
 

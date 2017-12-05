@@ -16,7 +16,10 @@
         vm.disabled = !$scope.isagent;
 
         $scope.$on('active-task-changed', function(event, args) {
-            vm.activeTask = args;
+            var taskId = args;
+            if (tasks) {
+                vm.activeTask = TaskFinderService.findById(taskId, tasks);
+            }
         });
         $scope.$on('show-task-text', function(event, args) {
             vm.showText = !vm.showText;

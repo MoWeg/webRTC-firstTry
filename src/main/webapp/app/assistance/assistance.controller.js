@@ -18,7 +18,7 @@
         var scene;
 
         function init() {
-            vm.tasks = TaskFinderService.initTasksForScenarioId($stateParams.scenario.id);
+            vm.scenarioid = $stateParams.scenario.id;
             var toolRequest = createToolRequestFor($stateParams.scenario);
             AnnotationToolService.initAnnotationTools(toolRequest);
             if (vm.isinitiator) {

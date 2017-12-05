@@ -8,9 +8,9 @@
     function ControlTask() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/task/controltask.html',
+            templateUrl: 'app/components/expert/task/controltask.html',
             scope: {
-                tasks: '='
+                scenarioid: '='
             },
             controllerAs: 'vm',
             controller: 'ControlTaskController'

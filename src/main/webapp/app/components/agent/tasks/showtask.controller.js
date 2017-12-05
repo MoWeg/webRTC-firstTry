@@ -9,7 +9,7 @@
 
     function ShowTaskController($scope, $rootScope, TaskFinderService) {
         var vm = this;
-        var tasks = $scope.tasks;
+        var tasks;
         vm.activeTask;
         vm.showText = false;
         vm.changeShowText = changeShowText;
@@ -22,9 +22,10 @@
             vm.showText = !vm.showText;
         });
 
-        function init() {
+        TaskFinderService.initTasksForScenarioId($scope.scenarioid).$promise.then(function(result) {
+            tasks = result;
             vm.activeTask = TaskFinderService.findFirstTask(tasks);
-        }
+        });
 
         function changeShowText() {
             vm.showText = !vm.showText;
@@ -40,6 +41,5 @@
         function sendMessage(message) {
             $rootScope.$broadcast('send-message', message);
         }
-        init();
     }
 })();

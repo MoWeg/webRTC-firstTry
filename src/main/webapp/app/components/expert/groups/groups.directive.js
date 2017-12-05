@@ -9,9 +9,6 @@
         var directive = {
             restrict: 'E',
             templateUrl: 'app/components/expert/groups/groups.html',
-            scope: {
-                tasks: '='
-            },
             controllerAs: 'vm',
             controller: 'ExpertGroupsController'
         };

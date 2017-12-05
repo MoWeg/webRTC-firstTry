@@ -8,9 +8,9 @@
     function showTask() {
         var directive = {
             restrict: 'E',
-            templateUrl: 'app/components/task/showtask.html',
+            templateUrl: 'app/components/agent/tasks/showtask.html',
             scope: {
-                tasks: '=',
+                scenarioid: '=',
                 isagent: '='
             },
             controllerAs: 'vm',

@@ -1,11 +1,11 @@
 <div class="is-relative">
     <div id="relevantForFullScreen" class="is-relative big-div">
-        <showtask ng-if="vm.isinitiator" tasks="vm.tasks" isagent="vm.isinitiator" class="my-task big-div" />
-        <expertmovables ng-if="vm.expertCam" expertcam="vm.expertCam" class="my-movable right big-div" />
-        <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" class="my-tool right big-div" />
-        <fullscreenbutton ng-if="vm.isinitiator" class="my-fullscreen right big-div" />
-        <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" class="big-div my-drawing-canvas" />
+        <showtask ng-if="vm.isinitiator" scenarioid="vm.scenarioid" isagent="vm.isinitiator" class="my-task big-div"></showtask>
+        <expertmovables ng-if="vm.expertCam" expertcam="vm.expertCam" class="my-movable right big-div"></expertmovables>
+        <experttools ng-if="vm.expertCam" expertcam="vm.expertCam" class="my-tool right big-div"></experttools>
+        <fullscreenbutton ng-if="vm.isinitiator" class="my-fullscreen right big-div"></fullscreenbutton>
+        <display3d usercam="vm.userCam" expertcam="vm.expertCam" isinitiator="vm.isinitiator" class="big-div my-drawing-canvas"></display3d>
     </div>
-    <controltask ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
-    <expertgroups ng-if="vm.expertCam" tasks="vm.tasks" class="big-div is-relative" />
+    <controltask ng-if="vm.expertCam" scenarioid="vm.scenarioid" class="big-div is-relative"></controltask>
+    <expertgroups ng-if="vm.expertCam" class="big-div is-relative"></expertgroups>
 </div>

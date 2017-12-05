@@ -9,17 +9,16 @@
 
     function ControlTaskController($scope, $rootScope, TaskFinderService) {
         var vm = this;
-        vm.tasks = $scope.tasks;
         vm.switchToNext = switchToNext;
         vm.switchToPrevious = switchToPrevious;
         vm.changeTask = changeTask;
         vm.isActive = isActive;
 
-        function init() {
-            vm.hasPrevious = false;
-            vm.activeTask = TaskFinderService.findFirstTask(vm.tasks);
-            vm.hasNext = TaskFinderService.hasNextTask(vm.activeTask, vm.tasks);
-        }
+        TaskFinderService.initTasksForScenarioId($scope.scenarioid).$promise.then(function(result) {
+            vm.tasks = result
+            var firstTask = TaskFinderService.findFirstTask(vm.tasks);
+            changeTask(firstTask);
+        });
 
         function isActive(task) {
             if (task == vm.activeTask) {
@@ -58,7 +57,5 @@
         function sendMessage(message) {
             $rootScope.$broadcast('send-message', message);
         }
-
-        init();
     }
 })();

@@ -10,26 +10,20 @@
     function ExpertGroupsController($scope, $rootScope, ThreejsSceneService, TaskFinderService) {
         var vm = this;
         var plane = ThreejsSceneService.getPlane();
-        var tasks = $scope.tasks;
 
         $scope.$on('active-task-changed', function(event, args) {
-            deactivateAllGroups(true);
-            animate();
+            if (vm.activeTask) {
+                deactivateAllGroups(true);
+                animate();
+            } else {
+                args.groups = [];
+            }
+
             vm.activeTask = args;
             var group = findEditableGroup();
             setActive(group);
         });
 
-        function init() {
-            angular.forEach(tasks, function(task) {
-                task.groups = [];
-                task.groups.push(createGroup());
-            });
-            vm.activeTask = TaskFinderService.findFirstTask(tasks);
-            vm.activeTask.groups[0].visible = true;
-            setActive(vm.activeTask.groups[0]);
-            animate();
-        }
 
         function createGroup() {
             var groupId = Math.round((Math.random() * 1000000) * 10);
@@ -168,7 +162,5 @@
         function sendMessage(message) {
             $rootScope.$broadcast('send-message', message);
         }
-
-        init();
     }
 })();

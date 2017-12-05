@@ -15,11 +15,11 @@
             if (vm.activeTask) {
                 deactivateAllGroups(true);
                 animate();
-            } else {
-                args.groups = [];
             }
-
             vm.activeTask = args;
+            if (!vm.activeTask.groups) {
+                vm.activeTask.groups = [];
+            }
             var group = findEditableGroup();
             setActive(group);
         });

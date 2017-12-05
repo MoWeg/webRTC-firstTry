@@ -57,6 +57,9 @@
         $scope.$on('set-camera-and-resize', function(event, args) {
             setCamera(args.deviceEvent);
         });
+        $scope.$on('update-camera-position', function(event, args) {
+            setCameraPosition(args);
+        });
         $scope.$on('just-resize', function(event, args) {
             resize3dModell(args);
         });
@@ -85,6 +88,20 @@
                 expertCanvas.remove();
             }
             animate();
+        }
+
+        function setCameraPosition(acceleration) {
+            if (acceleration) {
+                var positionUpdate = OrientationCalculator.calculateDistanceWithOrientation(event, 1000);
+                if (positionUpdate.right != 0 || positionUpdate.up != 0 || positionUpdate.forward != 0) {
+                    view.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
+                    if (expertView) {
+                        if (expertInSync) {
+                            expertView.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
+                        }
+                    }
+                }
+            }
         }
 
         function setCamera(deviceEvent) {

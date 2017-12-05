@@ -195,6 +195,13 @@
                 camera.quaternion.multiply(orientationInfo.screenAdjustment);
             };
 
+            this.setCameraPosition = function(x, y, z) {
+                var newX = x + camera.position.x;
+                var newY = y + camera.position.y;
+                var newZ = z + camera.position.z;
+                camera.position.set(newX, newY, newZ);
+            };
+
             this.getHelpers = function() {
                 return helpers;
             }

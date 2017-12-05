@@ -17,6 +17,7 @@ public class SimpleChatMessageDTO {
 
 	private PaintDto[] paint;
 	private DeviceOrientationDto orientation;
+	private DeviceAccelerationDTO acceleration;
 	private VoxelDto voxel;
 	private VoxelDto endPoint;
 	private GroupDto group;
@@ -107,6 +108,14 @@ public class SimpleChatMessageDTO {
 
 	public void setOrientation(DeviceOrientationDto orient) {
 		this.orientation = orient;
+	}
+
+	public DeviceAccelerationDTO getAcceleration() {
+		return acceleration;
+	}
+
+	public void setAcceleration(DeviceAccelerationDTO acceleration) {
+		this.acceleration = acceleration;
 	}
 
 	public VoxelDto getVoxel() {

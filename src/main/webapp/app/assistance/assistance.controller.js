@@ -23,6 +23,7 @@
             AnnotationToolService.initAnnotationTools(toolRequest);
             if (vm.isinitiator) {
                 window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
+                window.addEventListener('devicemotion', onDeviceMotionChangeEvent, false);
                 tools = AnnotationToolService.getAnnotationTools();
                 scene = ThreejsSceneService.getScene();
             } else {
@@ -68,6 +69,7 @@
             $rootScope.$broadcast('reset-3d');
             if (vm.isinitiator) {
                 window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
+                window.removeEventListener('devicemotion', onDeviceMotionChangeEvent, false);
             }
         });
         $scope.$on('rtc-hung-up', function() {
@@ -77,7 +79,11 @@
         function handleContent(message) {
             if (message.goal == '3d') {
                 if (message.content == 'camera') {
-                    setCamera(message.orientation);
+                    if (message.type == 'orientation') {
+                        setCamera(message.orientation);
+                    } else if (message.type == 'position') {
+                        setCameraPosition(message.acceleration)
+                    }
                 } else {
                     handleMessageWith3dGoal(message);
                 }
@@ -100,6 +106,10 @@
             $rootScope.$broadcast('check-resize');
         }
 
+        function setCameraPosition(acceleration) {
+            $rootScope.$broadcast('update-camera-position', acceleration);
+        }
+
         function notifyRtc(message) {
             $rootScope.$broadcast('rtc-message', message);
         }
@@ -113,6 +123,26 @@
 
         function nofityTaskClick() {
             $rootScope.$broadcast('show-task-text');
+        }
+
+        function onDeviceMotionChangeEvent(event) {
+            var acceleration = event.acceleration;
+            setCameraPosition(acceleration);
+            sendCameraPositionUpdate(acceleration);
+        }
+
+        function sendCameraPositionUpdate(acceleration) {
+            var message = {
+                goal: '3d',
+                content: 'camera',
+                type: 'position',
+                acceleration: {
+                    x: acceleration.x,
+                    y: acceleration.y,
+                    z: acceleration.z
+                }
+            };
+            sendMessage(message);
         }
 
         //handle orientation and resize
@@ -133,6 +163,7 @@
             var message = {
                 goal: '3d',
                 content: 'camera',
+                type: 'orientation',
                 orientation: newOrientation
             };
             sendMessage(message);
@@ -209,6 +240,8 @@
             this.objects = [];
             this.sprites = [];
         }
+
+
         init();
     }
 })();

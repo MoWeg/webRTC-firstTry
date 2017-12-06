@@ -23,7 +23,7 @@
             AnnotationToolService.initAnnotationTools(toolRequest);
             if (vm.isinitiator) {
                 window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
-                window.addEventListener('devicemotion', onDeviceMotionChangeEvent, false);
+                // window.addEventListener('devicemotion', onDeviceMotionChangeEvent, false);
                 tools = AnnotationToolService.getAnnotationTools();
                 scene = ThreejsSceneService.getScene();
             } else {
@@ -69,7 +69,7 @@
             $rootScope.$broadcast('reset-3d');
             if (vm.isinitiator) {
                 window.removeEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
-                window.removeEventListener('devicemotion', onDeviceMotionChangeEvent, false);
+                // window.removeEventListener('devicemotion', onDeviceMotionChangeEvent, false);
             }
         });
         $scope.$on('rtc-hung-up', function() {

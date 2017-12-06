@@ -126,23 +126,28 @@
         }
 
         function onDeviceMotionChangeEvent(event) {
-            var acceleration = event.acceleration;
+            var acceleration = getAccelerationInfo(event);
             setCameraPosition(acceleration);
             sendCameraPositionUpdate(acceleration);
         }
 
-        function sendCameraPositionUpdate(acceleration) {
+        function sendCameraPositionUpdate(accelerationEvent) {
             var message = {
                 goal: '3d',
                 content: 'camera',
                 type: 'position',
-                acceleration: {
-                    x: acceleration.x,
-                    y: acceleration.y,
-                    z: acceleration.z
-                }
+                acceleration: accelerationEvent
             };
             sendMessage(message);
+        }
+
+        function getAccelerationInfo(deviceEvent) {
+            return {
+                'x': deviceEvent.acceleration.x,
+                'y': deviceEvent.acceleration.y,
+                'z': deviceEvent.acceleration.z,
+                'interval': deviceEvent.interval
+            }
         }
 
         //handle orientation and resize

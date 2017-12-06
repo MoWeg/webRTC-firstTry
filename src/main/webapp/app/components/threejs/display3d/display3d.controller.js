@@ -92,11 +92,12 @@
 
         function setCameraPosition(acceleration) {
             if (acceleration) {
-                var positionUpdate = OrientationCalculator.calculateDistanceWithOrientation(event, 1000);
+                var positionUpdate = OrientationCalculator.calculateDistanceWithOrientation(acceleration, 500);
                 if (positionUpdate.right != 0 || positionUpdate.up != 0 || positionUpdate.forward != 0) {
                     view.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
                     if (expertView) {
                         if (expertInSync) {
+                            //expertView.setCameraPosition(positionUpdate.up, positionUpdate.forward, positionUpdate.right);
                             expertView.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
                         }
                     }

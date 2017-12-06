@@ -106,8 +106,8 @@
             return distance;
         }
 
-        function calcDist(newEvent, factor) {
-            intervalInSeconds = newEvent.interval * 0.001;
+        function calcDist(deviceAcceleration, factor) {
+            intervalInSeconds = deviceAcceleration.interval * 0.001;
             factorUnitsPerMeter = factor;
             var result = {
                 right: 0,
@@ -116,11 +116,11 @@
             }
 
             if (needsCalibration) {
-                setThreshold(newEvent);
+                setThreshold(deviceAcceleration);
             } else {
-                result.right = calcuteEverythingForDimension(newEvent, 'x');
-                result.up = calcuteEverythingForDimension(newEvent, 'y');
-                result.forward = calcuteEverythingForDimension(newEvent, 'z');
+                result.right = calcuteEverythingForDimension(deviceAcceleration, 'x');
+                result.up = calcuteEverythingForDimension(deviceAcceleration, 'y');
+                result.forward = calcuteEverythingForDimension(deviceAcceleration, 'z');
             }
 
             return result;
@@ -163,7 +163,7 @@
         }
 
         function setThreshold(deviceAcceleration) {
-            var requiredSampleSize = calibrationTimeInMillis / deviceEvent.interval;
+            var requiredSampleSize = calibrationTimeInMillis / deviceAcceleration.interval;
             setThresholdForDimension(deviceAcceleration, 'x');
             setThresholdForDimension(deviceAcceleration, 'y');
             setThresholdForDimension(deviceAcceleration, 'z');
@@ -174,7 +174,7 @@
                     var sum = value.sum;
                     value.average = sum / actualSampleSize;
                 });
-                console.log(sampledThreshold);
+                //console.log(sampledThreshold);
             }
         }
 

@@ -122,16 +122,23 @@
         }
 
         function moveCamLeftOrRight(positive) {
+            if (vm.isInSync == true) {
+                syncWithUser();
+            }
             var direction = 200;
             if (!positive) {
                 direction = -200;
             }
             var oldPos = view2Cam.position.x;
             view2Cam.position.x = oldPos + direction;
+            view2Cam.lookAt(scene.position);
             animate();
         }
 
         function moveCamUpOrDown(positive) {
+            if (vm.isInSync == true) {
+                syncWithUser();
+            }
             var direction = -200;
             if (!positive) {
                 direction = 200;
@@ -143,6 +150,7 @@
                 var oldPos = view2Cam.position.z;
                 view2Cam.position.z = oldPos + direction;
             }
+            view2Cam.lookAt(scene.position);
             animate();
         }
 

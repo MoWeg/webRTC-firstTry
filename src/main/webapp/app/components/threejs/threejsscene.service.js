@@ -54,13 +54,13 @@
         function getExpertCamera() {
             var w = 640,
                 h = 640;
-            return getCamera(w, h, 1, 30000, 500, 800, 1300);
+            return getCamera(w, h, 1, 30000, 0, 800, 1300);
         }
 
         function getUserCamera() {
             var w = 400,
                 h = 640;
-            return getCamera(w, h, 1, 10000, 500, 800, 1300);
+            return getCamera(w, h, 1, 10000, 0, 800, 1300);
         }
 
         function getScene() {

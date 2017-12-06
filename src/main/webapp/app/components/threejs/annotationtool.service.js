@@ -49,7 +49,11 @@
 
         function BoxManager() {
             var cubeGeo = new THREE.BoxGeometry(50, 50, 50);
-            var cubeMaterial;
+            var cubeMaterial = new THREE.MeshBasicMaterial({
+                color: 0x0000ff,
+                opacity: 0.5,
+                transparent: true
+            });
 
             this.action = function(intersect, scene, activeGroup) {
                 var voxel = simpleInsert(intersect.point, scene, activeGroup);

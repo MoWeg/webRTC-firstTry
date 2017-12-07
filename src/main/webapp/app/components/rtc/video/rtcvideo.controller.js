@@ -24,11 +24,12 @@
         var oldVideoWidth = 0;
 
         function init() {
-            if (isInitiator) {
-                UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
-            } else {
-
-            }
+            // if (isInitiator) {
+            //     UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
+            // } else {
+            //
+            // }
+            UserMediaService.getMediaAsPromise(true, isInitiator).then(handleUserMedia).catch(handleUserMediaError);
         }
         init();
 
@@ -157,8 +158,11 @@
         }
 
         function handleUserMedia(stream) {
-            video.src = window.URL.createObjectURL(stream);
             localStream = stream;
+            if (isInitiator) {
+                video.src = window.URL.createObjectURL(stream);
+                video.muted = true;
+            }
             if (!isStarted && typeof localStream != 'undefined') {
                 createPeerConnection();
                 pc.addStream(localStream);
@@ -205,7 +209,14 @@
         }
 
         function handleRemoteStreamAdded(event) {
-            video.src = window.URL.createObjectURL(event.stream);
+            console.warn(event);
+            var audio = document.querySelector("#rtcaudio");
+            if (isInitiator) {
+                audio.src = window.URL.createObjectURL(event.stream);
+            } else {
+                audio.remove();
+                video.src = window.URL.createObjectURL(event.stream);
+            }
         }
 
         function handleRemoteStreamRemoved(event) {
@@ -299,8 +310,8 @@
             if (isInitiator) {
                 video.pause();
                 video.src = "";
-                UserMediaService.closeAllStreams(localStream);
             }
+            UserMediaService.closeAllStreams(localStream);
         }
 
         function preferOpus(sdp) {

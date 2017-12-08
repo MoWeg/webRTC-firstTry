@@ -10,6 +10,8 @@ import de.mwg.web.service.dto.AnnotationAsPictureUploadDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -32,6 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +50,11 @@ public class AnnotationAsPictureResource {
     private final Logger log = LoggerFactory.getLogger(AnnotationAsPictureResource.class);
 
     private static final String ENTITY_NAME = "annotationAsPicture";
-    private static final String UPLOAD_FOLDER = "src\\main\\webapp\\content\\images\\annotations";
-
+    private static final String UPLOAD_FOLDER_POSTFIX = File.separator +"content"+ File.separator +"images"+ File.separator +"annotations";
+    
+    @Autowired
+    private Environment environment;
+    
     private final AnnotationAsPictureService annotationAsPictureService;
 
     public AnnotationAsPictureResource(AnnotationAsPictureService annotationAsPictureService) {
@@ -97,27 +104,28 @@ public class AnnotationAsPictureResource {
     	*/
     	AnnotationAsPictureDTO annotationAsPictureDTO = new AnnotationAsPictureDTO();
         try {
+        	String uploadFolder = getUploadFolder();
         	String name = file.getOriginalFilename();
         	
         	String originalFilename = file.getOriginalFilename();
         	
-        	File dir = new File(UPLOAD_FOLDER);
+        	File dir = new File(uploadFolder);
         	if(!dir.isDirectory()){
         		dir.mkdirs();
         	}
         	Date now = new Date();
         	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
         	String timeStampFolderName = dateFormat.format(now);
-        	File timeStampFolder = new File(UPLOAD_FOLDER+"\\"+timeStampFolderName);
+        	File timeStampFolder = new File(uploadFolder+File.separator+timeStampFolderName);
         	timeStampFolder.mkdir();
         	String pathToTimeStampFolder = timeStampFolder.getPath();
             byte[] bytes = file.getBytes();
-            Path path = Paths.get(pathToTimeStampFolder +"\\"+ originalFilename);
+            Path path = Paths.get(pathToTimeStampFolder +File.separator+ originalFilename);
             Files.write(path, bytes);          
             
             annotationAsPictureDTO.setFileName(originalFilename);
             annotationAsPictureDTO.setFolder(timeStampFolderName);
-            annotationAsPictureDTO.setPath(dir.getPath());
+            annotationAsPictureDTO.setPath(UPLOAD_FOLDER_POSTFIX);
             annotationAsPictureDTO.setName(name);
             annotationAsPictureDTO.setToolName("Sprite");
         } catch (IOException e) {
@@ -127,6 +135,17 @@ public class AnnotationAsPictureResource {
         return ResponseEntity.created(new URI("/api/annotation-as-pictures/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
+    }
+    
+    private String getUploadFolder(){
+    	String uploadFolder = null;
+    	List<String> profiles = Arrays.asList(environment.getActiveProfiles());
+    	if(profiles.contains("dev")){
+    		uploadFolder = "src"+ File.separator +"main"+ File.separator +"webapp" + UPLOAD_FOLDER_POSTFIX;
+    	}else{
+    		uploadFolder = File.separator +"var"+ File.separator +"lib"+ File.separator +"tomcat8"+ File.separator +"webapps"+ File.separator +"ROOT" + UPLOAD_FOLDER_POSTFIX;
+    	}
+    	return uploadFolder;
     }
 
     /**

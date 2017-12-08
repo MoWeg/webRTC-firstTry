@@ -112,6 +112,14 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
+        <!-- jhipster-needle-maven-add-dependency -->
+
+        <!--  jasypt -->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>1.16</version>
+        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -373,14 +381,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <!-- jhipster-needle-maven-add-dependency -->
-
-        <!--  jasypt -->
-        <dependency>
-          <groupId>com.github.ulisesbocchio</groupId>
-          <artifactId>jasypt-spring-boot-starter</artifactId>
-          <version>1.16</version>
         </dependency>
     </dependencies>
     <build>

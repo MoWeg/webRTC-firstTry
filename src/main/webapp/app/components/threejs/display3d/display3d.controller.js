@@ -43,7 +43,7 @@
             canvas.height = oldVideoWidth;
             var camera = ThreejsSceneService.getCamera();
             view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, camera, true, 0x000000, 0);
-            var expertStatus = !vm.isInitiator;
+            var expertStatus = !vm.isinitiator;
             view.isExpert(expertStatus);
 
             if (expertStatus) {

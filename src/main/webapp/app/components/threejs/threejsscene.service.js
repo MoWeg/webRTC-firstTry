@@ -10,6 +10,7 @@
 
     function ThreejsSceneService($q) {
         var scene, plane, raycaster;
+        var camera;
         var helperDeferred = $q.defer();
 
         var service = {
@@ -21,8 +22,6 @@
             getView: getView,
             getHelperPromise: getHelperPromise,
             removeGroupFromScene: removeGroupFromScene,
-            getExpertCamera: getExpertCamera,
-            getUserCamera: getUserCamera
         };
         return service;
 
@@ -51,16 +50,21 @@
             }
         }
 
-        function getExpertCamera() {
-            var w = 640,
-                h = 640;
-            return getCamera(w, h, 1, 30000, 0, 800, 1300);
-        }
-
-        function getUserCamera() {
-            var w = 400,
-                h = 640;
-            return getCamera(w, h, 1, 10000, 0, 800, 1300);
+        function getCamera() {
+            if (!camera) {
+                var canvasWidth = 480;
+                var canvasHeight = 640;
+                var minRenderDistance = 1;
+                var maxRenderDistance = 10000;
+                var fovDegrees = 45;
+                camera = new THREE.PerspectiveCamera(fovDegrees, canvasHeight / canvasWidth, minRenderDistance, maxRenderDistance);
+                var x = 0;
+                var y = 800;
+                var z = 1300;
+                camera.position.set(x, y, z);
+                //getCamera(w, h, 1, 10000, 0, 800, 1300);
+            }
+            return camera;
         }
 
         function getScene() {
@@ -98,15 +102,10 @@
             return raycaster;
         }
 
-        function getCamera(width, height, min, max, posX, posY, posZ) {
-            var camera = new THREE.PerspectiveCamera(45, width / height, min, max);
-            camera.position.set(posX, posY, posZ);
-            return camera;
-        }
 
-        function getView(canvas, viewWidth, viewHeight, inputCamera, alpha, clearColor, intesity, additionalCamera) {
+        function getView(canvas, viewWidth, viewHeight, inputCamera, alpha, clearColor, intesity) {
             var renderer = getRenderer(alpha, clearColor, intesity, viewWidth, viewHeight);
-            var view = new View(viewWidth, viewHeight, inputCamera, renderer, additionalCamera);
+            var view = new View(viewWidth, viewHeight, inputCamera, renderer);
             canvas.appendChild(view.renderer.domElement);
             return view;
         }
@@ -133,9 +132,11 @@
                 helpers = args;
             });
 
-            this.addSecondaryCam = function(additionalCamera) {
-                addHelpers(scene, additionalCamera);
-                seesHelper = true;
+            this.isExpert = function(expertStatus) {
+                if (expertStatus) {
+                    addHelpers(scene);
+                    seesHelper = true;
+                }
             }
 
             this.render = function(groups) {
@@ -208,7 +209,7 @@
 
         }
 
-        function addHelpers(scene, additionalCamera) {
+        function addHelpers(scene) {
             var helpers = [];
 
             var rollOverGeo = new THREE.BoxGeometry(50, 50, 50);
@@ -229,13 +230,6 @@
             helpers.push({
                 name: 'grid',
                 object: gridHelper
-            });
-
-            var camHelper = new THREE.CameraHelper(additionalCamera);
-            scene.add(camHelper);
-            helpers.push({
-                name: 'cam',
-                object: camHelper
             });
 
             helperDeferred.resolve(helpers);

@@ -23,7 +23,7 @@ spring:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:mysql://localhost:3306/simple_webrtc_server?useUnicode=true&characterEncoding=utf8&useSSL=false
         username: root
-        password: ENC($2b$10$YOeji6XxSy.BPtWeN9yzEuPQQLk4wE7.nxiZuEh9f1uqf5Vmy7C2.)
+        password: xjDdCPTIaIX5KRt29pPL
         hikari:
             data-source-properties:
                 cachePrepStmts: true

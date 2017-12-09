@@ -15,7 +15,7 @@
         var rollOverMesh;
         var gridHelper;
 
-        var view2Cam = $scope.expertcam;
+        var view2Cam = ThreejsSceneService.getCamera();
         var mouse;
         var newPosY;
 
@@ -77,26 +77,69 @@
 
         function calculate(event) {
             // var divisorY = $(".well")[0].childNodes[0].clientHeight + 640;
-            var divisorY = window.innerHeight;
-            var actualPlusY = 0.65;
+            // var divisorY = $("#userCanvas")[0].childNodes[0].clientHeight;
+            // // var divisorY = window.innerHeight;
+            // // var actualPlusY = 0.65;
+            // var actualPlusY = 0.85;
+            // // var y = -(event.clientY / divisorY) * 2 + 1;
+            // // var divisorY = $(".well")[0].childNodes[0].clientHeight;
+            // // var basePlusY = 1;
+            // // var diffY = divisorY - event.clientY;
+            // // var diffYCent = diffY / 100;
+            // // var dynamicPlusY = diffYCent * 0.4;
+            // // var actualPlusY = basePlusY + dynamicPlusY;
+            // var y = -(event.clientY / divisorY) * 2 + actualPlusY;
+            // //
+            // //
+            // // var divisorX = $(".well")[0].childNodes[0].clientWidth;
+            // var divisorX = $("#userCanvas")[0].childNodes[0].clientWidth;
+            // var baseMinusX = 2;
+            // var diffX = event.clientX - divisorX;
+            // var diffXCent = diffX / 100;
+            // // var dynamicMinusX = diffXCent * 0.85;
+            // var dynamicMinusX = diffXCent;
+            // var actualMinusX = baseMinusX - dynamicMinusX;
+            // var x = (event.clientX / divisorX) * 2 - actualMinusX;
+
+            //
+            // var x = (event.clientX / window.innerWidth) * 2 - 1; divisorY
+            // var y = -(event.clientY / window.innerHeight) * 2 + 1;
+            // var divisorY = $("#userCanvas")[0].childNodes[0].clientHeight;
+            // var divisorX = $("#userCanvas")[0].childNodes[0].clientWidth;
+            // var x = (event.clientX / divisorX) * 2 - 1;
             // var y = -(event.clientY / divisorY) * 2 + 1;
-            // var divisorY = $(".well")[0].childNodes[0].clientHeight;
-            // var basePlusY = 1;
-            // var diffY = divisorY - event.clientY;
-            // var diffYCent = diffY / 100;
-            // var dynamicPlusY = diffYCent * 0.4;
-            // var actualPlusY = basePlusY + dynamicPlusY;
-            var y = -(event.clientY / divisorY) * 2 + actualPlusY;
+
+            var canvasWidth = $("#userCanvas")[0].childNodes[0].clientWidth;
+            var canvasHeigth = $("#userCanvas")[0].childNodes[0].clientHeight;
+            // console.warn({
+            //     x: event.clientX / divisorX - 0.85, // 0 is left
+            //     y: event.clientY / divisorY - 0.15 // 0 is top
+            // });
+            // var offsetY = (canvasHeigth / canvasWidth) / 2;
+            // var offsetX = (canvasWidth / canvasHeigth) / 2;
+            if (canvasHeigth > canvasWidth) {
+                // var offsetX = ((canvasHeigth / canvasWidth) / 2) + 0.75;
+                // var offsetY = ((canvasWidth / canvasHeigth) / 2) + 0.25;
+                var offsetX = (canvasHeigth / canvasWidth);
+                var offsetY = (canvasWidth / canvasHeigth) - 0.1;
+            } else {
+                //  var offset = (canvasHeigth / canvasWidth) / 2;
+                // var offsetX = ((canvasWidth / canvasHeigth) / 2) + 0.50;
+                // var offsetY = ((canvasHeigth / canvasWidth) / 2) + 0.25;
+                var offsetX = (canvasWidth / canvasHeigth) - 0.2;
+                var offsetY = (canvasHeigth / canvasWidth);
+            }
+            //
+            // var offsetX = offset;
+            // var offsetY = offset;
+            // console.warn({
+            //     x: (event.clientX / canvasWidth - offsetX), // 0 is left
+            //     y: -(event.clientY / canvasHeigth - offsetY) // 0 is top
+            // });
 
 
-            var divisorX = $(".well")[0].childNodes[0].clientWidth;
-            var baseMinusX = 2;
-            var diffX = event.clientX - divisorX;
-            var diffXCent = diffX / 100;
-            var dynamicMinusX = diffXCent * 0.85;
-            var actualMinusX = baseMinusX - dynamicMinusX;
-            var x = (event.clientX / divisorX) * 2 - actualMinusX;
-
+            var x = (event.clientX / canvasWidth - offsetX) * 2;
+            var y = -(event.clientY / canvasHeigth - offsetY) * 2;
             return {
                 x: x,
                 y: y

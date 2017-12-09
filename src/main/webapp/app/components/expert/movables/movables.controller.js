@@ -5,31 +5,22 @@
         .module('simpleWebrtcServerApp')
         .controller('ExpertMovablesController', ExpertMovablesController);
 
-    ExpertMovablesController.$inject = ['$scope', '$rootScope', 'AnnotationToolService', 'ThreejsSceneService'];
+    ExpertMovablesController.$inject = ['$scope', '$rootScope', 'ThreejsSceneService'];
 
-    function ExpertMovablesController($scope, $rootScope, AnnotationToolService, ThreejsSceneService) {
+    function ExpertMovablesController($scope, $rootScope, ThreejsSceneService) {
         var vm = this;
         var gridHelper;
         var scene = ThreejsSceneService.getScene(); // $s
-        var view2Cam = $scope.expertcam;
         var newPosY;
-        vm.isInSync = true;
 
         var movableGrid = {
             name: 'grid',
             leftOrRight: moveGridLeftOrRight,
             upOrDown: moveGridUpOrDown
         }
-        var movableCam = {
-            name: 'camera',
-            leftOrRight: moveCamLeftOrRight,
-            upOrDown: moveCamUpOrDown
-        }
         var tabPressed = false;
-        vm.movables = [movableGrid, movableCam];
+        vm.movables = [movableGrid];
         vm.activeMovable = movableGrid;
-        vm.syncWithUser = syncWithUser;
-        vm.lookAtScene = lookAtScene;
 
         ThreejsSceneService.getHelperPromise().then(function(helpers) {
             angular.forEach(helpers, function(value, key) {
@@ -119,53 +110,6 @@
             var oldPos = gridHelper.position.x;
             gridHelper.position.x = oldPos + direction;
             animate();
-        }
-
-        function moveCamLeftOrRight(positive) {
-            if (vm.isInSync == true) {
-                syncWithUser();
-            }
-            var direction = 200;
-            if (!positive) {
-                direction = -200;
-            }
-            var oldPos = view2Cam.position.x;
-            view2Cam.position.x = oldPos + direction;
-            view2Cam.lookAt(scene.position);
-            animate();
-        }
-
-        function moveCamUpOrDown(positive) {
-            if (vm.isInSync == true) {
-                syncWithUser();
-            }
-            var direction = -200;
-            if (!positive) {
-                direction = 200;
-            }
-            if (tabPressed) {
-                var oldPos = view2Cam.position.y;
-                view2Cam.position.y = oldPos + direction;
-            } else {
-                var oldPos = view2Cam.position.z;
-                view2Cam.position.z = oldPos + direction;
-            }
-            view2Cam.lookAt(scene.position);
-            animate();
-        }
-
-        function syncWithUser() {
-            vm.isInSync = !vm.isInSync;
-            $rootScope.$broadcast('camera-sync-change', vm.isInSync);
-        }
-
-        function lookAtScene() {
-            view2Cam.lookAt(scene.position);
-            animate();
-        }
-
-        function animate() {
-            $rootScope.$broadcast('request-animation');
         }
 
         function posYchanged() {

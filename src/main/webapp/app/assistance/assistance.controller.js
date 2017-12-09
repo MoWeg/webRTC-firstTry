@@ -9,8 +9,6 @@
 
     function AssistanceController($rootScope, $scope, $state, $stateParams, JhiTrackerService, SdpService, OrientationCalculator, ThreejsSceneService, AnnotationToolService) {
         var vm = this;
-        vm.expertCam;
-        vm.userCam;
         vm.isinitiator = $stateParams.isInitiator;
         var tools;
         var lastGroup;
@@ -26,10 +24,7 @@
                 // window.addEventListener('devicemotion', onDeviceMotionChangeEvent, false);
                 tools = AnnotationToolService.getAnnotationTools();
                 scene = ThreejsSceneService.getScene();
-            } else {
-                vm.expertCam = ThreejsSceneService.getExpertCamera();
             }
-            vm.userCam = ThreejsSceneService.getUserCamera();
         }
 
         function createToolRequestFor(scenario) {

@@ -8,9 +8,6 @@
     function ExpertMovables() {
         var directive = {
             restrict: 'E',
-            scope: {
-                expertcam: '='
-            },
             templateUrl: 'app/components/expert/movables/movables.html',
             controllerAs: 'vm',
             controller: 'ExpertMovablesController'

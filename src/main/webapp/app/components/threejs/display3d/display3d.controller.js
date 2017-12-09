@@ -9,56 +9,22 @@
 
     function Display3DController($rootScope, $scope, $element, ThreejsSceneService, OrientationCalculator) {
         var vm = this;
-        var userCam = $scope.usercam;
-        var expertCam = $scope.expertcam;
         vm.isinitiator = $scope.isinitiator;
         var oldVideoHeight = 640;
-        var oldVideoWidth = 400;
+        var oldVideoWidth = 480;
         var rootWidth = $(".well")[0].childNodes[0].clientWidth;
         var view;
-        var expertView;
         var groups;
         var canvas;
-        var expertCanvas;
-        var expertInSync = true;
-        var lastOrientationInfo;
 
-        function checkIsInit() {
-            if (hasExpertCam == true) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        vm.onMouseMove = function(event) {
-            $rootScope.$broadcast('mouse-move', event);
-        }
-        vm.onMouseDown = function(event) {
-            $rootScope.$broadcast('mouse-down', event);
-        }
         $scope.$on('request-animation', function(event, args) {
             if (args) {
                 groups = args;
             }
             animate();
         });
-        $scope.$on('camera-sync-change', function(event, args) {
-            if (args) {
-                if (args != expertInSync) {
-                    expertCam.position.copy(userCam.position);
-                    if (lastOrientationInfo) {
-                        expertView.setOrientationInfo(lastOrientationInfo);
-                    }
-                }
-            }
-            expertInSync = args;
-        });
         $scope.$on('set-camera-and-resize', function(event, args) {
             setCamera(args.deviceEvent);
-        });
-        $scope.$on('update-camera-position', function(event, args) {
-            setCameraPosition(args);
         });
         $scope.$on('just-resize', function(event, args) {
             resize3dModell(args);
@@ -66,55 +32,39 @@
         $scope.$on('reset-3d', function(event, message) {
             ThreejsSceneService.resetScene();
         });
+        $scope.$on('$destroy', function(event, message) {
+            canvas.removeEventListener("mousedown", onMouseDown, false);
+            canvas.removeEventListener("mousemove", onMouseMove, false);
+        });
 
         function init3D() {
             canvas = document.querySelector("#userCanvas");
-
             canvas.width = oldVideoHeight;
             canvas.height = oldVideoWidth;
+            var camera = ThreejsSceneService.getCamera();
+            view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, camera, true, 0x000000, 0);
+            var expertStatus = !vm.isInitiator;
+            view.isExpert(expertStatus);
 
-            view = ThreejsSceneService.getView(canvas, oldVideoWidth, oldVideoHeight, userCam, true, 0x000000, 0);
-
-            expertCanvas = document.querySelector("#expertCanvas");
-            if (!vm.isinitiator) {
-                var w = 640;
-                var h = 640;
-                expertCanvas.width = h;
-                expertCanvas.height = w;
-
-                expertView = ThreejsSceneService.getView(expertCanvas, w, h, expertCam, false, 0xffffff, 1);
-                expertView.addSecondaryCam(userCam);
-            } else {
-                expertCanvas.remove();
+            if (expertStatus) {
+                canvas.addEventListener("mousedown", onMouseDown, false);
+                canvas.addEventListener("mousemove", onMouseMove, false);
             }
             animate();
         }
 
-        function setCameraPosition(acceleration) {
-            if (acceleration) {
-                var positionUpdate = OrientationCalculator.calculateDistanceWithOrientation(acceleration, 500);
-                if (positionUpdate.right != 0 || positionUpdate.up != 0 || positionUpdate.forward != 0) {
-                    view.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
-                    if (expertView) {
-                        if (expertInSync) {
-                            //expertView.setCameraPosition(positionUpdate.up, positionUpdate.forward, positionUpdate.right);
-                            expertView.setCameraPosition(positionUpdate.right, positionUpdate.up, positionUpdate.forward);
-                        }
-                    }
-                }
-            }
+        function onMouseDown(event) {
+            $rootScope.$broadcast('mouse-down', event);
+        }
+
+        function onMouseMove(event) {
+            $rootScope.$broadcast('mouse-move', event);
         }
 
         function setCamera(deviceEvent) {
             if (deviceEvent) {
                 var orientationInfo = OrientationCalculator.calculateOrientation(deviceEvent, null);
                 view.setOrientationInfo(orientationInfo);
-                if (expertView) {
-                    if (expertInSync) {
-                        expertView.setOrientationInfo(orientationInfo);
-                    }
-                }
-                lastOrientationInfo = orientationInfo;
             }
             animate();
         }
@@ -125,9 +75,6 @@
 
         function renderViews() {
             view.render(groups);
-            if (expertView) {
-                expertView.render(groups);
-            }
         }
 
         function resize3dModell(size) {
@@ -139,15 +86,9 @@
             if (width != null && width != oldVideoWidth) {
                 oldVideoWidth = width;
             }
-            var expertWidth = rootWidth - oldVideoWidth;
-            var expertHeight = 640;
-            if (expertView) {
-                expertView.setNewSize(expertWidth, 640);
-            }
             view.setNewSize(oldVideoWidth, oldVideoHeight);
             animate();
         }
-
 
         init3D();
     }

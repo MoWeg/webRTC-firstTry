@@ -20,15 +20,11 @@
         var storedOffer, storedAnswer;
 
         var canResize = false;
+        var firstResize = true;
         var oldVideoHeight = 0;
         var oldVideoWidth = 0;
 
         function init() {
-            // if (isInitiator) {
-            //     UserMediaService.getBackCameraAsPromise().then(handleUserMedia).catch(handleUserMediaError);
-            // } else {
-            //
-            // }
             UserMediaService.getMediaAsPromise(true, isInitiator).then(handleUserMedia).catch(handleUserMediaError);
         }
         init();
@@ -77,26 +73,26 @@
         }
 
         function checkResize() {
-            if (canResize) {
+            if (canResize && firstResize) {
+                firstResize = false;
                 var height = video.videoHeight;
                 var width = video.videoWidth;
-                if (height != oldVideoHeight || width != oldVideoWidth) {
-                    if (!height) {
-                        height = oldVideoHeight;
-                    }
-                    if (!width) {
-                        width = oldVideoWidth;
-                    }
-                    if (height != 0 || width != 0) {
-                        oldVideoHeight = height;
-                        oldVideoWidth = width;
-                        var size = {
-                            height: height,
-                            width: width
-                        };
-                        resize3dModell(size);
-                    }
+                if (height > width) {
+                    video.style.height = '640px';
+                    video.style.width = '480px';
+                    height = 640;
+                    width = 480;
+                } else {
+                    video.style.height = '480px';
+                    video.style.width = '640px';
+                    height = 480;
+                    width = 640;
                 }
+                var size = {
+                    height: height,
+                    width: width
+                };
+                resize3dModell(size);
             }
         }
 
@@ -209,7 +205,6 @@
         }
 
         function handleRemoteStreamAdded(event) {
-            console.warn(event);
             var audio = document.querySelector("#rtcaudio");
             if (isInitiator) {
                 audio.src = window.URL.createObjectURL(event.stream);

@@ -1,9 +1,6 @@
 <div class="inherit-z">
     <div class="flex-container inherit-z color-light">
         <span class="glyphicon glyphicon-move inherit-z" style="margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px;"></span>
-        <button class="btn btn-sm inherit-z" ng-click="vm.syncWithUser()" ng-class="vm.isInSync? 'btn-success' : btn-default" style="margin-left:20px">
-          <span class="glyphicon glyphicon-link"></span>
-        </button>
         <select class="form-control" ng-model="vm.activeMovable" ng-options="movable.name for movable in vm.movables">
           </select>
     </div>

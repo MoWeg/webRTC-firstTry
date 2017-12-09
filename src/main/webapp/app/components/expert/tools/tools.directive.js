@@ -9,9 +9,6 @@
         var directive = {
             restrict: 'E',
             templateUrl: 'app/components/expert/tools/tools.html',
-            scope: {
-                expertcam: '='
-            },
             controllerAs: 'vm',
             controller: 'ExpertToolsController'
         };

@@ -18,8 +18,7 @@
             leftOrRight: moveGridLeftOrRight,
             upOrDown: moveGridUpOrDown
         }
-        var tabPressed = false;
-        vm.movables = [movableGrid];
+        vm.tabPressed = false;
         vm.activeMovable = movableGrid;
 
         ThreejsSceneService.getHelperPromise().then(function(helpers) {
@@ -31,28 +30,20 @@
         });
 
         $scope.$on('$destroy', function() {
-            document.removeEventListener('keyup', onDocumentKeyUp, false);
             document.removeEventListener('keydown', onDocumentKeyDown, false);
         });
 
         function init() {
             newPosY = 0;
             document.addEventListener('keydown', onDocumentKeyDown, false);
-            document.addEventListener('keyup', onDocumentKeyUp, false);
         }
 
         function onDocumentKeyDown(event) {
             switch (event.keyCode) {
                 case 9:
                     event.preventDefault();
-                    tabPressed = !tabPressed;
-                    break;
-                case 16:
-                    isShiftDown = true;
-                    break;
-                case 27:
-                    event.preventDefault();
-                    // resetCamera();
+                    vm.tabPressed = !vm.tabPressed;
+                    $scope.$apply();
                     break;
                 case 65:
                 case 37:
@@ -77,20 +68,12 @@
             }
         }
 
-        function onDocumentKeyUp(event) {
-            switch (event.keyCode) {
-                case 16:
-                    isShiftDown = false;
-                    break;
-            }
-        }
-
         function moveGridUpOrDown(positive) {
             var direction = 50;
             if (!positive) {
                 direction = -50;
             }
-            if (tabPressed) {
+            if (vm.tabPressed) {
                 var oldPos = gridHelper.position.z;
                 gridHelper.position.z = oldPos + direction;
             } else {
@@ -115,6 +98,11 @@
         function posYchanged() {
             $rootScope.$broadcast('cursor-y-changed', newPosY);
         }
+
+        function animate() {
+            $rootScope.$broadcast('request-animation');
+        }
+
         init();
     }
 })();

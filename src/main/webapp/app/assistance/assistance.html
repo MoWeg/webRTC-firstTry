@@ -2,7 +2,7 @@
     <div id="relevantForFullScreen" class="is-relative big-div">
         <showtask ng-if="vm.isinitiator" scenarioid="vm.scenarioid" isagent="vm.isinitiator" class="my-task is-absolut big-div"></showtask>
         <expertmovables ng-if="!vm.isinitiator" class="my-movable right big-div"></expertmovables>
-        <experttools ng-if="!vm.isinitiator" class="my-tool right big-div"></experttools>
+        <experttools ng-if="!vm.isinitiator" class="my-tool right is-absolut big-div"></experttools>
         <fullscreenbutton ng-if="vm.isinitiator" class="my-fullscreen is-absolut right big-div"></fullscreenbutton>
         <display3d isinitiator="vm.isinitiator" class="my-drawing-canvas left is-absolut big-div"></display3d>
         <rtcvideo isinitiator="vm.isinitiator" class="my-video left big-div"></rtcvideo>

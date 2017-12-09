@@ -1,7 +1,20 @@
-<div class="inherit-z">
-    <div class="flex-container inherit-z color-light">
-        <span class="glyphicon glyphicon-move inherit-z" style="margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px;"></span>
-        <select class="form-control" ng-model="vm.activeMovable" ng-options="movable.name for movable in vm.movables">
-          </select>
+<div class="inherit-z big-div color-light" style="margin-left:10px; margin-right:10px; margin-top:10px; margin-bottom:10px;">
+    <div class="flex-container inherit-z" style="background-color: #e5e5e5; width:inherit">
+        <span class="glyphicon glyphicon-move inherit-z" style="margin-right:10px; align-self:center"></span>
+        <h4>Move Grid with Keyboard</h4>
+    </div>
+    <div class="flex-container inherit-z">
+        <p style="margin-right:10px">Left/Right or A/D</p>
+        <p><b>Left/Right</b></p>
+    </div>
+    <div class="flex-container inherit-z">
+        <p style="margin-right:10px">Up/Down or W/S</p>
+        <!-- <span ng-bind="vm.upDownLabel"></span> -->
+        <p ng-show="vm.tabPressed"><b>Forward/Backward</b></p>
+        <p ng-show="!vm.tabPressed"><b>Up/Down</b></p>
+    </div>
+    <div class="flex-container inherit-z">
+        <p style="margin-right:10px">Tab</p>
+        <p><b>Change mode for Up/Down or W/S</b></p>
     </div>
 </div>
